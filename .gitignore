@@ -1,0 +1,16 @@
+# Configuration
+wp-config.php
+
+# Uploads
+/wp-content/uploads
+
+# Log files
+*.log
+
+# htaccess
+/.htaccess
+
+.htaccess
+
+.DS_Store
+*/.DS_Store
