@@ -1,0 +1,500 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Mapplic 5.0.1\n"
+"POT-Creation-Date: 2019-02-27 20:30+0200\n"
+"PO-Revision-Date: 2019-02-27 20:34+0200\n"
+"Last-Translator: \n"
+"Language-Team: sekler\n"
+"Language: hu_HU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2.1\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: admin/admin.php:56
+msgid "Add"
+msgstr "Hozzáad"
+
+#: admin/admin.php:57 admin/metaboxes.php:67 admin/metaboxes.php:238
+#: admin/metaboxes.php:308
+msgid "Save"
+msgstr "Mentés"
+
+#: admin/admin.php:58 admin/metaboxes.php:397 mapplic.php:54
+msgid "Search"
+msgstr "Keresés"
+
+#: admin/admin.php:59 mapplic.php:55
+msgid "Nothing found. Please try a different search."
+msgstr "Nincs találat. Kérlek próbálkozz más kulcsszavakkal."
+
+#: admin/admin.php:60 admin/admin.php:77 admin/metaboxes.php:176
+#: admin/metaboxes.php:214
+msgid "Map"
+msgstr "Térkép"
+
+#: admin/admin.php:61 admin/admin.php:134
+msgid "Raw"
+msgstr "Nyers"
+
+#: admin/admin.php:62
+msgid "Landmark ID is required and must be unique!"
+msgstr "A tereptárgy ID mező kötelező és egyedinek kell lennie!"
+
+#: admin/admin.php:76
+msgid "Maps"
+msgstr "Térképek"
+
+#: admin/admin.php:78
+msgid "Add New Map"
+msgstr "Új Térkép"
+
+#: admin/admin.php:79
+msgid "New Map"
+msgstr "Új Térkép"
+
+#: admin/admin.php:80
+msgid "Edit Map"
+msgstr "Térkép Szerkesztése"
+
+#: admin/admin.php:118
+msgid "Shortcode"
+msgstr "Shortcode"
+
+#: admin/admin.php:128
+msgid "Indent"
+msgstr "Igazít"
+
+#: admin/admin.php:143
+msgid "Location"
+msgstr "Hely"
+
+#: admin/admin.php:144
+msgid "Floors"
+msgstr "Szintek"
+
+#: admin/admin.php:145 admin/metaboxes.php:101
+msgid "Groups"
+msgstr "Csoportok"
+
+#: admin/admin.php:146
+msgid "Geoposition"
+msgstr "Geopozíció"
+
+#: admin/admin.php:147
+msgid "Settings"
+msgstr "Beállítások"
+
+#: admin/maps.php:57
+msgid "World"
+msgstr "Világ"
+
+#: admin/maps.php:58
+msgid "Continents"
+msgstr "Kontinensek"
+
+#: admin/maps.php:59
+msgid "Europe"
+msgstr "Európa"
+
+#: admin/maps.php:60
+msgid "USA"
+msgstr "Egyesült Államok"
+
+#: admin/maps.php:61
+msgid "World + US"
+msgstr "Világ + EÁ"
+
+#: admin/maps.php:62
+msgid "Canada"
+msgstr "Kanada"
+
+#: admin/maps.php:63
+msgid "Australia"
+msgstr "Ausztrália"
+
+#: admin/maps.php:64
+msgid "France"
+msgstr "Franciaország"
+
+#: admin/maps.php:65
+msgid "Germany"
+msgstr "Németország"
+
+#: admin/maps.php:66
+msgid "United Kingdom"
+msgstr "Egyesült Királyság"
+
+#: admin/maps.php:67
+msgid "Italy"
+msgstr "Olaszország"
+
+#: admin/maps.php:68
+msgid "Netherlands"
+msgstr "Hollandia"
+
+#: admin/maps.php:69
+msgid "Switzerland"
+msgstr "Svájc"
+
+#: admin/maps.php:70
+msgid "Russia"
+msgstr "Oroszország"
+
+#: admin/maps.php:71
+msgid "China"
+msgstr "Kína"
+
+#: admin/maps.php:72
+msgid "Brazil"
+msgstr "Brazília"
+
+#: admin/maps.php:75
+msgid "Select Map Type"
+msgstr "Térképtípus Választása"
+
+#: admin/maps.php:76
+msgid ""
+"Create a custom map using your own file(s) or select one of the built-in "
+"maps."
+msgstr ""
+"Egyéni térkép készítése saját fájl(okk)al vagy beépített térkép használata."
+
+#: admin/maps.php:78
+msgid "Custom"
+msgstr "Egyéni"
+
+#: admin/maps.php:86
+msgid "Define Map File"
+msgstr "Térképfájl megadása"
+
+#: admin/maps.php:87
+msgid ""
+"Upload or select map file from library. SVG, JPG and PNG formats supported."
+msgstr "Tölts fel, vagy válassz térképfájlt a médatárból."
+
+#: admin/maps.php:89 admin/metaboxes.php:171 admin/metaboxes.php:205
+#: admin/metaboxes.php:259 admin/metaboxes.php:279
+msgid "Name"
+msgstr "Név"
+
+#: admin/maps.php:93
+msgid "ID (required)"
+msgstr "ID (kötelező)"
+
+#: admin/maps.php:98
+msgid "Map File (required)"
+msgstr "Térkép fájl (kötelező)"
+
+#: admin/maps.php:105
+msgid "Width (reqiured)"
+msgstr "Szélesség (kötelező)"
+
+#: admin/maps.php:109
+msgid "Height (reqiured)"
+msgstr "Magasság (kötelező)"
+
+#: admin/metaboxes.php:21
+msgid "Tooltip"
+msgstr "Szövegdoboz"
+
+#: admin/metaboxes.php:22
+msgid "Open link"
+msgstr "Link megnyitása"
+
+#: admin/metaboxes.php:23
+msgid "Open link in new tab"
+msgstr "Link megnyitása új ablakban"
+
+#: admin/metaboxes.php:24
+msgid "Lightbox"
+msgstr "Felugró ablak"
+
+#: admin/metaboxes.php:25 admin/metaboxes.php:111
+msgid "Image"
+msgstr "Kép"
+
+#: admin/metaboxes.php:26
+msgid "Reveal"
+msgstr "Felfedés"
+
+#: admin/metaboxes.php:27
+msgid "None"
+msgstr "Nincs"
+
+#: admin/metaboxes.php:28
+msgid "Disabled"
+msgstr "Kikapcsolva"
+
+#: admin/metaboxes.php:29
+msgid "Select"
+msgstr "Kiválasztás"
+
+#: admin/metaboxes.php:66 admin/metaboxes.php:190 admin/metaboxes.php:228
+#: admin/metaboxes.php:264 admin/metaboxes.php:299
+msgid "Delete"
+msgstr "Töröl"
+
+#: admin/metaboxes.php:72
+msgid "Title"
+msgstr "Cím"
+
+#: admin/metaboxes.php:73 admin/metaboxes.php:173 admin/metaboxes.php:206
+#: admin/metaboxes.php:261 admin/metaboxes.php:280
+msgid "ID (unique)"
+msgstr "ID (egyedi)"
+
+#: admin/metaboxes.php:79
+msgid "Geolocation"
+msgstr "Földrajzi hely"
+
+#: admin/metaboxes.php:84
+msgid "Color and Pin Type"
+msgstr "Szín és Jelző típus"
+
+#: admin/metaboxes.php:94
+msgid "Label"
+msgstr "Címke"
+
+#: admin/metaboxes.php:97
+msgid "Attributes"
+msgstr "Attribútumok"
+
+#: admin/metaboxes.php:98
+msgid "Link"
+msgstr "Hivatkozás"
+
+#: admin/metaboxes.php:118
+msgid "Thumbnail"
+msgstr "Miniatűr"
+
+#: admin/metaboxes.php:124
+msgid "Action"
+msgstr "Művelet"
+
+#: admin/metaboxes.php:126 admin/metaboxes.php:411 admin/metaboxes.php:424
+msgid "Default"
+msgstr "Alapértelmezett"
+
+#: admin/metaboxes.php:135
+msgid "Zoom Level"
+msgstr "Nagyítás szint"
+
+#: admin/metaboxes.php:137
+msgid "Reveal Zoom"
+msgstr "Felfedési Nagyítás"
+
+#: admin/metaboxes.php:140 admin/metaboxes.php:287
+msgid "Hide from sidebar"
+msgstr "Elrejtés az Oldalsávról"
+
+#: admin/metaboxes.php:143 admin/metaboxes.php:281
+msgid "About"
+msgstr "Összefoglaló"
+
+#: admin/metaboxes.php:145
+msgid "Duplicate"
+msgstr "Másolat"
+
+#: admin/metaboxes.php:148
+msgid "Add New"
+msgstr "Új"
+
+#: admin/metaboxes.php:166 admin/metaboxes.php:171 admin/metaboxes.php:237
+msgid "New Floor"
+msgstr "Új Szint"
+
+#: admin/metaboxes.php:183 admin/metaboxes.php:364
+msgid "Minimap"
+msgstr ""
+
+#: admin/metaboxes.php:192 admin/metaboxes.php:230 admin/metaboxes.php:266
+#: admin/metaboxes.php:301
+msgid "Cancel"
+msgstr "Mégse"
+
+#: admin/metaboxes.php:210
+msgid "Show by default"
+msgstr "Alapértelmezett"
+
+#: admin/metaboxes.php:253 admin/metaboxes.php:259 admin/metaboxes.php:307
+msgid "New Group"
+msgstr "Új Csoport"
+
+#: admin/metaboxes.php:284
+msgid "Add to legend"
+msgstr "Hozzáadás a térképkulcshoz"
+
+#: admin/metaboxes.php:290
+msgid "Enable toggle mode"
+msgstr "Ki/be kapcsolási mód"
+
+#: admin/metaboxes.php:293
+msgid "Switch off by default"
+msgstr "Kikapcsolva alapértelmezetten"
+
+#: admin/metaboxes.php:340
+msgid "Map file dimensions either not set or invalid!"
+msgstr "Hiányzó vagy érvénytelen térképfájl méretek!"
+
+#: admin/metaboxes.php:346
+msgid "Map container height"
+msgstr "Térkép ablak magasság"
+
+#: admin/metaboxes.php:351
+msgid "Map file dimensions (REQUIRED)"
+msgstr "Térképfájl méretei (KÖTELEZŐ)"
+
+#: admin/metaboxes.php:353
+msgid "File Width"
+msgstr "Térkép szélesség"
+
+#: admin/metaboxes.php:354 admin/metaboxes.php:358
+msgid "REQUIRED"
+msgstr "KÖTELEZŐ"
+
+#: admin/metaboxes.php:357
+msgid "File Height"
+msgstr "Térkép magasság"
+
+#: admin/metaboxes.php:362
+msgid "Features"
+msgstr "Funkcionalitások"
+
+#: admin/metaboxes.php:367
+msgid "Clear button"
+msgstr "Visszaállítás gomb"
+
+#: admin/metaboxes.php:370
+msgid "Zoom buttons"
+msgstr "Nagyítás gombok"
+
+#: admin/metaboxes.php:373
+msgid "Fullscreen"
+msgstr "Teljes képernyő"
+
+#: admin/metaboxes.php:376
+msgid "Hover Tooltip"
+msgstr "Lebegő Szövegdoboz"
+
+#: admin/metaboxes.php:379
+msgid "Deeplinking"
+msgstr "Mélyhivatkozások"
+
+#: admin/metaboxes.php:382
+msgid "Zoom out when closing popup"
+msgstr "Kicsinyítés felugró ablak bezárásakor"
+
+#: admin/metaboxes.php:385
+msgid "Close popup if zoomed all the way out"
+msgstr "Felugró ablak bezárása kicsinyítéskor"
+
+#: admin/metaboxes.php:389 admin/metaboxes.php:391
+msgid "Sidebar"
+msgstr "Oldalsáv"
+
+#: admin/metaboxes.php:394
+msgid "Alphabetically ordered"
+msgstr "Betűrendben rendez"
+
+#: admin/metaboxes.php:400
+msgid "Thumbnail Placeholder"
+msgstr "Miniatűrkép helykitöltő"
+
+#: admin/metaboxes.php:403
+msgid "Hide locations when no filter"
+msgstr "Helyek eltüntetése ha nincs szűrés"
+
+#: admin/metaboxes.php:407
+msgid "General Settings"
+msgstr "Általános Beállítások"
+
+#: admin/metaboxes.php:410
+msgid "Portrait breakpoint"
+msgstr "Portré töréspont"
+
+#: admin/metaboxes.php:414
+msgid "Enable zoom"
+msgstr "Nagyítás engedélyezése"
+
+#: admin/metaboxes.php:417
+msgid "Mouse wheel"
+msgstr "Egérgörgő"
+
+#: admin/metaboxes.php:420
+msgid "Always fill the container"
+msgstr "Ablak állandó kitöltése"
+
+#: admin/metaboxes.php:423
+msgid "Zoom Margin"
+msgstr "Nagyítási Szegély"
+
+#: admin/metaboxes.php:427
+msgid "Zoom Limit"
+msgstr "Nagyítási korlát"
+
+#: admin/metaboxes.php:428
+msgid "No zoom"
+msgstr "Nincs nagyítás"
+
+#: admin/metaboxes.php:430
+msgid "Default Action"
+msgstr "Alapértelmezett Művelet"
+
+#: admin/metaboxes.php:440
+msgid "Open links in new tab"
+msgstr "Link megnyitása új ablakban"
+
+#: admin/metaboxes.php:447
+msgid "CSV Support"
+msgstr "CSV Támogatás"
+
+#: admin/metaboxes.php:449
+msgid "CSV file"
+msgstr "CSV állomány"
+
+#: mapplic.php:37
+msgid "Map List"
+msgstr "Térkép Lista"
+
+#: mapplic.php:53
+msgid "More"
+msgstr "Tovább"
+
+#: mapplic.php:75
+msgid "Error: map with the specified ID doesn't exist!"
+msgstr "Hiba: nem létezik térkép a megadott ID-vel!"
+
+#~ msgid "Portrait"
+#~ msgstr "Portré mód"
+
+#~ msgid "Hide from Sidebar"
+#~ msgstr "Elrejtés az Oldalsávról"
+
+#~ msgid "Landmark"
+#~ msgstr "Tereptárgy"
+
+#~ msgid "Categories"
+#~ msgstr "Kategóriák"
+
+#~ msgid "Category"
+#~ msgstr "Kategória"
+
+#~ msgid "New Category"
+#~ msgstr "Új Kategória"
+
+#~ msgid "Expand by default"
+#~ msgstr "Nyitva"
+
+#~ msgid "Default Fill Color"
+#~ msgstr "Alapértelmezett Kitöltőszín"
+
+#~ msgid "New floor"
+#~ msgstr "Új szint"
+
+#~ msgid "New category"
+#~ msgstr "Új kategória"

@@ -1,0 +1,469 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Mapplic 5.0.1\n"
+"POT-Creation-Date: 2019-02-27 20:30+0200\n"
+"PO-Revision-Date: 2017-01-24 14:19+0200\n"
+"Last-Translator: \n"
+"Language-Team: sekler\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2.1\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: admin/admin.php:56
+msgid "Add"
+msgstr ""
+
+#: admin/admin.php:57 admin/metaboxes.php:67 admin/metaboxes.php:238
+#: admin/metaboxes.php:308
+msgid "Save"
+msgstr ""
+
+#: admin/admin.php:58 admin/metaboxes.php:397 mapplic.php:54
+msgid "Search"
+msgstr ""
+
+#: admin/admin.php:59 mapplic.php:55
+msgid "Nothing found. Please try a different search."
+msgstr ""
+
+#: admin/admin.php:60 admin/admin.php:77 admin/metaboxes.php:176
+#: admin/metaboxes.php:214
+msgid "Map"
+msgstr ""
+
+#: admin/admin.php:61 admin/admin.php:134
+msgid "Raw"
+msgstr ""
+
+#: admin/admin.php:62
+msgid "Landmark ID is required and must be unique!"
+msgstr ""
+
+#: admin/admin.php:76
+msgid "Maps"
+msgstr ""
+
+#: admin/admin.php:78
+msgid "Add New Map"
+msgstr ""
+
+#: admin/admin.php:79
+msgid "New Map"
+msgstr ""
+
+#: admin/admin.php:80
+msgid "Edit Map"
+msgstr ""
+
+#: admin/admin.php:118
+msgid "Shortcode"
+msgstr ""
+
+#: admin/admin.php:128
+msgid "Indent"
+msgstr ""
+
+#: admin/admin.php:143
+msgid "Location"
+msgstr ""
+
+#: admin/admin.php:144
+msgid "Floors"
+msgstr ""
+
+#: admin/admin.php:145 admin/metaboxes.php:101
+msgid "Groups"
+msgstr ""
+
+#: admin/admin.php:146
+msgid "Geoposition"
+msgstr ""
+
+#: admin/admin.php:147
+msgid "Settings"
+msgstr ""
+
+#: admin/maps.php:57
+msgid "World"
+msgstr ""
+
+#: admin/maps.php:58
+msgid "Continents"
+msgstr ""
+
+#: admin/maps.php:59
+msgid "Europe"
+msgstr ""
+
+#: admin/maps.php:60
+msgid "USA"
+msgstr ""
+
+#: admin/maps.php:61
+msgid "World + US"
+msgstr ""
+
+#: admin/maps.php:62
+msgid "Canada"
+msgstr ""
+
+#: admin/maps.php:63
+msgid "Australia"
+msgstr ""
+
+#: admin/maps.php:64
+msgid "France"
+msgstr ""
+
+#: admin/maps.php:65
+msgid "Germany"
+msgstr ""
+
+#: admin/maps.php:66
+msgid "United Kingdom"
+msgstr ""
+
+#: admin/maps.php:67
+msgid "Italy"
+msgstr ""
+
+#: admin/maps.php:68
+msgid "Netherlands"
+msgstr ""
+
+#: admin/maps.php:69
+msgid "Switzerland"
+msgstr ""
+
+#: admin/maps.php:70
+msgid "Russia"
+msgstr ""
+
+#: admin/maps.php:71
+msgid "China"
+msgstr ""
+
+#: admin/maps.php:72
+msgid "Brazil"
+msgstr ""
+
+#: admin/maps.php:75
+msgid "Select Map Type"
+msgstr ""
+
+#: admin/maps.php:76
+msgid ""
+"Create a custom map using your own file(s) or select one of the built-in "
+"maps."
+msgstr ""
+
+#: admin/maps.php:78
+msgid "Custom"
+msgstr ""
+
+#: admin/maps.php:86
+msgid "Define Map File"
+msgstr ""
+
+#: admin/maps.php:87
+msgid ""
+"Upload or select map file from library. SVG, JPG and PNG formats supported."
+msgstr ""
+
+#: admin/maps.php:89 admin/metaboxes.php:171 admin/metaboxes.php:205
+#: admin/metaboxes.php:259 admin/metaboxes.php:279
+msgid "Name"
+msgstr ""
+
+#: admin/maps.php:93
+msgid "ID (required)"
+msgstr ""
+
+#: admin/maps.php:98
+msgid "Map File (required)"
+msgstr ""
+
+#: admin/maps.php:105
+msgid "Width (reqiured)"
+msgstr ""
+
+#: admin/maps.php:109
+msgid "Height (reqiured)"
+msgstr ""
+
+#: admin/metaboxes.php:21
+msgid "Tooltip"
+msgstr ""
+
+#: admin/metaboxes.php:22
+msgid "Open link"
+msgstr ""
+
+#: admin/metaboxes.php:23
+msgid "Open link in new tab"
+msgstr ""
+
+#: admin/metaboxes.php:24
+msgid "Lightbox"
+msgstr ""
+
+#: admin/metaboxes.php:25 admin/metaboxes.php:111
+msgid "Image"
+msgstr ""
+
+#: admin/metaboxes.php:26
+msgid "Reveal"
+msgstr ""
+
+#: admin/metaboxes.php:27
+msgid "None"
+msgstr ""
+
+#: admin/metaboxes.php:28
+msgid "Disabled"
+msgstr ""
+
+#: admin/metaboxes.php:29
+msgid "Select"
+msgstr ""
+
+#: admin/metaboxes.php:66 admin/metaboxes.php:190 admin/metaboxes.php:228
+#: admin/metaboxes.php:264 admin/metaboxes.php:299
+msgid "Delete"
+msgstr ""
+
+#: admin/metaboxes.php:72
+msgid "Title"
+msgstr ""
+
+#: admin/metaboxes.php:73 admin/metaboxes.php:173 admin/metaboxes.php:206
+#: admin/metaboxes.php:261 admin/metaboxes.php:280
+msgid "ID (unique)"
+msgstr ""
+
+#: admin/metaboxes.php:79
+msgid "Geolocation"
+msgstr ""
+
+#: admin/metaboxes.php:84
+msgid "Color and Pin Type"
+msgstr ""
+
+#: admin/metaboxes.php:94
+msgid "Label"
+msgstr ""
+
+#: admin/metaboxes.php:97
+msgid "Attributes"
+msgstr ""
+
+#: admin/metaboxes.php:98
+msgid "Link"
+msgstr ""
+
+#: admin/metaboxes.php:118
+msgid "Thumbnail"
+msgstr ""
+
+#: admin/metaboxes.php:124
+msgid "Action"
+msgstr ""
+
+#: admin/metaboxes.php:126 admin/metaboxes.php:411 admin/metaboxes.php:424
+msgid "Default"
+msgstr ""
+
+#: admin/metaboxes.php:135
+msgid "Zoom Level"
+msgstr ""
+
+#: admin/metaboxes.php:137
+msgid "Reveal Zoom"
+msgstr ""
+
+#: admin/metaboxes.php:140 admin/metaboxes.php:287
+msgid "Hide from sidebar"
+msgstr ""
+
+#: admin/metaboxes.php:143 admin/metaboxes.php:281
+msgid "About"
+msgstr ""
+
+#: admin/metaboxes.php:145
+msgid "Duplicate"
+msgstr ""
+
+#: admin/metaboxes.php:148
+msgid "Add New"
+msgstr ""
+
+#: admin/metaboxes.php:166 admin/metaboxes.php:171 admin/metaboxes.php:237
+msgid "New Floor"
+msgstr ""
+
+#: admin/metaboxes.php:183 admin/metaboxes.php:364
+msgid "Minimap"
+msgstr ""
+
+#: admin/metaboxes.php:192 admin/metaboxes.php:230 admin/metaboxes.php:266
+#: admin/metaboxes.php:301
+msgid "Cancel"
+msgstr ""
+
+#: admin/metaboxes.php:210
+msgid "Show by default"
+msgstr ""
+
+#: admin/metaboxes.php:253 admin/metaboxes.php:259 admin/metaboxes.php:307
+msgid "New Group"
+msgstr ""
+
+#: admin/metaboxes.php:284
+msgid "Add to legend"
+msgstr ""
+
+#: admin/metaboxes.php:290
+msgid "Enable toggle mode"
+msgstr ""
+
+#: admin/metaboxes.php:293
+msgid "Switch off by default"
+msgstr ""
+
+#: admin/metaboxes.php:340
+msgid "Map file dimensions either not set or invalid!"
+msgstr ""
+
+#: admin/metaboxes.php:346
+msgid "Map container height"
+msgstr ""
+
+#: admin/metaboxes.php:351
+msgid "Map file dimensions (REQUIRED)"
+msgstr ""
+
+#: admin/metaboxes.php:353
+msgid "File Width"
+msgstr ""
+
+#: admin/metaboxes.php:354 admin/metaboxes.php:358
+msgid "REQUIRED"
+msgstr ""
+
+#: admin/metaboxes.php:357
+msgid "File Height"
+msgstr ""
+
+#: admin/metaboxes.php:362
+msgid "Features"
+msgstr ""
+
+#: admin/metaboxes.php:367
+msgid "Clear button"
+msgstr ""
+
+#: admin/metaboxes.php:370
+msgid "Zoom buttons"
+msgstr ""
+
+#: admin/metaboxes.php:373
+msgid "Fullscreen"
+msgstr ""
+
+#: admin/metaboxes.php:376
+msgid "Hover Tooltip"
+msgstr ""
+
+#: admin/metaboxes.php:379
+msgid "Deeplinking"
+msgstr ""
+
+#: admin/metaboxes.php:382
+msgid "Zoom out when closing popup"
+msgstr ""
+
+#: admin/metaboxes.php:385
+msgid "Close popup if zoomed all the way out"
+msgstr ""
+
+#: admin/metaboxes.php:389 admin/metaboxes.php:391
+msgid "Sidebar"
+msgstr ""
+
+#: admin/metaboxes.php:394
+msgid "Alphabetically ordered"
+msgstr ""
+
+#: admin/metaboxes.php:400
+msgid "Thumbnail Placeholder"
+msgstr ""
+
+#: admin/metaboxes.php:403
+msgid "Hide locations when no filter"
+msgstr ""
+
+#: admin/metaboxes.php:407
+msgid "General Settings"
+msgstr ""
+
+#: admin/metaboxes.php:410
+msgid "Portrait breakpoint"
+msgstr ""
+
+#: admin/metaboxes.php:414
+msgid "Enable zoom"
+msgstr ""
+
+#: admin/metaboxes.php:417
+msgid "Mouse wheel"
+msgstr ""
+
+#: admin/metaboxes.php:420
+msgid "Always fill the container"
+msgstr ""
+
+#: admin/metaboxes.php:423
+msgid "Zoom Margin"
+msgstr ""
+
+#: admin/metaboxes.php:427
+msgid "Zoom Limit"
+msgstr ""
+
+#: admin/metaboxes.php:428
+msgid "No zoom"
+msgstr ""
+
+#: admin/metaboxes.php:430
+msgid "Default Action"
+msgstr ""
+
+#: admin/metaboxes.php:440
+msgid "Open links in new tab"
+msgstr ""
+
+#: admin/metaboxes.php:447
+msgid "CSV Support"
+msgstr ""
+
+#: admin/metaboxes.php:449
+msgid "CSV file"
+msgstr ""
+
+#: mapplic.php:37
+msgid "Map List"
+msgstr ""
+
+#: mapplic.php:53
+msgid "More"
+msgstr ""
+
+#: mapplic.php:75
+msgid "Error: map with the specified ID doesn't exist!"
+msgstr ""

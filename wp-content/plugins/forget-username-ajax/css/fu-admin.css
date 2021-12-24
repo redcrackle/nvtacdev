@@ -1,0 +1,5 @@
+#fu-admin-page .form-table{width:auto}
+td.rowmerge{vertical-align:top;text-align:left}
+.output-box{padding:10px;width:300px;margin-top:15px;display:none}
+.output-box h3{border-bottom:1px solid #ccc;margin-bottom:10px;padding-bottom:10px}
+.output-box p{margin:10px 0}

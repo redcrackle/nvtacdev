@@ -1,0 +1,67 @@
+/* These styles are used only in the backend editor */
+
+/* Here you can override any CSS which causes layout or visibility problems in the editor, */
+/* and duplicate any Theme-CSS to make the editor display look more like the real frontend */
+
+.h1 {
+        font-family:Helvetica, Verdana-bold;
+        font-size:32px;
+        color: #355390;
+}
+.h2, .h3, .h4, .h5 {
+        font-family: Helvetica, verdana-bold;
+        color:#355390
+}
+.h2 {
+        font-size:27px;
+        font-family: Helvetica, verdana-bold;
+}
+.h3 {
+        font-size:24px;
+}
+.h4, .h5 {
+        font-size:18px;
+}
+.h6 {
+        font-size: 16px;
+}
+
+.pquote {
+	font-family:Montserrat-regular, Tahoma-regular;
+	color:#000000;
+	border-top:1px solid #9a3637;
+	border-bottom:1px solid #9a3637;
+	padding:10px 0px;
+}
+.smtxt {
+	font-family:Lato-regular, arial-regular;
+	font-size:10px;
+	color:#000000;
+	padding-left:10px;
+}
+.entry-content img {
+	border:1px solid #35538F;
+	padding:10px;
+        margin-right:10px;
+}
+.entry-content-no img {
+  border:0px;
+  padding:10px;
+  margin-right:10px;
+}
+.readmorebtn  {
+  color:#ffffff;
+  background-color:#273C59;
+  font-weight:bold;
+  font-size:12px;
+  padding:15px;
+}
+.readmorebtn a {
+  color:#ffffff;
+  font-weight:bold;
+  box-shadow:0 1px 0 0 currentColor;
+}
+.readmorebtn a:hover, .readmorebtn:hover {
+  background:#355390;
+  color:#ffffff;
+}

@@ -1,0 +1,92 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "0e2bbf497299acc79122a487c5c34c75",
+    "packages": [
+        {
+            "name": "objectivco/wordpress-simple-settings",
+            "version": "0.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Objectivco/wordpress-simple-settings.git",
+                "reference": "d4c80f46e420a214fcb4b3c5c4345da1c5d8191b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Objectivco/wordpress-simple-settings/zipball/d4c80f46e420a214fcb4b3c5c4345da1c5d8191b",
+                "reference": "d4c80f46e420a214fcb4b3c5c4345da1c5d8191b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/wordpress-simple-settings.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Clifton Griffin",
+                    "email": "clif@objectiv.co"
+                }
+            ],
+            "description": "A minimalist framework for managing WordPress plugin or theme settings.",
+            "homepage": "https://github.com/Objectivco/wordpress-simple-settings",
+            "time": "2017-10-19T16:46:17+00:00"
+        },
+        {
+            "name": "objectivco/wp_tabbed_navigation",
+            "version": "0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Objectivco/WP_Tabbed_Navigation.git",
+                "reference": "932f0f2f94763ac10bdcd79549352d6bf047dddd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Objectivco/WP_Tabbed_Navigation/zipball/932f0f2f94763ac10bdcd79549352d6bf047dddd",
+                "reference": "932f0f2f94763ac10bdcd79549352d6bf047dddd",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/class-wp-tabbed-navigation.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Clifton Griffin",
+                    "email": "clif@objectiv.co"
+                }
+            ],
+            "description": "Automate creating a tabbed navigation and maintaining tabbed states",
+            "homepage": "https://github.com/Objectivco/WP_Tabbed_Navigation",
+            "time": "2019-04-24T19:52:48+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}
