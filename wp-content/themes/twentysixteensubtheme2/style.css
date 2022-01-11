@@ -768,7 +768,9 @@ body:not(.search-results) article:not(.type-page) .entry-content {
 .login #login_error {
   display:none!important;
 }
-
+.bsp-register {
+  display: none;
+}
 
 /* media queries */
 
