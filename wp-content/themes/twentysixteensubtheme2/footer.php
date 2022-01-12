@@ -73,8 +73,6 @@ by the institution that created it. Internal use by an organization and/or perso
 <a href="https://www.dol.gov" target="blank"><img class="ftlogo" src="https://nvtac.org/wp-content/uploads/2019/08/NVTAC_footer-logos__DoL.png" alt="DOL Logo" title="DOL Logo" class=""></a>
 <a href="http://dol.gov/vets" target="blank"><img class="ftlogo" src="https://nvtac.org/wp-content/uploads/2019/08/NVTAC_footer-logos__DoL-Vets.png" alt="DOL Vets Logo" title="DOL Vets Logo"></a> 
 <a href="http://www.nchv.org" target="blank"><img class="ftlogo" src="https://nvtac.org/wp-content/uploads/2019/08/NVTAC_footer-logos__NCHV.png" draggable="false" alt="NCHV Logo"  title="NCHV Logo" class=""></a> 
-<a href="https://www.atlasresearch.us/" target="blank"><img class="ftlogo" src="https://nvtac.org/wp-content/uploads/2019/08/NVTAC_footer-logos_Atlas.png" draggable="false" alt="Atlas Logo" title="Atlas Logo"></a> 
-<a href="http://www.manhattanstrategy.com" target="blank"><img class="ftlogo" src="https://nvtac.org/wp-content/uploads/2019/08/NVTAC_footer-logos__MSG.png" draggable="false" alt="Manhattan Strategy Group Logo" title="Manhattan Strategy Group Logo"></a>	
 </div>
 
 
