@@ -4,3 +4,6 @@
 	display:none;
 }
 
+.wp-core-ui .button.bsp-register {
+	display: none;
+}
