@@ -139,7 +139,11 @@ p ol {
   box-shadow: 0 0 0 0px;
 }
 #wpadminbar {
-/*  z-index:9999999999; */
+  /*  z-index:9999999999; */
+  visibility: hidden;
+}
+.logged-in #wpadminbar {
+  visibility: visible;
 }
 #mceu_0-open {  
   display:none !important;
