@@ -130,4 +130,33 @@ function my_custom_login_stylesheet() {
 //This loads the function above on the login page
 add_action( 'login_enqueue_scripts', 'my_custom_login_stylesheet' );
 
+
+//Feature Custom Post Type
+function create_county_post_type()
+{
+  register_post_type(
+    'county',
+    array(
+      'labels' => array(
+        'name' => __('Countys'),
+        'singular_name' => __('County'),
+        'add_new' => __('Add New'),
+        'add_new_item' => __('Add New County'),
+        'edit_item' => __('Edit County'),
+        'new_item' => __('New County'),
+        'view_item' => __('View County'),
+        'search_items' => __('Search Countys'),
+        'not_found' => __('No County found'),
+        'not_found_in_trash' => __('No County found in Trash'),
+        'parent_item_colon' => __('Parent County:')
+      ),
+      'public' => true,
+      'has_archive' => true,
+      'rewrite' => array('slug' => 'county'),
+      'menu_icon' => 'dashicons-star-filled',
+      'supports' => array('title', 'editor', 'revisions'),
+    )
+  );
+}
+add_action('init', 'create_county_post_type');
 ?>

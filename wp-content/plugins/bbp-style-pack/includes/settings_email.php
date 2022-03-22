@@ -262,7 +262,7 @@ $default_reply_body_h = '{author} wrote:<p>{content}</p><p>Post Link: {url}</p><
 
 					
 					<label class="description"><?php _e( 'Email message sent to forum subscribers when a new topic is posted', 'bbp-style-pack' ); ?></label><br/>
-					<label class="description"><?php _e( 'Allowable codes - {author} {content} {url} {forum_name}', 'bbp-style-pack' ); ?></label><br/>
+					<label class="description"><?php _e( 'Allowable codes - {author} {content} {excerpt} {url} {forum_name}', 'bbp-style-pack' ); ?></label><br/>
 					
 			</td>
 		</tr>
@@ -298,15 +298,61 @@ $default_reply_body_h = '{author} wrote:<p>{content}</p><p>Post Link: {url}</p><
 
 					
 					<label class="description"><?php _e( 'Email message sent to forum subscribers when a new topic is posted', 'bbp-style-pack' ); ?></label><br/>
-					<label class="description"><?php _e( 'Allowable codes - {author} {content} {url} {forum_name}', 'bbp-style-pack' ); ?></label><br/>
+					<label class="description"><?php _e( 'Allowable codes - {author} {content} {excerpt} {url} {forum_name}', 'bbp-style-pack' ); ?></label><br/>
 					
 			</td>
+		</tr>
+		
+		<?php
+		$name1 = __('Excerpt type and length', 'bbp-style-pack') ;
+		$name2 = __('Excerpt length', 'bbp-style-pack') ;
+		$area1='_length' ;
+		$value1 = (!empty($bsp_style_settings_email[$name.$area1]) ? $bsp_style_settings_email[$name.$area1]  : 100) ;
+		$item1="bsp_style_settings_email[".$name.$area1."]" ;
+		$area2='_excerpt_type' ;
+		$value2 = (!empty($bsp_style_settings_email[$name.$area2]) ? $bsp_style_settings_email[$name.$area2]  : 'char') ;
+		$item2="bsp_style_settings_email[".$name.$area2."]" ;
+			
+		?>
+		<tr>	
+			<th>
+				9. <?php echo $name1 ; ?> 
+			</th>
+			<td>
+				<label class="description"><?php _e( '<b>If you are not using {excerpt} in the email body then you can ignore these settings.</b>', 'bbp-style-pack' ); ?></label><br/>
+				<label class="description"><?php _e( 'If you are using {excerpt} then the excerpt type and length can be set here ', 'bbp-style-pack' ); ?></label><br/>
+			<td>
+		</tr>
+		<tr>
+			<td>
+			</td>
+			<td>
+				<?php echo $name2 ; ?> 
+				<?php echo '<input id="'.$item1.'" class="small-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'">' ; ?> 
+			</td>
+		</tr>
+		<tr>
+		<td>
+		</td>
+		<td>
+			<?php
+				echo '<input name="'.$item2.'" id="'.$item2.'" type="radio" value="char" class="code"  ' . checked( 'char',$value2, false ) . ' />' ;
+				_e ('Characters' , 'bbp-style-pack' ) ;
+			?>
+				<p/>
+			<?php
+				echo '<input name="'.$item2.'" id="'.$item2.'" type="radio" value="words" class="code"  ' . checked( 'words',$value2, false ) . ' />' ;
+				_e ('Words' , 'bbp-style-pack' ) ;
+			?>
+				<p/>
+														
+			</td>		
 		</tr>
 		
 		<!-- checkbox to activate  -->
 	<tr>
 		<th>
-					9. <?php _e('Send test email', 'bbp-style-pack'); ?>
+					10. <?php _e('Send test email', 'bbp-style-pack'); ?>
 		</th>
 		<td>
 		<?php _e('<b> Save changes before sending test emails</b>', 'bbp-style-pack'); ?>

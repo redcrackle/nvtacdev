@@ -89,9 +89,9 @@ function bsp_plugins () {
 	</td></tr>
 	
 	<tr><td style="width:250px">	
-	<a href = "https://wordpress.org/plugins/bbpress-notifications/">bbPress Notifications </a>
+	<a href = "https://wordpress.org/plugins/bbpress-notify-nospam/">bbPress Notify (No Spam) </a>
 	</td><td>
-	<?php _e('Allows you to automatically send email notifications to specific users when new topics or replies are posted	', 'bbp-style-pack'); ?> 
+	<?php _e('Give bbPress notifications your personal touch by deciding who gets the emails and what they look like.', 'bbp-style-pack'); ?> 
 	</td></tr>
 	
 	

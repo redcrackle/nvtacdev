@@ -145,6 +145,8 @@ function bsp_display_topic_index($attr, $content = '' ) {
 		if (!empty ($show)) {
 			$args['posts_per_page'] = $show ;
 			$args['max_num_pages'] = 1;
+			$args['paged'] = 1;
+			
 		}
 		else {
 			$args['posts_per_page'] = bbp_get_topics_per_page() ;
