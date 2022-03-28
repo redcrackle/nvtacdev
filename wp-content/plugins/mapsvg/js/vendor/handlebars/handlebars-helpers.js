@@ -1,3 +1,7 @@
+Handlebars.registerHelper('isselected', function (selectedValue, value) {
+    return selectedValue === value;
+  });
+
 Handlebars.registerHelper("ifeq", function (v1, v2, options) {
     if (v1 == v2) {
         return options.fn(this);
@@ -395,3 +399,4 @@ Handlebars.registerHelper("for", function (from, to, incr, block) {
     for (var i = from; i < to; i += incr) accum += block.fn(i);
     return accum;
 });
+
