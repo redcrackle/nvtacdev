@@ -1,16 +1,15 @@
 # Configuration
-wp-config.php
+/wp-config.php
 
 # Uploads
-/wp-content/uploads
+/wp-content/uploads/
 
 # Log files
 *.log
-
+/nvtac_db.sql
 # htaccess
-/.htaccess
 
-.htaccess
+/.htaccess
 
 .DS_Store
 */.DS_Store

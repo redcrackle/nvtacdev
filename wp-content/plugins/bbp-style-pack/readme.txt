@@ -3,8 +3,8 @@ Contributors: Robin Wilson
 Tags: forum, bbpress, bbp, style
 Requires at least: 3.0.1
 Donate link: http://www.rewweb.co.uk/donate
-Tested up to: 5.8
-Stable tag: 4.9.1
+Tested up to: 5.9
+Stable tag: 4.9.5
 Contributors: Robin W
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -58,6 +58,10 @@ To install this plugin :
 
 == Changelog ==
 <ul>
+<li>4.9.5 Improved [bsp-display-topic-index]shortocde to work inline </li>
+<li>4.9.4 added the ability to specify no. words or characters for excerpt in subscription emails</li>
+<li>4.9.3 minor correction to 4.9.2</li>
+<li>4.9.2 added ability to have excerpt in subscription emails</li>
 <li>4.9.1 a better method for bug fix for visual/text editors</li>
 <li>4.9.0 bug fix for visual/text editors in topics and replies forms and show_parent => false added to widgets.php line 440</li>
 <li>4.8.9 added bug fix to allow 'restore' to work on front end</li>

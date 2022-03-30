@@ -72,6 +72,10 @@ function bsp_topic_message( $message, $topic_id, $forum_id ) {
 		if (empty ($bsp_style_settings_email['email_email_type'])) $topic_content = strip_tags( bbp_get_topic_content( $topic_id ) );
 		else $topic_content 	= bbp_get_topic_content( $topic_id ) ;
 		
+		$excerpt_length = (!empty($bsp_style_settings_email['email_length']) ? $bsp_style_settings_email['email_length']  : 100) ;
+		$excerpt_type = (!empty($bsp_style_settings_email['email_excerpt_type']) ? $bsp_style_settings_email['email_excerpt_type']  : 'char') ;
+		$topic_excerpt = bsp_get_topic_excerpt($topic_id, $excerpt_length, $excerpt_type ) ;
+		
 		$topic_url     	= bbp_get_topic_permalink( $topic_id );
 		$topic_author	= bbp_get_topic_author_display_name( $topic_id );
 		$forum_name     = bbp_get_forum_title( $forum_id );
@@ -84,6 +88,7 @@ function bsp_topic_message( $message, $topic_id, $forum_id ) {
 		
 		$message = str_replace( '{author}',  $topic_author,  $message );
 		$message = str_replace( '{content}', $topic_content, $message );
+		$message = str_replace( '{excerpt}', $topic_excerpt, $message );
 		$message = str_replace( '{url}',     $topic_url,     $message );
 		$message = str_replace( '{forum_name}', $forum_name, $message );
 		//add html text if HTML
@@ -127,6 +132,10 @@ function bsp_reply_message($message, $reply_id, $topic_id ) {
 		if (empty ($bsp_style_settings_email['email_email_type'])) $reply_content = strip_tags( bbp_get_reply_content( $reply_id ) );
 		else $reply_content 	= bbp_get_reply_content( $reply_id ) ;
 		
+		$excerpt_length = (!empty($bsp_style_settings_email['email_length']) ? $bsp_style_settings_email['email_length']  : 100) ;
+		$excerpt_type = (!empty($bsp_style_settings_email['email_excerpt_type']) ? $bsp_style_settings_email['email_excerpt_type']  : 'char') ;
+		$reply_excerpt = bsp_get_reply_excerpt( $reply_id, $excerpt_length, $excerpt_type ) ;
+		
 		$reply_url     = bbp_get_reply_url( $reply_id );
 		// Poster name
 		$reply_author_name = bbp_get_reply_author_display_name( $reply_id );
@@ -141,6 +150,7 @@ function bsp_reply_message($message, $reply_id, $topic_id ) {
 		
 		$message = str_replace( '{author}',  $reply_author_name,  $message );
 		$message = str_replace( '{content}', $reply_content, $message );
+		$message = str_replace( '{excerpt}', $reply_excerpt, $message );
 		$message = str_replace( '{url}',     $reply_url,     $message );
 		$message = str_replace( '{forum_name}', $forum_name, $message );
 		//add html text if HTML
@@ -184,6 +194,7 @@ function bsp_test_email ($input) {
 		//set up the body	
 			
 			$topic_content 	= 'This is a sample of the content' ;
+			$topic_excerpt 	= 'This is a sample of the content excerpt' ;
 			
 			$topic_url     	= get_home_url().'/test_content/' ;
 			$topic_author	= 'Fred Jones' ;
@@ -199,6 +210,7 @@ function bsp_test_email ($input) {
 			
 			$message = str_replace( '{author}',  $topic_author,  $message );
 			$message = str_replace( '{content}', $topic_content, $message );
+			$message = str_replace( '{excerpt}', $topic_excerpt, $message );
 			$message = str_replace( '{url}',     $topic_url,     $message );
 			$message = str_replace( '{forum_name}', $forum_name, $message );
 			//add html text if HTML
@@ -246,8 +258,8 @@ function bsp_test_email ($input) {
 
 		//set up the body	
 			
-			$topic_content 	= 'This is a sample of the content' ;
-			
+			$reply_content 	= 'This is a sample of the content' ;
+			$reply_excerpt 	= 'This is a sample of the content excerpt' ;
 			$topic_url     	= get_home_url().'/test_content/' ;
 			$topic_author	= 'Fred Jones' ;
 			$forum_name     = 'General';
@@ -261,7 +273,8 @@ function bsp_test_email ($input) {
 
 			
 			$message = str_replace( '{author}',  $topic_author,  $message );
-			$message = str_replace( '{content}', $topic_content, $message );
+			$message = str_replace( '{content}', $reply_content, $message );
+			$message = str_replace( '{excerpt}', $reply_excerpt, $message );
 			$message = str_replace( '{url}',     $topic_url,     $message );
 			$message = str_replace( '{forum_name}', $forum_name, $message );
 			//add html text if HTML
@@ -281,6 +294,74 @@ function bsp_test_email ($input) {
 	
 return $input;
 }
+
+
+function bsp_get_reply_excerpt( $reply_id = 0, $length = 100, $excerpt_type='char' ) {
+		$reply_id = bbp_get_reply_id( $reply_id );
+		$length   = (int) $length;
+		$excerpt  = get_post_field( 'post_excerpt', $reply_id );
+
+		if ( empty( $excerpt ) ) {
+			$excerpt = bbp_get_reply_content( $reply_id );
+		}
+
+		$excerpt = trim ( strip_tags( $excerpt ) );
+		
+		if ($excerpt_type=='char') {
+			
+			// Multibyte support
+			if ( function_exists( 'mb_strlen' ) ) {
+				$excerpt_length = mb_strlen( $excerpt );
+			} else {
+				$excerpt_length = strlen( $excerpt );
+			}
+
+			if ( ! empty( $length ) && ( $excerpt_length > $length ) ) {
+				$excerpt  = mb_substr( $excerpt, 0, $length );
+			}
+			
+		}
+		elseif ($excerpt_type=='words')  {
+			$excerpt = wp_trim_words( $excerpt, $length, '');
+		}
+
+		// Filter & return
+		return apply_filters( 'bsp_get_reply_excerpt', $excerpt, $reply_id, $length, $excerpt_type );
+	}
+	
+function bsp_get_topic_excerpt( $topic_id = 0, $length = 100, $excerpt_type='char' ) {
+		$topic_id = bbp_get_topic_id( $topic_id );
+		$length   = (int) $length;
+		$excerpt  = get_post_field( 'post_excerpt', $topic_id );
+
+		if ( empty( $excerpt ) ) {
+			$excerpt = bbp_get_topic_content( $topic_id );
+		}
+
+		$excerpt = trim( strip_tags( $excerpt ) );
+		
+		if ($excerpt_type=='char') {
+
+			// Multibyte support
+			if ( function_exists( 'mb_strlen' ) ) {
+				$excerpt_length = mb_strlen( $excerpt );
+			} else {
+				$excerpt_length = strlen( $excerpt );
+			}
+
+			if ( ! empty( $length ) && ( $excerpt_length > $length ) ) {
+				$excerpt  = mb_substr( $excerpt, 0, $length );
+			}
+		}
+		
+		elseif ($excerpt_type=='words')  {
+			$excerpt = wp_trim_words( $excerpt, $length, '');
+		}
+
+			
+		// Filter & return
+		return apply_filters( 'bsp_get_topic_excerpt', $excerpt, $topic_id, $length, $excerpt_type );
+	}
 
 
 

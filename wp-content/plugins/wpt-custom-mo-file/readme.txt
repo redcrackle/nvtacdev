@@ -1,10 +1,11 @@
 === WPT Custom Mo File ===
-Contributors: wptranslationsteam, g3ronim0, fxbenard
-Tags: language, textdomain, Text Domain, translation, translators, localization, localisation, l10n, i18n, MO, .mo file, productivity
+Contributors: wptranslationsteam, g3ronim0, fxbenard, pedromendonca
+Tags: language, textdomain, translation, localization, internationalization
 Donate link: https://paypal.me/wptranslations
-Requires at least: 4.0
-Tested up to: 4.9.1
-Stable tag: 1.1.0
+Requires at least: 5.3
+Tested up to: 5.9
+Requires PHP: 7.2
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,9 +25,9 @@ Thanks to [Pixabay](https://pixabay.com/en/wood-cube-abc-cube-letters-473703/) f
 
 = Minimum Requirements =
 
-* PHP version 5.2.4 or greater (PHP 5.6 or greater is recommended)
+* PHP version 7.2 or greater (PHP 7.3 or greater is recommended)
 * MySQL version 5.0 or greater (MySQL 5.6 or greater is recommended)
-* WPT Custom Mo File 1.0 requires WordPress 4.0 or greater
+* WPT Custom Mo File 1.1 requires WordPress 5.3 or greater
 
 = Automatic installation =
 
@@ -36,7 +37,7 @@ In the search field type “WPT Custom Mo File” and click Search Plugins. Once
 
 = Manual installation =
 
-The manual installation method involves downloading our translation plugin and uploading it to your webserver via your favourite FTP application. The WordPress codex contains [instructions on how to do this here](https://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation).
+The manual installation method involves downloading our translation plugin and uploading it to your webserver via your favourite FTP application. Check the documentation about [managing plugins](https://wordpress.org/support/article/managing-plugins/).
 
 = Updating =
 
@@ -46,30 +47,26 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 1. Select the textdomain in the list at *Tools > WPT Custom Mo File*
 2. Select your language
-3. Upload your custom .mo file
+3. Upload your custom `.mo` file
 4. That's it. Enjoy your Custom Translations
 
 == Frequently Asked Questions ==
 
-= Where can I find WPT Custom Mo File documentation and user guides? =
+= Can I use .po files? =
 
-For help setting up and configuring WPT Custom Mo File please refer to our [dedicated plugin page](https://wp-translations.org/plugins/wpt-custom-mo-file/)
-
-= Can I use .po files ? =
-
-No, not yet. Until we implement this feature, we recommend you to use any gettext editor to create your .mo files. E.g. [Poedit](https://make.wordpress.org/polyglots/handbook/tools/poedit/)
+No, not yet. Until we implement this feature, we recommend you to use any gettext editor to create your .mo files. E.g. [Poedit](https://make.wordpress.org/polyglots/handbook/translating/glotpress-translate-wordpress-org/poedit/)
 
 = Where can I get support or talk to other users? =
 
-If you get stuck, you can ask for help in the [WPT Custom Mo File Plugin Forum](https://wordpress.org/support/plugin/wpt-custom-mo-file).
+If you get stuck, you can ask for help in the [WPT Custom Mo File plugin Forum](https://wordpress.org/support/plugin/wpt-custom-mo-file).
 
 = Will WPT Custom Mo File work with my theme and plugins? =
 
-Yes, WPT Custom Mo File wih any WordPress theme and plugins.
+Yes, WPT Custom Mo File work with any WordPress theme and plugins.
 
 = Will WPT Custom Mo File work with any languages? =
 
-Yes, WPT Custom Mo File wih any WordPress supported languages.
+Yes, WPT Custom Mo File work with any WordPress supported languages.
 
 = Where can I request new features, report bugs or contribute to the project? =
 
@@ -84,6 +81,15 @@ Yes you can! Join in on our [GitHub repository](https://github.com/WP-Translatio
 1. The slick but efficient WPT Custom Mo File settings panel.
 
 == Changelog ==
+
+= 1.2.1 - 22 Feb 2022 =
+* Fix mime type according to WordPress core fileinfo mime type check.
+
+= 1.2.0 - 22 Feb 2022 =
+* Tested up to WP 5.9
+* Minimum requirement: WP 5.3 and PHP 7.2
+* Update assets
+* Code review and fix coding standards
 
 = 1.1.0 - 03 Jan 2018 =
 * Change hook to override text domain

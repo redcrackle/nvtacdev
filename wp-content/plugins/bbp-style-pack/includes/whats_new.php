@@ -14,6 +14,22 @@ function bsp_new() {
 
 	</h3> 
 	
+	<h4><span style="color:blue"><?php _e('Version 4.9.5', 'bbp-style-pack' ) ; ?></span></h4>
+
+<p>
+<?php _e("A technical release - I've improved the [bsp-display-topic-index]shortcode to work better when called from within a bbpress template", 'bbp-style-pack') ; ?>
+</p>
+	
+	<h4><span style="color:blue"><?php _e('Version 4.9.4', 'bbp-style-pack' ) ; ?></span></h4>
+
+<p>
+<?php _e("I've added the ability to specify the number of words or characters to the excerpt in the subscritption email content.", 'bbp-style-pack') ; ?>
+</p>
+	<h4><span style="color:blue"><?php _e('Version 4.9.2/4.9.3', 'bbp-style-pack' ) ; ?></span></h4>
+
+<p>
+<?php _e("I've added the ability to have an excerpt in the subscritption email content.", 'bbp-style-pack') ; ?>
+</p>
 	
 	<h4><span style="color:blue"><?php _e('Versions 4.9.0/4.9.1', 'bbp-style-pack' ) ; ?></span></h4>
 

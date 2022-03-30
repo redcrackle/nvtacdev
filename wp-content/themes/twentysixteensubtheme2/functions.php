@@ -130,4 +130,3 @@ function my_custom_login_stylesheet() {
 //This loads the function above on the login page
 add_action( 'login_enqueue_scripts', 'my_custom_login_stylesheet' );
 
-?>
