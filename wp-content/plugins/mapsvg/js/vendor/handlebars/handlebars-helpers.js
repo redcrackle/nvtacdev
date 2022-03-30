@@ -1,7 +1,3 @@
-Handlebars.registerHelper('isselected', function (selectedValue, value) {
-    return selectedValue === value;
-  });
-
 Handlebars.registerHelper("ifeq", function (v1, v2, options) {
     if (v1 == v2) {
         return options.fn(this);
@@ -167,7 +163,6 @@ Handlebars.registerHelper("if_starts", function (v1, v2, options) {
     }
     return options.inverse(this);
 });
-
 Handlebars.registerHelper("if_function", function (v1, options) {
     return typeof v1 == "function" ? options.fn(this) : options.inverse(this);
 });
@@ -399,4 +394,3 @@ Handlebars.registerHelper("for", function (from, to, incr, block) {
     for (var i = from; i < to; i += incr) accum += block.fn(i);
     return accum;
 });
-
