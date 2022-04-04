@@ -757,7 +757,8 @@ body:not(.search-results) article:not(.type-page) .entry-content {
 .page-id-958 .breadcrumbs,
 .page-id-108 .breadcrumbs,
 .page-id-861 .breadcrumbs,
-.page-id-2387 .breadcrumbs {
+.page-id-2387 .breadcrumbs,
+.page-id-4894 .breadcrumbs {
   display:none;
 }
 .ftthsz {
