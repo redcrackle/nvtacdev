@@ -58,7 +58,7 @@ class MapChart extends Component {
     var county = this.state.county;
     var zip = this.state.zip;
 
-    let response = await fetch(`http://nvtac/wp-json/grantee/v1/map?state=${state}&county=${county}&zip=${zip}`)
+    let response = await fetch(`https://nvtac.org/wp-json/grantee/v1/map?state=${state}&county=${county}&zip=${zip}`)
         .then(response => {
           return response.json();
         })
