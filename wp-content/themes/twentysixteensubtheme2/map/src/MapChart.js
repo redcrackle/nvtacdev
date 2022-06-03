@@ -58,7 +58,7 @@ class MapChart extends Component {
     var county = this.state.county;
     var zip = this.state.zip;
 
-    let response = await fetch(`https://nvtac.org/wp-json/grantee/v1/map?state=${state}&county=${county}&zip=${zip}`)
+    let response = await fetch(`http://nvtac/wp-json/grantee/v1/map?state=${state}&county=${county}&zip=${zip}`)
         .then(response => {
           return response.json();
         })
@@ -92,19 +92,34 @@ class MapChart extends Component {
         </div>
       })
 
+      const selectedzip = this.state.zip;
+      var ziparray = [];
       zipitems = mapitems.map(function(row, i) {
-        if (row.zip) {
+        if (row.zip && !ziparray.includes(row.zip)) {
+          ziparray.push(row.zip);
           const zipcode = row.zip.split('-');
-          return <option className="tcontainer">{zipcode[0]}</option>
+          if (zipcode[0] === selectedzip) {
+            return <option className="tcontainer" selected>{zipcode[0]}</option>
+          }
+          else {
+            return <option className="tcontainer">{zipcode[0]}</option>
+          }
         }
       })
     }
 
+
     if (this.state.countylist) {
       const countylist = JSON.parse(this.state.countylist);
+      const selectedcounty = this.state.county;
       countyitems = countylist.map(function(row, i) {
         if (row.county) {
-          return <option className="tcontainer">{row.county}</option>
+          if (row.county === selectedcounty) {
+            return <option className="tcontainer" selected>{row.county}</option>
+          }
+          else {
+            return <option className="tcontainer">{row.county}</option>
+          }
         }
       })
     }
@@ -117,12 +132,16 @@ class MapChart extends Component {
                 <>
                   {geographies.map(geo => {
                     const cur = allStates.find(s => s.val === geo.id);
+                    var fillcolor = '#44a6da';
+                    if (cur.id === this.state.statevalue) {
+                      fillcolor = '#2f5083';
+                    }
                     return (
                         <Geography
                             key={geo.rsmKey}
                             stroke="#FFF"
                             geography={geo}
-                            fill="#44a6da"
+                            fill={fillcolor}
                             onClick={this.handleClick}
                             data-id={cur.id}
                         />
@@ -131,6 +150,10 @@ class MapChart extends Component {
                   {geographies.map(geo => {
                     const centroid = geoCentroid(geo);
                     const cur = allStates.find(s => s.val === geo.id);
+                    var fillclass='';
+                    if (cur.id === 'HI') {
+                      fillclass = 'transparenttext';
+                    }
                     return (
                         <g key={geo.rsmKey + "-name"}>
                           {cur &&
@@ -138,7 +161,7 @@ class MapChart extends Component {
                           centroid[0] < -67 &&
                           (Object.keys(offsets).indexOf(cur.id) === -1 ? (
                               <Marker coordinates={centroid}>
-                                <text y="2" fontSize={14} textAnchor="middle">
+                                <text y="2" fontSize={14} textAnchor="middle" className={fillclass}>
                                   {cur.id}
                                 </text>
                               </Marker>
@@ -161,7 +184,7 @@ class MapChart extends Component {
           </Geographies>
         </ComposableMap>
           <div className="container flex-justify">
-            <div className="item2"><h5>State: California </h5></div>
+            <div className="item2"><h5>Grantees </h5></div>
             <div className="item2">
               <div className="county_d">
                 <select className="event-type-select" name="county" onChange={this.handleCountyChange}>
@@ -180,9 +203,14 @@ class MapChart extends Component {
             </div>
           </div>
           <div className="container">
-            <div className="item">Grantee Name</div>
+            <div className="item">Details</div>
           </div>
-        {items}
+          {items}
+          {items.length === 0 &&
+          <div className="message">If the county you are looking for is not listed, please visit the <a
+              href="https://www.careeronestop.org/LocalHelp/service-locator.aspx">Service Locator Local Help |
+            CareerOneStop</a> website to find a local American Job Center that can assist you</div>
+          }
         </div>
     );
   };

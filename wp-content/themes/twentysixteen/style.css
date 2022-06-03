@@ -4086,4 +4086,9 @@ p > video {
 
 .map-container .rsm-marker text {
 	fill: #ffffff;
+	pointer-events:none;
+}
+
+.map-container .rsm-marker text.transparenttext {
+	fill: #000000;
 }
