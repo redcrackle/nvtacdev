@@ -20,6 +20,9 @@ wp_head();
       <?php twentysixteen_post_thumbnail(); ?>
 
       <div class="entry-content">
+        <?php
+		the_content();
+		?>
 
       <div id="grantee-map"></div>
       </div><!-- .entry-content -->
