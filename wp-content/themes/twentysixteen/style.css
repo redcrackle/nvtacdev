@@ -4030,3 +4030,60 @@ p > video {
 		padding: 0;
 	}
 }
+
+.map-container .container {
+	display: flex;
+	flex-direction: row;
+}
+
+.map-container .item {
+	width: 100%;
+	padding: 0px 0px 0px 16px;
+	background-color: #273c59;
+	color: #fff;
+	border: 2px solid #e8e8e8;
+	font-weight: 600;
+	font-family: sans-serif;
+}
+
+.map-container .item1 {
+	width: 100%;
+	padding: 20px 16px 20px 16px;
+	background-color: #fff;
+	color: #000;
+	border: 2px solid #e8e8e8;
+	font-weight: 500;
+	font-family: sans-serif;
+}
+.map-container .item1 h4 {
+	margin: 0px;
+}
+.map-container .item1 .description {
+	margin-top:10px;
+}
+.map-container .item1 .description p {
+	margin: 0px 0px 3px;
+	font-size: 13px;
+	line-height: 20px;
+}
+.map-container .item2 select {
+	font-size: 14px;
+	padding: 10px 0px 10px 10px;
+	background-color: #273c59;
+	color: #fff;
+}
+.flex-justify {
+	justify-content: space-between;
+}
+.map-container path:hover {
+	cursor:pointer;
+}
+
+.map-container path:focus, .map-container path:active, .map-container path:hover {
+	fill: #2f5083;
+	outline: none;
+}
+
+.map-container .rsm-marker text {
+	fill: #ffffff;
+}

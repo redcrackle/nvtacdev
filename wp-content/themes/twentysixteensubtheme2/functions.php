@@ -5,6 +5,14 @@ add_action( 'wp_enqueue_scripts', 'twentysixteensubtheme2_enqueue_styles' );
 
 function twentysixteensubtheme2_enqueue_styles() {
     wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css' );
+    wp_register_script(
+                'react-map',
+                get_stylesheet_directory_uri() . '/map/build/index.js',
+                ['wp-element'],
+                '0.01',
+                'true'
+            );
+            wp_enqueue_script('react-map');
 } 
 
 function add_style_select_buttons( $buttons ) {
@@ -130,3 +138,47 @@ function my_custom_login_stylesheet() {
 //This loads the function above on the login page
 add_action( 'login_enqueue_scripts', 'my_custom_login_stylesheet' );
 
+add_action( 'rest_api_init', function () {
+  register_rest_route( 'grantee/v1', '/map', array(
+    'methods' => 'GET',
+    'callback' => 'get_all_grantees',
+    'args' => array(
+      'zipcode' => array(
+        'validate_callback' => function($param, $request, $key) {
+          return is_numeric( $param );
+        }
+      ),
+      'county' => array(
+        'validate_callback' => function($param, $request, $key) {
+          return $param;
+        }
+      ),
+      'state' => array(
+        'validate_callback' => function($param, $request, $key) {
+          return $param;
+        }
+      ),
+    ),
+  ) );
+} );
+
+function get_all_grantees(WP_REST_Request $request) {
+  $zip = $request->get_param( 'zip' );
+  $county = $request->get_param( 'county' );
+  $state = $request->get_param( 'state' );
+  global $wpdb;
+  $state_condition = '';
+  if ($state && $state != 'all') {
+    $state_condition = "and state = '$state'";
+  }
+  $county_condition = '';
+  if ($county && $county != 'all') {
+    $county_condition = "and county = '$county'";
+  }
+  $zip_condition = '';
+  if ($zip && $zip != 'all') {
+    $zip_condition = "and zip like '$zip%'";
+  }
+  $result = $wpdb->get_results("SELECT * FROM wp_grantee_awards where 1 $state_condition $county_condition $zip_condition");
+  return json_encode($result);
+}
