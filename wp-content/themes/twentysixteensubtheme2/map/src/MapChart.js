@@ -83,6 +83,7 @@ class MapChart extends Component {
             <div className="item1"><h4>{row.grantee_name}</h4>
               <div className="description">
                 <p>{row.grantee_first_name} {row.grantee_last_name}</p>
+                <p><strong>Address: </strong>{row.street1 !=='' && `${row.street1},`} {row.street2 !=='' && `${row.street2},`} {row.city}, {row.state}, {row.zip}</p>
                 <p>{row.grantee_phone_number}</p>
                 <p><a href={`mailto:${row.grantee_email}`}>{row.grantee_email}</a></p>
                 <p><strong>Serving:</strong> {row.service_delivery_area}</p>
