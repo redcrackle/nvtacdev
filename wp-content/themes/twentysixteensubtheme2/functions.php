@@ -160,6 +160,28 @@ add_action( 'rest_api_init', function () {
       ),
     ),
   ) );
+
+  register_rest_route( 'grantee/v1', '/zip', array(
+    'methods' => 'GET',
+    'callback' => 'get_all_zipcodes',
+    'args' => array(
+      'zipcode' => array(
+        'validate_callback' => function($param, $request, $key) {
+          return is_numeric( $param );
+        }
+      ),
+      'county' => array(
+        'validate_callback' => function($param, $request, $key) {
+          return $param;
+        }
+      ),
+      'state' => array(
+        'validate_callback' => function($param, $request, $key) {
+          return $param;
+        }
+      ),
+    ),
+  ) );
 } );
 
 function get_all_grantees(WP_REST_Request $request) {
@@ -169,16 +191,39 @@ function get_all_grantees(WP_REST_Request $request) {
   global $wpdb;
   $state_condition = '';
   if ($state && $state != 'all') {
-    $state_condition = "and state = '$state'";
+    $state_condition = "and A.state = '$state'";
   }
   $county_condition = '';
   if ($county && $county != 'all') {
-    $county_condition = "and county = '$county'";
+    $county_condition = "and A.service_delivery_area LIKE '%$county%'";
+  }
+  $zip_condition = '';
+  if ($zip && $zip != 'all') {
+    $result = $wpdb->get_results("SELECT A.* FROM  wp_grantee_awards A join wp_zipcodes z on A.state = z.state and A.service_delivery_area LIKE CONCAT('%',REPLACE(z.county,' County',''),'%') and z.zip = '$zip' where 1 $state_condition $county_condition ");
+    return json_encode($result);
+  }
+  $result = $wpdb->get_results("SELECT * FROM wp_grantee_awards A where 1 $state_condition $county_condition");
+  return json_encode($result);
+}
+
+function get_all_zipcodes(WP_REST_Request $request) {
+  $zip = $request->get_param( 'zip' );
+  $county = $request->get_param( 'county' );
+  $state = $request->get_param( 'state' );
+  global $wpdb;
+  $state_condition = '';
+  if ($state && $state != 'all') {
+    $state_condition = "and A.state = '$state'";
+  }
+  $county_condition = '';
+  if ($county && $county != 'all') {
+    $county_condition = "and z.county LIKE '%$county%'";
   }
   $zip_condition = '';
   if ($zip && $zip != 'all') {
     $zip_condition = "and zip like '$zip%'";
   }
-  $result = $wpdb->get_results("SELECT * FROM wp_grantee_awards where 1 $state_condition $county_condition $zip_condition");
+  $result = $wpdb->get_results("SELECT distinct(z.zip) FROM wp_zipcodes z join wp_grantee_awards A on A.state = z.state and A.service_delivery_area LIKE CONCAT('%',REPLACE(z.county,' County',''),'%') where 1 $state_condition $county_condition");
   return json_encode($result);
 }
+

@@ -7,6 +7,7 @@ import {
   Marker,
   Annotation
 } from "react-simple-maps";
+import Select from 'react-select';
 
 import allStates from "./data/allstates.json";
 
@@ -30,35 +31,49 @@ class MapChart extends Component {
     super(props);
     this.state = { grantees: '' };
     this.state = { countylist: '' };
+    this.state = { ziplist: '' };
     this.state = { county: '', statevalue: '', zip: '' };
     this.handleClick = this.handleClick.bind(this);
     this.handleCountyChange = this.handleCountyChange.bind(this);
     this.handleZipChange = this.handleZipChange.bind(this);
-    this.getNames = this.getNames.bind(this);
-    this.getNames();
+    this.getGrantees = this.getGrantees.bind(this);
+    this.getZipcodes = this.getZipcodes.bind(this);
+    this.getGrantees();
+    this.getZipcodes();
   }
 
   handleClick = async (geography) => {
     await this.setState({statevalue: geography.currentTarget.getAttribute("data-id"), county: '', zip: ''})
-    this.getNames();
+    this.getGrantees();
+    this.getZipcodes();
   }
 
-  handleCountyChange = async (event) => {
-    await this.setState({county: event.target.value})
-    this.getNames();
+  handleCountyChange = async (selectedOption) => {
+    await this.setState({county: selectedOption})
+    this.getGrantees();
+    this.getZipcodes();
   }
 
-  handleZipChange = async (event) => {
-    await this.setState({zip: event.target.value})
-    this.getNames();
+  handleZipChange = async (selectedOption) => {
+    await this.setState({zip: selectedOption})
+    this.getGrantees();
   }
 
-  async getNames() {
+  async getGrantees() {
     var state = this.state.statevalue;
     var county = this.state.county;
     var zip = this.state.zip;
+    var county_val = '';
+    if (county.value) {
+      county_val = county.value;
+    }
 
-    let response = await fetch(`https://nvtac.org/wp-json/grantee/v1/map?state=${state}&county=${county}&zip=${zip}`)
+    var zip_val = '';
+    if (zip.value) {
+      zip_val = zip.value;
+    }
+
+    let response = await fetch(`http://nvtac/wp-json/grantee/v1/map?state=${state}&county=${county_val}&zip=${zip_val}`)
         .then(response => {
           return response.json();
         })
@@ -69,12 +84,40 @@ class MapChart extends Component {
         .catch(error => {
           console.log(error);
         });
+
+  }
+
+  async getZipcodes() {
+    var state = this.state.statevalue;
+    var county = this.state.county;
+    var zip = this.state.zip;
+    var county_val = '';
+    if (county.value) {
+      county_val = county.value;
+    }
+
+    var zip_val = '';
+    if (zip.value) {
+      zip_val = zip.value;
+    }
+
+    let response_zip = await fetch(`http://nvtac/wp-json/grantee/v1/zip?state=${state}&county=${county_val}&zip=${zip_val}`)
+        .then(response_zip => {
+          return response_zip.json();
+        })
+        .then((responseData) => {
+          this.setState({ ziplist: responseData });
+        })
+        .catch(error => {
+          console.log(error);
+        });
+
   }
 
   render () {
     var items = '';
-    var countyitems = '';
-    var zipitems = '';
+    var countyitems = [];
+    var zipitems = [];
     if (this.state.grantees) {
       const mapitems = JSON.parse(this.state.grantees);
       items = mapitems.map(function(row, i) {
@@ -92,35 +135,27 @@ class MapChart extends Component {
           </div>
         </div>
       })
-
-      const selectedzip = this.state.zip;
-      var ziparray = [];
-      zipitems = mapitems.map(function(row, i) {
-        if (row.zip && !ziparray.includes(row.zip)) {
-          ziparray.push(row.zip);
-          const zipcode = row.zip.split('-');
-          if (zipcode[0] === selectedzip) {
-            return <option className="tcontainer" selected>{zipcode[0]}</option>
-          }
-          else {
-            return <option className="tcontainer">{zipcode[0]}</option>
-          }
-        }
-      })
     }
-
 
     if (this.state.countylist) {
       const countylist = JSON.parse(this.state.countylist);
       const selectedcounty = this.state.county;
-      countyitems = countylist.map(function(row, i) {
-        if (row.county) {
-          if (row.county === selectedcounty) {
-            return <option className="tcontainer" selected>{row.county}</option>
+      countylist.map(function(row, i) {
+        var counties = row.service_delivery_area.split(",");
+        counties.map(function(items, y) {
+          if (items) {
+            countyitems.push({value: items.trim(), label: items.trim()})
           }
-          else {
-            return <option className="tcontainer">{row.county}</option>
-          }
+        })
+      })
+    }
+
+    if (this.state.ziplist) {
+      const ziplist = JSON.parse(this.state.ziplist);
+      const selectedzip = this.state.zip;
+      ziplist.map(function(row, i) {
+        if (row.zip) {
+          zipitems.push({value: row.zip, label: row.zip})
         }
       })
     }
@@ -188,18 +223,20 @@ class MapChart extends Component {
             <div className="item2"><h5>Grantees </h5></div>
             <div className="item2">
               <div className="county_d">
-                <select className="event-type-select" name="county" onChange={this.handleCountyChange}>
-                  <option value="all">Select County</option>
-                  {countyitems}
-                </select>
+                <Select
+                    value={this.state.county}
+                    onChange={this.handleCountyChange}
+                    options={countyitems}
+                />
               </div>
             </div>
             <div className="item2">
               <div className="zip_d">
-                <select className="event-type-zip" name="zip" onChange={this.handleZipChange}>
-                  <option value="all">Select Zip code</option>
-                  {zipitems}
-                </select>
+                <Select
+                    value={this.state.zip}
+                    onChange={this.handleZipChange}
+                    options={zipitems}
+                />
               </div>
             </div>
           </div>
