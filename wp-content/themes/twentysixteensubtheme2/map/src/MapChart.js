@@ -139,13 +139,22 @@ class MapChart extends Component {
 
     if (this.state.countylist) {
       const countylist = JSON.parse(this.state.countylist);
-      const selectedcounty = this.state.county;
+      var selectedcounty = [];
       countylist.map(function(row, i) {
-        var counties = row.service_delivery_area.split(",");
-        counties.map(function(items, y) {
-          if (items) {
-            countyitems.push({value: items.trim(), label: items.trim()})
-          }
+        var countieslist = row.service_delivery_area.split("\n");
+        countieslist.map(function(countiesitems, a) {
+          var counties = countiesitems.split(",");
+          counties.map(function(items, y) {
+            if (items.includes(':')) {
+              var split = items.split(":");
+              items = split[1];
+            }
+            var item = items.trim();
+            if (!selectedcounty.includes(item)) {
+              selectedcounty.push(item);
+              countyitems.push({value: item, label: item})
+            }
+          })
         })
       })
     }
