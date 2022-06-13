@@ -129,7 +129,7 @@ class MapChart extends Component {
                 <p><strong>Address: </strong>{row.street1 !=='' && `${row.street1},`} {row.street2 !=='' && `${row.street2},`} {row.city}, {row.state}, {row.zip}</p>
                 <p>{row.grantee_phone_number}</p>
                 <p><a href={`mailto:${row.grantee_email}`}>{row.grantee_email}</a></p>
-                <p><strong>Serving:</strong> {row.service_delivery_area}</p>
+                <p><strong>Counties Served:</strong> {row.service_delivery_area}</p>
               </div>
             </div>
           </div>
@@ -232,6 +232,7 @@ class MapChart extends Component {
             <div className="item2"><h5>Grantees </h5></div>
             <div className="item2">
               <div className="county_d">
+                <div class="label">Search by County</div>
                 <Select
                     value={this.state.county}
                     onChange={this.handleCountyChange}
@@ -241,6 +242,7 @@ class MapChart extends Component {
             </div>
             <div className="item2">
               <div className="zip_d">
+                <div className="label">Search by Zipcode</div>
                 <Select
                     value={this.state.zip}
                     onChange={this.handleZipChange}
