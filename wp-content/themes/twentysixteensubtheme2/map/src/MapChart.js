@@ -121,15 +121,23 @@ class MapChart extends Component {
     if (this.state.grantees) {
       const mapitems = JSON.parse(this.state.grantees);
       items = mapitems.map(function(row, i) {
+        var serve_counties = row.service_delivery_area.split("\n");
+        var countiestext = serve_counties.map(function(servelist, a) {
+          var countiesserve = servelist.split(":");
+          return (
+              <p><strong>{countiesserve[0]}: </strong>{countiesserve[1]}</p>
+          )
+        })
         return <div className="tcontainer">
           <div className="container">
             <div className="item1"><h4>{row.grantee_name}</h4>
               <div className="description">
                 <p>{row.grantee_first_name} {row.grantee_last_name}</p>
-                <p><strong>Address: </strong>{row.street1 !=='' && `${row.street1},`} {row.street2 !=='' && `${row.street2},`} {row.city}, {row.state}, {row.zip}</p>
+                <p><strong>Main Office Address: </strong>{row.street1 !=='' && `${row.street1},`} {row.street2 !=='' && `${row.street2},`} {row.city}, {row.state}, {row.zip}</p>
                 <p>{row.grantee_phone_number}</p>
                 <p><a href={`mailto:${row.grantee_email}`}>{row.grantee_email}</a></p>
-                <p><strong>Counties Served:</strong> {row.service_delivery_area}</p>
+                <p><strong>Counties Served:</strong></p>
+                {countiestext}
               </div>
             </div>
           </div>
