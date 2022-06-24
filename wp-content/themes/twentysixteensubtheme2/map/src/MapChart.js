@@ -133,7 +133,7 @@ class MapChart extends Component {
             <div className="item1"><h4>{row.grantee_name}</h4>
               <div className="description">
                 <p><strong>Main Office Address: </strong>{row.street1 !=='' && `${row.street1},`} {row.street2 !=='' && `${row.street2},`} {row.city}, {row.state}, {row.zip}</p>
-                <p><strong>Website: <a href="`${row.website}`">{row.website}</a></strong></p>
+                <p><strong>Website: <a href={row.website}>{row.website}</a></strong></p>
                 <p><strong>Counties Served:</strong></p>
                 {countiestext}
               </div>
