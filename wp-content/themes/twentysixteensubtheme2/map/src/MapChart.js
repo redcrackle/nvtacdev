@@ -11,7 +11,7 @@ import Select from 'react-select';
 
 import allStates from "./data/allstates.json";
 
-const geoUrl = "http://nvtac.org/wp-content/themes/twentysixteensubtheme2/map/src/data/states-10m.json";
+const geoUrl = "https://nvtac.org/wp-content/themes/twentysixteensubtheme2/map/src/data/states-10m.json";
 
 const offsets = {
   VT: [50, -8],
