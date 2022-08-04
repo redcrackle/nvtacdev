@@ -73,7 +73,7 @@ class MapChart extends Component {
       zip_val = zip.value;
     }
 
-    let response = await fetch(`http://nvtac.debugme.in/wp-json/grantee/v1/map?state=${state}&county=${county_val}&zip=${zip_val}`)
+    let response = await fetch(`http://nvtac/wp-json/grantee/v1/map?state=${state}&county=${county_val}&zip=${zip_val}`)
         .then(response => {
           return response.json();
         })
@@ -101,7 +101,7 @@ class MapChart extends Component {
       zip_val = zip.value;
     }
 
-    let response_zip = await fetch(`http://nvtac.debugme.in/wp-json/grantee/v1/zip?state=${state}&county=${county_val}&zip=${zip_val}`)
+    let response_zip = await fetch(`http://nvtac/wp-json/grantee/v1/zip?state=${state}&county=${county_val}&zip=${zip_val}`)
         .then(response_zip => {
           return response_zip.json();
         })
@@ -134,7 +134,7 @@ class MapChart extends Component {
               <div className="description">
                 <p><strong>Main Office Address: </strong>{row.street1 !=='' && `${row.street1},`} {row.street2 !=='' && `${row.street2},`} {row.city}, {row.state}, {row.zip}</p>
                 <p><strong>Website: <a href={row.website}>{row.website}</a></strong></p>
-                <p><strong>Counties Served:</strong></p>
+                <p><strong>Counties or Independent Cities Served:</strong></p>
                 {countiestext}
               </div>
             </div>
@@ -264,7 +264,7 @@ class MapChart extends Component {
             <div className="item2"><h5>Grantees </h5></div>
             <div className="item2">
               <div className="county_d">
-                <div class="label">Search by County</div>
+                <div class="label">Search by County or Independent City</div>
                 <Select
                     value={this.state.county}
                     onChange={this.handleCountyChange}

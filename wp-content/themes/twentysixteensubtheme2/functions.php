@@ -13,7 +13,7 @@ function twentysixteensubtheme2_enqueue_styles() {
                 'true'
             );
             wp_enqueue_script('react-map');
-} 
+}
 
 function add_style_select_buttons( $buttons ) {
     array_unshift( $buttons, 'styleselect' );
@@ -21,25 +21,25 @@ function add_style_select_buttons( $buttons ) {
 }
 
 //add custom styles to the WordPress editor
-function my_custom_styles( $init_array ) {  
- 
-    $style_formats = array(  
+function my_custom_styles( $init_array ) {
+
+    $style_formats = array(
         // These are the custom styles
-        array(  
-            'title' => 'Pull Quote',  
-            'block' => 'div',  
+        array(
+            'title' => 'Pull Quote',
+            'block' => 'div',
             'classes' => 'pquote',
             'wrapper' => true,
-        ),  
-        array(  
-            'title' => 'Small Text',  
-            'block' => 'div',  
+        ),
+        array(
+            'title' => 'Small Text',
+            'block' => 'div',
             'classes' => 'smtxt',
             'wrapper' => true,
         ),
-        array(  
-            'title' => 'Heading 1',  
-            'block' => 'span',  
+        array(
+            'title' => 'Heading 1',
+            'block' => 'span',
             'classes' => 'h1',
             'wrapper' => true,
         ),
@@ -91,24 +91,24 @@ function my_custom_styles( $init_array ) {
             'classes' => 'readmorebtn',
             'wrapper' => true,
         ),
-    );  
+    );
     // Insert the array, JSON ENCODED, into 'style_formats'
-    $init_array['style_formats'] = json_encode( $style_formats );  
-    
-    return $init_array;  
-  
-} 
-// Attach callback to 'tiny_mce_before_init' 
+    $init_array['style_formats'] = json_encode( $style_formats );
+
+    return $init_array;
+
+}
+// Attach callback to 'tiny_mce_before_init'
 add_filter( 'tiny_mce_before_init', 'my_custom_styles' );
 
 function custom_editor_styles() {
 	add_editor_style('editor-style.css');
 }
- 
+
 add_action('init', 'custom_editor_styles');
 
 function wpb_widgets_init() {
- 
+
     register_sidebar( array(
         'name'          => 'Custom Header Widget Area',
         'id'            => 'custom-header-widget',
@@ -117,14 +117,14 @@ function wpb_widgets_init() {
         'before_title'  => '<h2 class="chw-title">',
         'after_title'   => '</h2>',
     ) );
- 
+
 }
 add_action( 'widgets_init', 'wpb_widgets_init' );
 
 function mapplic_extend_pins($pins) {
 	// New pin types
 	$custom = array('yellow-push-pin', 'yellow-push-pin2');
-	
+
 	// Merging arrays
 	$pins = array_merge($pins, $custom);
 
