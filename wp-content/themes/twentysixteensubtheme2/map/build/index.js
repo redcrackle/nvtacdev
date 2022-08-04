@@ -1847,7 +1847,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const geoUrl = "http://nvtac.debugme.in/wp-content/themes/twentysixteensubtheme2/map/src/data/states-10m.json";
+const geoUrl = "http://nvtac.org/wp-content/themes/twentysixteensubtheme2/map/src/data/states-10m.json";
 const offsets = {
   VT: [50, -8],
   NH: [34, 2],
