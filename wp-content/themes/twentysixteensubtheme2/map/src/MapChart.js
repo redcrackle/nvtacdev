@@ -146,6 +146,7 @@ class MapChart extends Component {
     if (this.state.countylist) {
       const countylist = JSON.parse(this.state.countylist);
       var selectedcounty = [];
+      var countyitems_list = [];
       countylist.map(function(row, i) {
         var countieslist = row.service_delivery_area.split("\n");
         countieslist.map(function(countiesitems, a) {
@@ -158,11 +159,14 @@ class MapChart extends Component {
             var item = items.trim();
             if (!selectedcounty.includes(item)) {
               selectedcounty.push(item);
-              countyitems.push({value: item, label: item})
+              countyitems_list.push(item)
             }
           })
         })
       })
+      {countyitems_list.sort().map(function(item, y) {
+        countyitems.push({value: item, label: item})
+      })}
     }
 
     if (this.state.ziplist) {
