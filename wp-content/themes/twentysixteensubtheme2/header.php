@@ -97,21 +97,21 @@
 <div class="confeed"><a href="/contact-us">Contact</a> | <a href="/feedback">Feedback</a></div>
 
 <?php
- 
+
 if ( is_active_sidebar( 'custom-header-widget' ) ) : ?>
     <div id="header-widget-area" class="chw-widget-area widget-area" role="complementary">
-    <?php dynamic_sidebar( 'custom-header-widget' ); ?> 
+    <?php dynamic_sidebar( 'custom-header-widget' ); ?>
     </div>
-     
+
 <?php endif; ?>
                         <?php if ( is_front_page() ) : ?>
 
- <?php 
-/**if ( function_exists( 'meteor_slideshow' ) ) { meteor_slideshow( "nvtac-slideshow", "" ); } 
+ <?php
+/**if ( function_exists( 'meteor_slideshow' ) ) { meteor_slideshow( "nvtac-slideshow", "" ); }
 */
 ?>
 
-<?php nivo_slider( "1082" ); ?>
+<?php nivo_slider( "5156" ); ?>
 			<?php elseif ( get_header_image() ) : ?>
 
 				<?php
