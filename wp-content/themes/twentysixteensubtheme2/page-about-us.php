@@ -11,7 +11,7 @@
  * @since Twenty Sixteen 1.0
  */
 
-if(is_page(about-us)) {
+if(is_page('about-us')) {
 get_header('about-us');
 }
 else {

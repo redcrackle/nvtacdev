@@ -11,7 +11,7 @@
  * @since Twenty Sixteen 1.0
  */
 
-if(is_page(grantees)) {
+if(is_page('grantees')) {
 get_header('grantees');
 }
 else {

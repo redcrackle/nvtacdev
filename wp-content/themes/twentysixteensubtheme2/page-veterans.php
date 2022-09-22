@@ -11,7 +11,7 @@
  * @since Twenty Sixteen 1.0
  */
 
-if(is_page(veterans)) {
+if(is_page('veterans')) {
 get_header('veterans');
 }
 else {
