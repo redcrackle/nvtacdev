@@ -11,7 +11,7 @@ import Select from 'react-select';
 
 import allStates from "./data/allstates.json";
 
-const geoUrl = "http://localhost:10023/wp-content/themes/twentysixteensubtheme2/map/src/data/states-10m.json";
+const geoUrl = "https://nvtac.org/wp-content/themes/twentysixteensubtheme2/map/src/data/states-10m.json";
 
 const offsets = {
   VT: [50, -8],
@@ -73,7 +73,7 @@ class MapChart extends Component {
       zip_val = zip.value;
     }
 
-    let response = await fetch(`http://localhost:10023/wp-json/grantee/v1/map?state=${state}&county=${county_val}&zip=${zip_val}`)
+    let response = await fetch(`https://nvtac.org/wp-json/grantee/v1/map?state=${state}&county=${county_val}&zip=${zip_val}`)
       .then(response => {
         return response.json();
       })
@@ -101,7 +101,7 @@ class MapChart extends Component {
       zip_val = zip.value;
     }
 
-    let response_zip = await fetch(`http://localhost:10023/wp-json/grantee/v1/zip?state=${state}&county=${county_val}&zip=${zip_val}`)
+    let response_zip = await fetch(`https://nvtac.org/wp-json/grantee/v1/zip?state=${state}&county=${county_val}&zip=${zip_val}`)
       .then(response_zip => {
         return response_zip.json();
       })
