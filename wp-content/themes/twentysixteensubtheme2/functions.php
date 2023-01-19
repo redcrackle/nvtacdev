@@ -228,4 +228,20 @@ function get_all_zipcodes(WP_REST_Request $request) {
   $result = $wpdb->get_results("SELECT distinct(z.zip) FROM wp_zipcodes z join wp_grantee_awards A on A.service_delivery_state LIKE CONCAT('%',z.state,'%') and A.service_delivery_area LIKE CONCAT('%',REPLACE(z.county,' County',''),'%') where 1 $state_condition $county_condition");
   return json_encode($result);
 }
+function custom_redirect() {
+    if ( is_page( 'https://nvtac.org/grantees/welcome-new-grantees/training/virtual-learning-classes-vlcs/' ) ) {
+        wp_redirect( 'https://nvtac.org/grantees/welcome-new-grantees/training/virtual-learning-courses-vlcs/' );
+        exit;
+    }
+}
+add_action( 'template_redirect', 'custom_redirect' );
+
+function custom_redirect2() {
+    if ( is_page( 'https://nvtac.org/grantees/welcome-new-grantees/training/virtual-learning-classes-archives/' ) ) {
+        wp_redirect( 'https://nvtac.org/grantees/welcome-new-grantees/training/virtual-learning-courses-archives/' );
+        exit;
+    }
+}
+add_action( 'template_redirect', 'custom_redirect2' );
+
 
