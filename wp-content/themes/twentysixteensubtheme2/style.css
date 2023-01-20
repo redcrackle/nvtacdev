@@ -1332,13 +1332,40 @@ body:not(.search-results) article:not(.type-page) .entry-content {
   }
 }
 
+/* hides the total number count for all grantees */
+[data-category="all_grantees"] .mapplic-list-count {
+  display: none !important;
+}
+
+#bbpress-forums div.bbp-reply-content a {
+  color: #355390;
+  font-weight: bold;
+}
+
+#bbpress-forums .status-closed {
+  color: #000000;
+}
+
+.csColumnGap img {
+  border: 0px;
+}
+
+.entry-content-no img {
+  margin-left: -8px;
+}
+
 #menu-main li:nth-child(8) {
   border-right: 1px solid #d2d2d2;
 }
 
 @media screen and (min-width: 1274px) and (max-width:1357px) {
   .main-navigation a {
-    padding: 0.65625em 0.775em !important;
+    padding: 0.65625em 0.500em !important;
+  }
+
+  .main-navigation .menu-item-has-children>a {
+    margin: 0;
+    padding-right: 2.25em !important;
   }
 }
 
@@ -1389,4 +1416,26 @@ body:not(.search-results) article:not(.type-page) .entry-content {
 
 #menu-main li:nth-child(9) {
   border-right: 0px;
+}
+
+@media screen and (min-width: 910px)and (max-width:1273px) {
+  .main-navigation .menu-item-has-children ul>li>a {
+    padding: 0.15625em 0.875em 1.15em !important;
+
+  }
+}
+
+@media screen and (min-width: 1078px)and (max-width:1083px) {
+  .main-navigation a {
+    padding: 0.65625em 0.550em !important;
+  }
+
+  .main-navigation .menu-item-has-children>a {
+    margin: 0;
+    padding-right: 2.25em !important;
+  }
+
+  #menu-main li.current-menu-item a {
+    padding-top: 13px !important;
+  }
 }
