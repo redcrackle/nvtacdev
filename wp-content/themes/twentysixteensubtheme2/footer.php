@@ -64,15 +64,15 @@
 <div class="nvtacfoot">
 <p class="fthead">© National Veterans' Technical Assistance Center - All rights reserved </p>
 
-<p class="fttxt">This workforce product was funded by a contract with the U.S. Department of Labor’s Veterans’ Employment and Training Service (DOL-VETS) and copyrighted by the National Veterans’ Technical Assistance Center (NVTAC). It 
-does not necessarily reflect the official position of the U.S. Department of Labor. The U.S. Department of Labor makes no guarantees, warranties, or assurances of any kind, express or implied, with respect to such information, 
-including any information on linked sites and including, but not limited to, accuracy of the information or its completeness, timeliness, usefulness, adequacy, continued availability, or ownership. This product is copyrighted 
+<p class="fttxt">This workforce product was funded by a contract with the U.S. Department of Labor’s Veterans’ Employment and Training Service (DOL-VETS) and copyrighted by the National Veterans’ Technical Assistance Center (NVTAC). It
+does not necessarily reflect the official position of the U.S. Department of Labor. The U.S. Department of Labor makes no guarantees, warranties, or assurances of any kind, express or implied, with respect to such information,
+including any information on linked sites and including, but not limited to, accuracy of the information or its completeness, timeliness, usefulness, adequacy, continued availability, or ownership. This product is copyrighted
 by the institution that created it. Internal use by an organization and/or personal use by an individual for non-commercial purposes is permissible. All other uses require the prior authorization of the copyright owner. </p>
 </div>
 <div class="ftthumbs">
 <a href="https://www.dol.gov" target="blank"><img class="ftlogo" src="https://nvtac.org/wp-content/uploads/2019/08/NVTAC_footer-logos__DoL.png" alt="DOL Logo" title="DOL Logo" class=""></a>
-<a href="http://dol.gov/vets" target="blank"><img class="ftlogo" src="https://nvtac.org/wp-content/uploads/2019/08/NVTAC_footer-logos__DoL-Vets.png" alt="DOL Vets Logo" title="DOL Vets Logo"></a> 
-<a href="http://www.nchv.org" target="blank"><img class="ftlogo" src="https://nvtac.org/wp-content/uploads/2019/08/NVTAC_footer-logos__NCHV.png" draggable="false" alt="NCHV Logo"  title="NCHV Logo" class=""></a> 
+<a href="http://dol.gov/vets" target="blank"><img class="ftlogo" src="https://nvtac.org/wp-content/uploads/2019/08/NVTAC_footer-logos__DoL-Vets.png" alt="DOL Vets Logo" title="DOL Vets Logo"></a>
+<!-- <a href="http://www.nchv.org" target="blank"><img class="ftlogo" src="https://nvtac.org/wp-content/uploads/2019/08/NVTAC_footer-logos__NCHV.png" draggable="false" alt="NCHV Logo"  title="NCHV Logo" class=""></a>  -->
 </div>
 
 
