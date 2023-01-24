@@ -1461,3 +1461,7 @@ body:not(.search-results) article:not(.type-page) .entry-content {
     height: 100% !important;
   }
 }
+
+.nscap .readmorebtn {
+  display: inline-block !important;
+}
