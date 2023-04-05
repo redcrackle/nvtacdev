@@ -13,12 +13,12 @@
 <html <?php language_attributes(); ?> class="no-js">
 <head>
 <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43541138-7"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BGPPST86P8"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'UA-43541138-7');
+  gtag('config', 'G-BGPPST86P8');
 </script>
 
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
