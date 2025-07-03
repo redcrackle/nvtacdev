@@ -1,0 +1,17 @@
+# Configuration
+/wp-config.php
+
+# Uploads
+/wp-content/uploads/
+
+# Log files
+*.log
+/nvtac_db.sql
+# htaccess
+
+/.htaccess
+
+.DS_Store
+*/.DS_Store
+
+*/node-modules

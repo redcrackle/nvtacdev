@@ -1,0 +1,1 @@
+// (function($){ $( document ).ready(function() {$('body').addClass('bt-switch-header-colors');});})(jQuery);

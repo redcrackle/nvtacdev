@@ -1,0 +1,279 @@
+.flagcontent-validation-error {
+	color: red;
+}
+
+.flagcontent-validation-errors-description {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
+.flagcontent-form-container {
+	margin-top: 20px;
+	margin-bottom: 20px;
+	clear: both;
+}
+
+
+.flagcontent-form-inside {
+	/*border: 1px solid #ddd;*/
+	padding: 20px;
+	/*box-shadow: 1px 1px 2px #bbb;*/
+	background-color: #fff;
+	font-size: 14px;
+}
+
+.flagcontent-name-email-container,
+.flagcontent-reason-container,
+.flagcontent-description-container,
+.flagcontent-submit-container{
+	margin-top: 25px;
+}
+
+.flagcontent-reason-container {
+    width: 75%;
+}
+
+.flagcontent-form-fields select {
+    width: 100%;
+}
+
+.flagcontent-name-email-container .flagcontent-name-field {
+	width: 46%;
+	float: left;
+	margin-right: 4%;
+}
+
+.flagcontent-name-email-container .flagcontent-email-field {
+	width: 46%;
+	float: left;
+}
+
+
+.flagcontent-form-fields p {
+	margin-top: 1.5em;
+	margin-bottom: 0;
+}
+
+.flagcontent-form-fields input[type="text"] {
+  width: 100%;
+}
+
+.flagcontent-form-fields textarea {
+  resize: none;
+  width: 75%;
+  height: 150px;
+}
+
+.flagcontent-form-fields label {
+	display: inline-block;
+}
+
+.flagcontent-form-fields .flagcontent-submit-spinner {
+	visibility: hidden;
+	display: inline-block;
+	margin-left: 10px;
+}
+
+.flagcontent-reveal-button, .flagcontent-submit-button {
+	text-transform: none;
+}
+
+.flagcontent-alert-box {
+	display: none;
+	padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+    .flagcontent-alert-box-success {
+        color: #3c763d;
+        background-color: #dff0d8;
+        border-color: #d6e9c6;
+    }
+
+.flagcontent-clear-floated-fields {
+	clear: both;
+}
+
+
+/**
+ * Button styles and color schemes
+ */
+
+/**
+ * Color: Black
+ */
+.flagcontent-button-color-black {
+	background: #323232;
+	color: #FDFDFD;
+}
+	.flagcontent-button-color-black:hover,
+	.flagcontent-button-color-black:active,
+	.flagcontent-button-color-black:focus {
+		background: #191919;
+		color: #FDFDFD;
+	}
+
+/**
+ * Gray
+ */
+.flagcontent-button-color-gray  {
+	background: #717174;
+	color: #FDFDFD;
+}
+	.flagcontent-button-color-gray:hover,
+	.flagcontent-button-color-gray:active,
+	.flagcontent-button-color-gray:focus {
+		background: #5A5A5C;
+		color: #FDFDFD;
+	}
+
+/**
+ * Green
+ */
+.flagcontent-button-color-green {
+	background: #007300;
+	color: #FDFDFD;
+	/*border-color: #007300;*/
+}
+	.flagcontent-button-color-green:hover,
+	.flagcontent-button-color-green:active,
+	.flagcontent-button-color-green:focus {
+		background: #005000;
+		color: #FDFDFD;
+	}
+
+/**
+ * Red
+ */
+.flagcontent-button-color-red {
+	background: #e74c3c;
+	color: #FDFDFD;
+}
+	.flagcontent-button-color-red:hover,
+	.flagcontent-button-color-red:active,
+	.flagcontent-button-color-red:focus {
+		background: #B83D30;
+		color: #FDFDFD;
+	}
+
+@media only screen and ( max-width : 480px ) {
+
+	.flagcontent-form-modal {
+		/*width: 95%;*/
+		padding: 8px;
+	}
+
+	.flagcontent-form-fields input[type="text"] {
+	  width: 100%;
+	}
+
+	.flagcontent-form-fields textarea {
+	  width: 100%;
+	}
+
+	.flagcontent-form-fields .flagcontent-reason-container {
+	  width: 100%;
+	}
+
+    .flagcontent-form-fields select {
+        width: 100%;
+    }
+
+	.flagcontent-name-email-container .flagcontent-name-field {
+		width: 100%;
+	    float: none;
+	    margin-right: 0;
+	}
+
+	.flagcontent-name-email-container .flagcontent-email-field {
+		width: 100%;
+	    float: none;
+	    margin-right: 0;
+	}
+}
+
+
+
+/*
+ * Modal styles
+ */
+
+.flagcontent-form-modal {
+	position: relative;
+	background: #FFF;
+	padding: 20px;
+	width: auto;
+	max-width: 640px;
+	margin: 20px auto;
+	box-shadow: 0px 8px 20px rgba(0,0,0,0.25);
+	border-radius: 3px;
+}
+
+.mfp-close:hover, .mfp-close:focus {
+	background: none;
+}
+
+
+/**
+ * Fade-move animation for second dialog
+ */
+
+/* at start */
+.flagcontent-mfp-slide-bottom .flagcontent-zoom-anim-dialog {
+	opacity: 0;
+	-webkit-transition: all 0.2s ease-out;
+	-moz-transition: all 0.2s ease-out;
+	-o-transition: all 0.2s ease-out;
+	transition: all 0.2s ease-out;
+
+	-webkit-transform: translateY(-20px) perspective( 600px ) rotateX( 10deg );
+	-moz-transform: translateY(-20px) perspective( 600px ) rotateX( 10deg );
+	-ms-transform: translateY(-20px) perspective( 600px ) rotateX( 10deg );
+	-o-transform: translateY(-20px) perspective( 600px ) rotateX( 10deg );
+	transform: translateY(-20px) perspective( 600px ) rotateX( 10deg );
+
+}
+
+/* animate in */
+.flagcontent-mfp-slide-bottom.mfp-ready .flagcontent-zoom-anim-dialog {
+	opacity: 1;
+	-webkit-transform: translateY(0) perspective( 600px ) rotateX( 0 ); 
+	-moz-transform: translateY(0) perspective( 600px ) rotateX( 0 ); 
+	-ms-transform: translateY(0) perspective( 600px ) rotateX( 0 ); 
+	-o-transform: translateY(0) perspective( 600px ) rotateX( 0 ); 
+	transform: translateY(0) perspective( 600px ) rotateX( 0 ); 
+}
+
+/* animate out */
+.flagcontent-mfp-slide-bottom.mfp-removing .flagcontent-zoom-anim-dialog {
+	opacity: 0;
+
+	-webkit-transform: translateY(-10px) perspective( 600px ) rotateX( 10deg ); 
+	-moz-transform: translateY(-10px) perspective( 600px ) rotateX( 10deg ); 
+	-ms-transform: translateY(-10px) perspective( 600px ) rotateX( 10deg ); 
+	-o-transform: translateY(-10px) perspective( 600px ) rotateX( 10deg ); 
+	transform: translateY(-10px) perspective( 600px ) rotateX( 10deg ); 
+}
+
+/* Dark overlay, start state */
+.flagcontent-mfp-slide-bottom.mfp-bg {
+	opacity: 0;
+
+	-webkit-transition: opacity 0.3s ease-out; 
+	-moz-transition: opacity 0.3s ease-out; 
+	-o-transition: opacity 0.3s ease-out; 
+	transition: opacity 0.3s ease-out;
+}
+
+/* animate in */
+.flagcontent-mfp-slide-bottom.mfp-ready.mfp-bg {
+	opacity: 0.8;
+}
+
+/* animate out */
+.flagcontent-mfp-slide-bottom.mfp-removing.mfp-bg {
+	opacity: 0;
+}

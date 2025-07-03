@@ -1,0 +1,1467 @@
+/*
+Theme Name: NVTAC Twenty Sixteen Subtheme
+Theme URI: https://nvtac.org
+Description: NVTAC Redisgned Website.
+Author: NVTAC
+Version: 1.0.0
+Template: twentysixteen
+Tags: bold purple clean & elegant and just peachy
+*/
+
+/* general */
+body {
+  font-family: sans-serif;
+  background-color: #ffffff;
+}
+
+.js {
+  margin-top: 0px !important;
+}
+
+body:not(.custom-background-image).admin-bar::before {
+  visibility: hidden;
+}
+
+.h1 {
+  font-family: Archivo, Verdana-bold;
+  font-size: 32px;
+  color: #355390;
+}
+
+.h2,
+.h3,
+.h4,
+.h5 {
+  font-family: Helvetica, verdana-bold;
+  color: #355390
+}
+
+.h2 {
+  font-size: 27px;
+  font-family: Helvetica, verdana-bold;
+  font-weight: bold;
+}
+
+.h2:before {
+  border-top: 1px solid #d2d2d2;
+  content: "";
+  display: block;
+  padding-bottom: 1px;
+  width: 100%;
+  font-size: 27px;
+}
+
+.h2.top:before {
+  border-top: 0px solid #d2d2d2;
+  content: "";
+  display: block;
+  padding-bottom: 1px;
+  width: 100%;
+  font-size: 27px;
+}
+
+.h3 {
+  font-size: 24px;
+}
+
+.h4,
+.h5 {
+  font-size: 18px;
+}
+
+.h6 {
+  font-size: 16px;
+}
+
+.pquote {
+  font-family: Montserrat-regular, Tahoma-regular;
+  color: #000000;
+  border-top: 1px solid #9a3637;
+  border-bottom: 1px solid #9a3637;
+  padding: 10px 0px;
+}
+
+.smtxt {
+  font-family: Lato-regular, arial-regular;
+  font-size: 10px;
+  color: #000000;
+  padding-left: 10px;
+}
+
+p ol {
+  font-family: open sans-regular, arial-regular;
+  size: 14px;
+  color: #000000;
+}
+
+.entry-content ul {
+  list-style: none;
+}
+
+.entry-content ul li:before {
+  content: "\2022";
+  font-weight: bold;
+  display: inline-block;
+  width: 1em;
+  margin-left: 1em;
+  color: #9a3637;
+}
+
+.entry-content ol {
+  list-style: none;
+  counter-reset: my-awesome-counter;
+}
+
+.entry-content ol li {
+  counter-increment: my-awesome-counter;
+}
+
+.entry-content ol li:before {
+  content: counter(my-awesome-counter)".";
+  color: #9a3637;
+  font-weight: bold;
+  padding-right: 10px;
+}
+
+.entry-content img {
+  border: 1px solid #35538F;
+  padding: 10px;
+  margin-right: 10px;
+}
+
+.entry-content-no img {
+  border: 0px;
+  padding: 10px;
+  margin-right: 10px;
+}
+
+.rmbtn {
+  font-family: open sans-regular, arial-regular;
+  font-size: 12px;
+  color: #ffffff;
+  background: #273c59;
+  max-width: 100px;
+  text-align: center;
+  padding: 10px 0px;
+}
+
+.rmbtn a {
+  color: #ffffff;
+}
+
+.rmbtn a:hover {
+  background-color: #355390;
+  padding: 13px 23px;
+}
+
+.frntpg h3 {
+  color: #073882;
+  border-bottom: 1px solid #000000;
+  padding-bottom: 5px;
+}
+
+.entry-content a {
+  box-shadow: 0 0 0 0px;
+}
+
+#wpadminbar {
+  /*  z-index:9999999999; */
+  visibility: hidden;
+}
+
+.logged-in #wpadminbar {
+  visibility: visible;
+}
+
+#mceu_0-open {
+  display: none !important;
+}
+
+.field_dol-employee legend,
+.field_hvrp-community-partner legend,
+.field_hvrp-grantee-staff legend {
+  display: none;
+}
+
+.field-visibility-settings-toggle {
+  display: none;
+}
+
+.post-185 .entry-title {
+  display: none;
+}
+
+.bbp-forum-info .bbp-forum-title {
+  position: relative;
+  left: 0px;
+}
+
+.entry-content ul li:before {
+  display: none;
+}
+
+#bbpress-forums p.bbp-topic-meta img.avatar {
+  display: none;
+}
+
+.gallery-icon img {
+  border: 0px;
+  padding: 0px;
+}
+
+.csRow {
+  margin-top: -25px;
+}
+
+.column {
+  float: left;
+  width: 50%;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+#emrow img {
+  border: 0px;
+  padding: 0px;
+  padding-right: 10px;
+}
+
+.bximgright {
+  padding-right: 0px !important;
+}
+
+#emrow.rowleft {
+  background: #9a3637 !important;
+}
+
+#emrow {
+  margin-top: 50px !important;
+  margin-bottom: 50px !important;
+  background: #273c59;
+  color: #ffffff;
+}
+
+#emrow .readmorebtn {
+  position: relative;
+  top: 25px;
+  background: #9a3637;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.rowleft .col2txt {
+  padding-top: 50px !important;
+}
+
+#emrow.rowleft .readmorebtn {
+  background: #273c59 !important;
+}
+
+#emrow .readmorebtn:hover {
+  color: #d2d2d2;
+  font-weight: bold;
+  font-size: 14px;
+  background: #9a3637;
+}
+
+#emrow.rowleft .readmorebtn:hover {
+  background: #273c59 !important;
+  color: #d2d2d2;
+}
+
+#emrow .h2,
+#emrow .h3 {
+  color: #ffffff;
+}
+
+#emrow .col2txt {
+  padding: 25px;
+}
+
+/* end of general */
+
+/* widgets */
+.widget .widget-title,
+.cuswidge {
+  color: #073882;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+#custom_html-3 .widget-title {
+  display: none;
+}
+
+.cuswidge a {
+  position: relative;
+  top: 60px !important;
+  left: 15px;
+}
+
+#custom_html-2 {
+  background-image: url("/wp-content/uploads/2019/07/trainees.jpg");
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-position-y: 10px;
+  margin-bottom: 5.25em;
+  border-top: 0px;
+}
+
+.widget {
+  margin-bottom: 0px;
+  padding: 10px 0;
+}
+
+.bbp-login-form fieldset {
+  background: #E8E8E6;
+  border: 1px solid #355390;
+  padding-bottom: 30px;
+}
+
+.bbp-login-form .user-submit {
+  background: #273C59;
+  position: relative;
+  top: -10px;
+}
+
+.bbp-login-form .user-submit:hover {
+  background: #355390;
+}
+
+#secondary {
+  background: #f0f0ef;
+  padding: 10px;
+}
+
+#bbpress-forums ul li:before {
+  color: transparent;
+}
+
+#custom_html-2,
+#custom_html-3 {
+  border-top: 0px;
+}
+
+#custom_html-2 .widget-title {
+  display: none;
+}
+
+#custom_html-3 .textwidget {
+  position: relative;
+  top: -75px;
+  left: 8px;
+}
+
+body.logged-in #bp_core_whos_online_widget-2 {
+  position: relative;
+  top: 0px;
+}
+
+#bp_core_whos_online_widget-2 {
+  position: relative;
+  top: -58px;
+}
+
+#custom_html-3 .textwidget a {
+  box-shadow: 0 0px 0 0 currentColor;
+}
+
+#bbp_login_widget-2 .widget-title:after {
+  content: "Login or Register to Participate in the Knowledge Network";
+  font-size: 9px;
+  padding-left: 10px;
+}
+
+#bbp_forums_widget-3 a {
+  font-size: 16px;
+}
+
+/* end of widgets */
+
+/* menu */
+#site-header-menu {
+  background-color: #2E5083;
+  padding: 0 0px;
+  max-height: 42px;
+  position: absolute;
+  top: 123px;
+  z-index: 99999999;
+  width: 100%;
+}
+
+#site-header-menu a {
+  color: #ffffff;
+}
+
+#site-navigation ul {
+  margin-left: 20%;
+}
+
+#menu-main a:hover {
+  background-color: #808080;
+  color: #ffffff;
+}
+
+#menu-main li.current-menu-item a {
+  background-color: #d2d2d2;
+  color: #073882;
+}
+
+#menu-main li {
+  border-right: 1px solid #d2d2d2;
+}
+
+.main-navigation {
+  margin: 0 0;
+}
+
+.main-navigation ul ul li {
+  background-color: #2e5083;
+  font-color: #ffffff;
+  position: relative;
+  left: 50%;
+}
+
+.main-navigation ul ul {
+  border-bottom: 0px;
+}
+
+#menu-main li:nth-child(8) {
+  border-right: 0px;
+}
+
+#menu-toggle {
+  margin-right: 20px;
+}
+
+/* end of menu */
+
+/* slideshow */
+.nivoSlider {
+  margin-top: 47px;
+}
+
+.slider-wrapper {
+  margin-bottom: 0px;
+}
+
+.nivoSlider img {
+  margin-bottom: 0px;
+  width: 100%;
+}
+
+.nivo-controlNav {
+  margin-bottom: -80px;
+}
+
+.nivo-caption {
+  font-family: archivo-semi bold, verdana-semi-bold;
+  background: rgb(64, 42, 30) !important;
+  /*  opacity:.75 !important;*/
+  height: autopx;
+  left: 60% !important;
+  top: 0px;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+}
+
+.nscap .readmorebtn {
+  border: 2px solid;
+  background: rgb(64, 42, 30, 1.0) !important;
+  font-weight: bolder;
+}
+
+.nscap .readmorebtn:hover {
+  background: #355390 !important;
+  color: #ffffff;
+  ;
+  font-weight: bolder;
+}
+
+.nscap {
+  padding: 35px;
+  overflow: auto;
+  height: 300px;
+  background: rgb(64, 42, 30, 1.0) !important;
+  font-weight: bolder;
+}
+
+.nivo-caption p {
+  padding: 0px !important;
+}
+
+.theme-default .nivo-caption a {
+  border-bottom: 0px !important;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* end of slideshow */
+
+/* grantee box
+.grantbx {
+  background-color:#a47434;
+  color:#ffffff;
+  padding:20px;
+}
+.grantbxtx {
+  text-align:center;
+  margin-bottom:10px;
+}
+.learnbtnfg {
+  border:1px solid #ffffff;
+  padding:4px;
+  border-radius:10px;
+  position:relative;
+  top:10px;
+}
+.learnbtnfg a {
+  color:#ffffff;
+}
+.learnbtnfg a:hover{
+  color:#073882;
+  font-weight:bold;
+}
+.grantbxtx a {
+  color:#ffffff;
+}
+.grantbxtx a:hover {
+  color:#d2d2d2;
+}
+end of grantee box */
+
+/* learn more and read more  buttons */
+.learnbtnwt,
+.learnbtnwta {
+  border: 1px solid #000000;
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.learnbtnwt {
+  position: relative;
+  top: -20px;
+  left: 44%;
+}
+
+.learnbtnwta {
+  position: relative;
+  left: 0px;
+  top: 20px;
+}
+
+.learnbtnwta a,
+.learnbtnwt a {
+  color: #073882;
+  font-weight: bold;
+}
+
+.learnbtnwta a:hover,
+.learnbtnwt a:hover {
+  background: #073882;
+  color: #ffffff;
+  border: 3px solid #073882;
+  border-radius: 10px;
+}
+
+.readmorebtn {
+  color: #ffffff;
+  background-color: #273C59;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.readmorebtn a {
+  color: #ffffff;
+  font-weight: bold;
+  box-shadow: 0 0px 0 0 currentColor;
+}
+
+.readmorebtn a:hover,
+.readmorebtn:hover {
+  background: #355390;
+  color: #ffffff;
+}
+
+/* end of learn more buttons */
+
+/* mapplic styles */
+.mapplic-sidebar {
+  width: 40% !important;
+}
+
+.mapplic-container {
+  width: 60% !important;
+}
+
+.mapplic-tooltip-description,
+.mapplic-tooltip p {
+  color: #000 !important;
+}
+
+.mapplic-list-category {
+  border-bottom: 1px solid #355390;
+}
+
+.mapplic-popup-link {
+  background-color: #355390 !important;
+}
+
+.mapplic-about {
+  display: none !important;
+}
+
+.mapplic-pin.pin-dot::before {
+  border-width: 6px !important;
+}
+
+.mapplic-zoomable::before {
+  content: "Select icon to enlarge map. Pins don't represent grantee's exact State geographic location.";
+  position: relative;
+  top: -30px;
+  font-size: 20px;
+  left: 30px;
+}
+
+.ja_btn_green,
+.ja_btn_green:link {
+  background: #355390 !important;
+}
+
+/*end of mapplic styles */
+
+/*forum styles */
+
+.bbp-reply-author,
+.bbp-reply-post-date,
+.bbp-reply-header {
+  font-weight: bold;
+}
+
+.bbp-reply-content {
+  font-size: 14px;
+}
+
+#bbpress-forums li.bbp-header .bbp-reply-content,
+#bbpress-forums li.bbp-header .bbp-reply-author,
+#bbpress-forums li.bbp-footer .bbp-reply-content,
+#bbpress-forums li.bbp-footer .bbp-reply-author {
+  color: #ffffff;
+  text-transform: uppercase;
+  font-weight: normal;
+}
+
+.bbp-reply-content ul.bbp-topic-revision-log li,
+.bbp-reply-permalink,
+#bbpress-forums li.bbp-footer .bbp-reply-author,
+#bbpress-forums li.bbp-footer .bbp-reply-content {
+  display: none;
+}
+
+#bbpress-forums li.bbp-header .bbp-reply-author {
+  position: relative;
+  top: 0px;
+  text-transform: uppercase;
+  font-size: 14px;
+  margin-right: 100px;
+}
+
+#bbpress-forums ul.forum-titles li.bbp-forum-info,
+#bbpress-forums ul.forum-titles li.bbp-topic-title {
+  position: relative;
+  top: 0px;
+  text-transform: uppercase;
+  font-size: 16px;
+}
+
+#bbpress-forums li.bbp-header {
+  height: 50px;
+}
+
+#bbpress-forums a.bbp-topic-permalink:link,
+#bbpress-forums a.bbp-topic-permalink:link {
+  position: relative;
+  left: 0px;
+}
+
+#bbpress-forums ul.forum-titles li.bbp-forum-topic-count,
+#bbpress-forums ul.forum-titles li.bbp-forum-reply-count {
+  text-transform: uppercase;
+  position: relative;
+  top: 0px;
+  font-size: 16px;
+  margin-left: 13px;
+  width: auto;
+}
+
+.bbp-forum-reply-count {
+  left: 20%;
+}
+
+.bbp-forum-topic-count {
+  left: 8%;
+}
+
+/*li.bbp-topic-freshness  {
+  width:1%;
+}*/
+#bbp_search {
+  margin-bottom: 20px;
+}
+
+.bsp-forum-content {
+  margin-top: 20px;
+}
+
+#bbpress-forums div.bbp-reply-content a {
+  color: #ffffff;
+}
+
+#bbpress-forums span.bbp-admin-links a,
+#bbpress-forums span.bbp-admin-links {
+  color: #355390;
+}
+
+#bbpress-forums ul.forum-titles li.bbp-topic-voice-count,
+#bbpress-forums ul.forum-titles li.bbp-topic-reply-count {
+  position: relative;
+  top: 0px;
+  left: 0px;
+  font-size: 16px;
+  margin-left: 60px;
+}
+
+#bbpress-forums li.bbp-forum-topic-count,
+#bbpress-forums li.bbp-forum-reply-count {
+  position: relative;
+  font-size: 18px;
+  color: #8f3f34;
+}
+
+#bbpress-forums li.bbp-body ul.forum,
+#bbpress-forums li.bbp-body ul.topic {
+  padding-bottom: 0px;
+  padding-top: 10px;
+}
+
+.bsp_button1 {
+  border-radius: 0px;
+  background: #273c59;
+}
+
+.bbp-login-form label {
+  width: 320px;
+}
+
+#fu-submit {
+  background: #273c59;
+}
+
+#fu-submit:hover {
+  background: #355390;
+}
+
+#fu_email {
+  border: 1px solid #355390;
+}
+
+#bbpress-forums li.bbp-topic-voice-count {
+  font-size: 18px;
+  margin-left: 60px;
+  color: #8f3f34;
+}
+
+#bbpress-forums li.bbp-topic-reply-count {
+  margin-left: 60px;
+  color: #8f3f34;
+}
+
+body:not(.search-results) article:not(.type-page) .entry-content {
+  float: none;
+  width: 100%;
+}
+
+#bbpress-forums div.bbp-forum-author,
+#bbpress-forums div.bbp-topic-author,
+#bbpress-forums div.bbp-reply-author {
+  width: 215px;
+}
+
+#bbp_reply_submit {
+  background: #273659;
+}
+
+#bbp_reply_submit:hover {
+  background: #355390;
+}
+
+.kkbullets {
+  list-style: disc !important;
+  margin-left: 20px !important;
+}
+
+.widget_display_stats {
+  display: none;
+}
+
+/*end of forum styles */
+.fthead {
+  font-weight: bold;
+}
+
+.fttxt {
+  font-size: .75rem;
+}
+
+#gallery-2 {
+  width: 40%;
+  float: right;
+}
+
+#media_gallery-2 {
+  border: 0px;
+}
+
+.nvtacfoot {
+  float: left;
+  width: 100%;
+  padding-top: 25px;
+}
+
+.fttxt {
+  width: 100%;
+}
+
+.ftthumbs {
+  width: 100%;
+}
+
+.ftlogo {
+  height: 75px;
+  padding: 0 10px;
+}
+
+.search-form {
+  top: -65px;
+  left: 50%;
+  z-index: 999999;
+  width: 20%;
+  float: left;
+}
+
+/*.search-form:after {
+  content:"Contact | Feedback";
+  font-family:arial;
+  position:absolute;
+  left:100%;
+  margin-left:10px;
+  top:15px;
+  font-weight:bold;
+  font-size:15px;
+  color:#374561;
+  width:90%;
+}*/
+.search-submit {
+  background: #2e5083;
+}
+
+#colophon {
+  border-top: 1px solid #073882;
+}
+
+#masthead {
+  padding-top: 0px !important;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-bottom: 2.5%;
+}
+
+#page {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+#content.site-content {
+  max-width: 1320px !important;
+  margin: auto;
+  margin-top: 30px;
+}
+
+.site-inner {
+  max-width: none;
+}
+
+.nvtaclogo {
+  position: relative;
+  left: 20%;
+  z-index: 99;
+  max-width: 300px;
+}
+
+.breadcrumbs {
+  position: relative;
+  left: 0%;
+  top: 0px;
+  padding-bottom: 20px;
+}
+
+.page-id-722 .breadcrumbs,
+.page-id-958 .breadcrumbs,
+.page-id-108 .breadcrumbs,
+.page-id-861 .breadcrumbs,
+.page-id-2387 .breadcrumbs,
+.page-id-4894 .breadcrumbs {
+  display: none;
+}
+
+.ftthsz {
+  width: 75px;
+  margin-right: 10px;
+}
+
+/* hides the total number count for all grantees */
+[data-category="all_grantees"] .mapplic-list-count {
+  display: none;
+}
+
+.login #login_error {
+  display: none !important;
+}
+
+.bsp-register {
+  display: none;
+}
+
+/* media queries */
+
+@media (min-width:320px) and (max-width:1074px) {
+  #emrow .column {
+    width: 100%;
+  }
+
+  #emrow img {
+    padding-right: 0px;
+  }
+
+  #emrow .col2txt {
+    padding: 15px;
+    padding-bottom: 55px;
+    padding-top: 0px !important;
+  }
+}
+
+@media (min-width:532px) and (max-width:909px) {
+  .imgdol {
+    margin-top: 20px;
+    margin-bottom: 15px;
+  }
+
+  .imgvet,
+  .imgmsg {
+    position: relative;
+    left: 0px;
+  }
+}
+
+@media (max-width:709px) {
+  .nvtaclogo {
+    left: 2%;
+    max-width: 210px;
+    top: -42px;
+  }
+
+  .search-form {
+    margin-bottom: 19px;
+    width: 95%;
+    left: 2%;
+    top: -60px;
+  }
+
+  .confeed {
+    left: 2%;
+    top: 25px;
+    margin-left: 0px;
+    position: relative;
+  }
+
+  /*.nivo-caption {
+ top:0px !important;
+ width:250px !important;
+ left:65% !important;
+ position:relative;
+ height:auto !important;
+ }*/
+  #bbpress-forums ul.forum-titles li.bbp-forum-topic-count,
+  #bbpress-forums ul.forum-titles li.bbp-forum-reply-count {
+    margin-left: 0px;
+  }
+
+  body:not(.search-results) article:not(.type-page) .entry-content {
+    width: 85%;
+  }
+}
+
+@media (min-width:710px) and (max-width:909px) {
+  .nvtaclogo {
+    top: -84px;
+    left: 2%;
+    max-width: 240px;
+  }
+
+  .search-form {
+    top: -72px;
+    left: 2%;
+    width: 95%;
+    margin-bottom: -22px;
+  }
+
+  .confeed {
+    top: 10px;
+    left: 2%;
+    position: relative;
+  }
+
+  .nivoSlider {
+    margin-top: 17px;
+  }
+
+  /*.nivo-caption {
+  width:40% !important;
+  top:0px;
+  font-size:12px;
+  height:auto !important;
+  left:65% !important;
+ }*/
+  body:not(.search-results) article:not(.type-page) .entry-content {
+    width: 85%;
+  }
+
+  #bbpress-forums ul.forum-titles li.bbp-forum-topic-count,
+  #bbpress-forums ul.forum-titles li.bbp-forum-reply-count {
+    margin-left: 0px;
+  }
+}
+
+@media (max-width:909px) {
+  #custom_html-3 .textwidget {
+    position: relative;
+    top: -78px;
+    left: 15px;
+  }
+
+  #menu-main {
+    background-color: #355390;
+  }
+
+  .main-navigation ul ul li {
+    left: 5%;
+  }
+
+  #menu-main-1 {
+    display: none;
+  }
+
+  #site-header-menu a {
+    padding-left: 5px
+  }
+
+  #site-navigation ul {
+    margin-left: 0%;
+  }
+
+  .ftlogo {
+    height: 50px;
+    margin-bottom: 15px;
+  }
+}
+
+@media (min-width:910px) {
+  #menu-item-444 {
+    visibility: hidden;
+  }
+}
+
+@media (min-width:910px) and (max-width:1077px) {
+  #site-navigation ul {
+    margin-left: 0%;
+  }
+
+  #menu-main {
+    font-size: .75rem;
+  }
+
+  #site-header-menu {
+    top: 133px;
+  }
+
+  #menu-main li {
+    height: 43px;
+    padding-top: 5px;
+  }
+
+  #menu-main li.current-menu-item a {
+    height: 43px;
+    padding-top: 12px;
+    margin-top: -5px;
+  }
+
+  #menu-main a:hover {
+    background-color: #808080;
+    color: #ffffff;
+    height: 43px;
+    margin-top: -5px;
+    padding-top: 12px;
+  }
+
+  .nvtaclogo {
+    left: 4.5%;
+  }
+
+  .search-form {
+    width: 20.2%;
+    top: -80px;
+  }
+
+  .confeed {
+    position: absolute;
+    top: 80px;
+    left: 71%;
+  }
+}
+
+/*.nivo-caption {
+  width:40% !important;
+  top:0px !important;
+  height:auto !important;
+  left:65% !important;
+ }*/
+@media (min-width:910px) and (max-width:976px) {
+  .bbp-login-form fieldset {
+    background: #E8E8E6;
+    border: 1px solid #CCCCCC;
+    padding-bottom: 55px;
+  }
+
+  #custom_html-3 .textwidget {
+    position: relative;
+    top: -98px;
+    left: 8px;
+  }
+}
+
+@media (min-width:1078px) and (max-width:1273px) {
+  #menu-main {
+    font-size: .75rem;
+  }
+
+  #site-header-menu {
+    top: 133px;
+  }
+
+  #menu-main li {
+    height: 43px;
+    padding-top: 5px;
+  }
+
+  #menu-main li.current-menu-item a {
+    height: 43px;
+    padding-top: 12px;
+    margin-top: -5px;
+  }
+
+  #site-navigation ul {
+    margin-left: 10%;
+  }
+
+  .nvtaclogo {
+    left: 4.45%;
+  }
+
+  .search-form {
+    width: 21.5%;
+    top: -80px;
+  }
+
+  .confeed {
+    position: absolute;
+    top: 80px;
+    left: 73%;
+  }
+
+  .nivo-caption {
+    width: 40% !important;
+    top: 0px !important;
+    height: auto !important;
+  }
+
+  #bbpress-forums ul.forum-titles li.bbp-forum-topic-count,
+  #bbpress-forums ul.forum-titles li.bbp-forum-reply-count {
+    margin-left: 7px;
+  }
+}
+
+@media (max-width:1077px) {
+  .nivo-caption {
+    width: 100% !important;
+    left: 0% !important;
+    position: relative !important;
+    background: rgb(166, 121, 81 1.0) !important;
+  }
+
+  .nscap {
+    height: auto;
+    padding-top: 5px;
+    padding-bottom: 20px;
+  }
+}
+
+@media (min-width:1075px) and (max-width:1213px) {
+  #emrow .col2txt {
+    padding: 20px;
+    font-size: 14px;
+  }
+
+  #emrow .column {
+    width: 50%;
+  }
+}
+
+@media (min-width:1274px) and (max-width:1549px) {
+  #site-navigation ul {
+    margin-left: 4.35%;
+  }
+
+  .nvtaclogo {
+    left: 4.35%;
+  }
+
+  .search-form {
+    width: 24%;
+    top: -80px;
+  }
+
+  .confeed {
+    position: absolute;
+    top: 80px;
+    left: 74.8%;
+  }
+
+  .nivo-caption {
+    width: 40% !important;
+    top: 0px !important;
+    height: auto !important;
+  }
+}
+
+@media (min-width:1550px) and (max-width:1893px) {
+  .nvtaclogo {
+    left: 12%;
+  }
+
+  #site-navigation ul {
+    margin-left: 12%;
+  }
+
+  .search-form {
+    top: -80px;
+    width: 18.5%;
+  }
+
+  .confeed {
+    position: absolute;
+    top: 80px;
+    left: 69.7%;
+  }
+
+  .nivo-caption {
+    width: 40% !important;
+    top: 0px !important;
+    height: auto !important;
+  }
+}
+
+@media (min-width:1894px) {
+  .nvtaclogo {
+    left: 20%;
+  }
+
+  #site-navigation ul {
+    margin-left: 20%;
+  }
+
+  .search-form {
+    top: -80px;
+    width: 16.5%;
+  }
+
+  .confeed {
+    position: absolute;
+    left: 67.0%;
+    top: 80px;
+    width: 20%;
+  }
+
+  .nivo-caption {
+    width: 40% !important;
+    top: 0px !important;
+    height: auto !important;
+    left: 60% !important;
+    background: rgb(64, 42, 30) !important;
+  }
+
+  .nscap {
+    background: rgb(64, 42, 30 1.0) !important;
+  }
+}
+
+@media screen and (-ms-high-contrast: active),
+(-ms-high-contrast: none) {
+
+  /* IE10+ specific styles go here */
+  #site-header-menu {
+    top: 121px;
+    left: 0px;
+  }
+}
+
+/* hides the total number count for all grantees */
+[data-category="all_grantees"] .mapplic-list-count {
+  display: none !important;
+}
+
+#bbpress-forums div.bbp-reply-content a {
+  color: #355390;
+  font-weight: bold;
+}
+
+#bbpress-forums .status-closed {
+  color: #000000;
+}
+
+.csColumnGap img {
+  border: 0px;
+}
+
+.entry-content-no img {
+  margin-left: -8px;
+}
+
+#menu-main li:nth-child(8) {
+  border-right: 1px solid #d2d2d2;
+}
+
+@media screen and (min-width: 1274px) and (max-width:1357px) {
+  .main-navigation a {
+    padding: 0.65625em 0.500em !important;
+  }
+
+  .main-navigation .menu-item-has-children>a {
+    margin: 0;
+    padding-right: 2.25em !important;
+  }
+}
+
+@media screen and (min-width: 910px) and (max-width:975px) {
+  .main-navigation a {
+    padding: 0.65625em 0.850em !important;
+  }
+
+  .main-navigation .menu-item-has-children>a:after {
+    right: 0em !important;
+  }
+}
+
+@media screen and (min-width: 910px) and (max-width:975px) {
+  .main-navigation .menu-item-has-children>a {
+    margin: 0;
+    padding-right: 2.25em !important;
+  }
+}
+
+@media (min-width: 910px) and (max-width: 1077px) {
+  #menu-main li.current-menu-item a {
+    padding-top: 12px !important;
+  }
+
+  #menu-main .menu-item-has-children>a:hover {
+    padding-top: 8px !important;
+    display: inline-block;
+  }
+}
+
+@media screen and (min-width: 910px) and (max-width:971px) {
+  .main-navigation a {
+    padding: 0.65625em 0.830em !important;
+  }
+
+  .main-navigation .menu-item-has-children>a {
+    margin: 0;
+    padding-right: 1.25em !important;
+  }
+}
+
+@media screen and (min-width: 910px) and (max-width:920px) {
+  .main-navigation a {
+    padding: 0.65625em 0.790em !important;
+  }
+
+  .main-navigation .menu-item-has-children>a {
+    margin: 0;
+    padding-right: 1.15em !important;
+  }
+}
+
+#menu-main li:nth-child(9) {
+  border-right: 0px;
+}
+
+@media screen and (min-width: 910px)and (max-width:1273px) {
+  .main-navigation .menu-item-has-children ul>li>a {
+    padding: 0.15625em 0.875em 1.15em !important;
+
+  }
+}
+
+@media screen and (min-width: 1078px)and (max-width:1083px) {
+  .main-navigation a {
+    padding: 0.75625em 0.875em;
+     !important;
+  }
+
+  .main-navigation .menu-item-has-children>a {
+    margin: 0;
+    padding-right: 2.05em !important;
+  }
+
+  #menu-main li.current-menu-item a {
+    padding-top: 13px !important;
+  }
+}
+
+@media (min-width: 1084px) and (max-width: 1273px) {
+  .main-navigation a {
+    padding: 0.85625em 0.875em;
+  }
+
+  #menu-main li {
+    padding-top: 4px !important;
+  }
+}
+
+@media (min-width: 1077px) {
+  #menu-main a:hover {
+    height: 100% !important;
+  }
+}
+
+.nscap .readmorebtn {
+  display: inline-block !important;
+}

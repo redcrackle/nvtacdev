@@ -1,0 +1,24 @@
+Apart from generator.php, the code in this folder comes from
+
+https://wordpress.org/plugins/wicked-block-builder/
+
+This code makes the blocks in the blocks folder work.
+
+Generator.php is my file, which sets up the others, see below for how I think i did this.
+
+The others are in (as at version 1.4.6)
+
+wicked-block-builder/dist
+
+generator.css
+generator.js
+
+wicked-block-builder/classes/rest-api/v1
+
+class-generator-api.php
+class-rest-api.php
+
+generator.php is code that I think is created when you export a block to a plugin.  
+So in the wicked-block-builder there is an option to export a block to a standalone plugin.  
+This generates a plugin.zip file, and I think I took the code from that.
+
