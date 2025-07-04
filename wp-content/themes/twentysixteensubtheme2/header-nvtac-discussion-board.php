@@ -93,7 +93,7 @@
 
 
 
-<a href="https://nvtac.org" class="noExitNotifier"><img class="nvtaclogo" src="https://nvtac.org/wp-content/uploads/2019/06/nvtac_hor_logo.png"  alt="National Veterans' Technical Assistance Center (NVTAC) Logo" title="National Veterans' Technical Assistance Center (NVTAC) Logo" ></a>
+<a href="<?php echo site_url(); ?>" class="noExitNotifier"><img class="nvtaclogo" src="https://nvtac.org/wp-content/uploads/2019/06/nvtac_hor_logo.png"  alt="National Veterans' Technical Assistance Center (NVTAC) Logo" title="National Veterans' Technical Assistance Center (NVTAC) Logo" ></a>
 
 <?php
 
