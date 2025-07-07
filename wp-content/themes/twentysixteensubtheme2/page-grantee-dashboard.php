@@ -21,7 +21,7 @@ wp_head();
         <?php
 		the_content();
 		?>
-
+  </div>
     </article><!-- #post-<?php the_ID(); ?> -->
 
 
