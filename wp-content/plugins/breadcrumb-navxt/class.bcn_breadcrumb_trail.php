@@ -1,6 +1,6 @@
 <?php
 /*
-	Copyright 2015-2022  John Havlik  (email : john.havlik@mtekk.us)
+	Copyright 2015-2025  John Havlik  (email : john.havlik@mtekk.us)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ require_once(dirname(__FILE__) . '/includes/block_direct_access.php');
 class bcn_breadcrumb_trail
 {
 	//Our member variables
-	const version = '7.0.2';
+	const version = '7.4.1';
 	//An array of breadcrumbs
 	public $breadcrumbs = array();
 	public $trail = array();
@@ -325,6 +325,7 @@ class bcn_breadcrumb_trail
 	 * @param string $type The post type of the post to figure out the taxonomy for
 	 * @param int $parent (optional) The id of the parent of the current post, used if hiearchal posts will be the "taxonomy" for the current post
 	 */
+	//TODO/FIXME Move to passing in WP_POST instead of id, type and parent
 	protected function post_hierarchy($id, $type, $parent = null)
 	{
 		//Check to see if breadcrumbs for the hierarchy of the post needs to be generated
@@ -392,6 +393,10 @@ class bcn_breadcrumb_trail
 		if(!($parent instanceof WP_Post))
 		{
 			$parent = get_post($id);
+			if(!($parent instanceof WP_Post))
+			{
+				return;
+			}
 		}
 		//Finish off with trying to find the type archive
 		$this->maybe_do_archive_by_post_type($parent->post_type);
@@ -576,6 +581,11 @@ class bcn_breadcrumb_trail
 	 */
 	protected function do_archive_by_term($term, $is_paged = false)
 	{
+		if(!($term instanceof WP_Term))
+		{
+			_doing_it_wrong(__CLASS__ . '::' . __FUNCTION__, __('$term global is not of type WP_Term', 'breadcrumb-navxt'), '7.0.3');
+			return;
+		}
 		//Place the breadcrumb in the trail, uses the constructor to set the title, template, and type, get a pointer to it in return
 		$breadcrumb = $this->add(new bcn_breadcrumb(
 				$term->name,
@@ -842,8 +852,14 @@ class bcn_breadcrumb_trail
 		{
 			$type = $this->get_type_string_query_var();
 		}
+		$add_query_arg = false;
 		//Add a query arg if we are not on the default post type for the archive in question and the post type is not post
-		$add_query_arg = (!($taxonomy && $type === $wp_taxonomies[$taxonomy]->object_type[0]) && $type !== 'post');
+		if($type !== 'post' && !($taxonomy
+				&& isset($wp_taxonomies[$taxonomy]->object_type[0])
+				&& $type === $wp_taxonomies[$taxonomy]->object_type[0]))
+		{
+			$add_query_arg = true;
+		}
 		//Filter the add_query_arg logic, only add the query arg if necessary
 		if(apply_filters('bcn_add_post_type_arg', $add_query_arg, $type, $taxonomy))
 		{
@@ -855,7 +871,6 @@ class bcn_breadcrumb_trail
 	 * A Breadcrumb Trail Filling Function
 	 *
 	 * This functions fills a breadcrumb for a post type archive (WP 3.1 feature)
-	 *
 	 * @param string type_str The name of the CPT to generate the archive breadcrumb for
 	 * @param bool $force_link Whether or not to force this breadcrumb to be linked
 	 * @param bool $is_paged Whether or not the current resource is on a page other than page 1
@@ -995,9 +1010,11 @@ class bcn_breadcrumb_trail
 	/**
 	 * Breadcrumb Trail Filling Function
 	 * 
+	 * @param bool $use_loop_post Whether or not to generate for the post within the loop or the page containing the loop (usually an archive of some sort)
+	 * 
 	 * This functions fills the breadcrumb trail.
 	 */
-	public function fill()
+	public function fill($use_loop_post = false)
 	{
 		global $wpdb, $wp_query, $wp, $wp_taxonomies;
 		//Check to see if the trail is already populated
@@ -1034,7 +1051,7 @@ class bcn_breadcrumb_trail
 			$this->do_paged($page_number);
 		}
 		//For the front page, as it may also validate as a page, do it first
-		if(is_front_page())
+		if(is_front_page() && (!$use_loop_post || !in_the_loop()))
 		{
 			//Must have two seperate branches so that we don't evaluate it as a page
 			if($this->opt['bhome_display'])
@@ -1043,17 +1060,20 @@ class bcn_breadcrumb_trail
 			}
 		}
 		//For posts
-		else if(is_singular())
+		else if(is_singular() || ($use_loop_post && in_the_loop()))
 		{
-			$this->do_post(get_post(), false, (get_query_var('page') > 1));
+			//Could use the $post global, but we can't really trust it
+			$type = get_post();
+			$this->do_post($type, false, (get_query_var('page') > 1));
 			//If this is an attachment then we need to change the queried object to the parent post
-			if(is_attachment())
+			if(is_attachment() && $type instanceof WP_Post)
 			{
-				//Could use the $post global, but we can't really trust it
-				$post = get_post();
-				$type = get_post($post->post_parent); //TODO check for WP_Error?
+				$type = get_post($type->post_parent);
 			}
-			$this->do_root($type->post_type, $this->opt['apost_' . $type->post_type . '_root'], is_paged(), false);
+			if($type instanceof WP_Post)
+			{
+				$this->do_root($type->post_type, $this->opt['apost_' . $type->post_type . '_root'], is_paged(), false);
+			}
 		}
 		//For searches
 		else if(is_search())
@@ -1061,7 +1081,7 @@ class bcn_breadcrumb_trail
 			$this->do_search(get_search_query(), is_paged());
 		}
 		//For author pages
-		else if(is_author())
+		else if(is_author() && $type instanceof WP_User)
 		{
 			$this->do_author($type, is_paged());
 			$this->do_root('post', $this->opt['aauthor_root'], is_paged(), false);
@@ -1100,7 +1120,7 @@ class bcn_breadcrumb_trail
 				$this->do_archive_by_post_type($this->get_type_string_query_var(), false, is_paged(), true);
 			}
 			//For taxonomy based archives
-			else if(is_category() || is_tag() || is_tax())
+			else if((is_category() || is_tag() || is_tax()) && $type instanceof WP_Term)
 			{
 				$this->do_archive_by_term($type, is_paged());
 				$type_str = $this->type_archive($type);
@@ -1139,7 +1159,7 @@ class bcn_breadcrumb_trail
 			}
 		}
 		//We always do the home link last, unless on the frontpage
-		if(!is_front_page())
+		if(!is_front_page() || ($use_loop_post && in_the_loop()))
 		{
 			$this->do_home(true, false, false);
 		}
@@ -1220,12 +1240,14 @@ class bcn_breadcrumb_trail
 	 * @param string $template The template to use for the string output of each breadcrumb. Also known as the inner template.
 	 * @param string $outer_template The template to place an entire dimension of the trail into for all dimensions higher than 1.
 	 * @param string $separator The separator to use at this level of the breadcrumb trail
+	 * @param int $depth The iteration depth
 	 * 
 	 * @return string Compiled string version of breadcrumb trail ready for display.
 	 */
-	protected function display_loop($breadcrumbs, $linked, $reverse, $template, $outer_template, $separator)
+	protected function display_loop($breadcrumbs, $linked, $reverse, $template, $outer_template, $separator, $depth = 1)
 	{
 		$position = 1;
+		$breadcrumbs = apply_filters('bcn_before_loop', $breadcrumbs);
 		$last_position = count($breadcrumbs);
 		if($reverse)
 		{
@@ -1243,7 +1265,7 @@ class bcn_breadcrumb_trail
 			if(is_array($breadcrumb))
 			{
 				$trail_str .= sprintf($outer_template, 
-						$this->display_loop($breadcrumb, $linked, $reverse, $template, $outer_template, $this->opt['hseparator_higher_dim']), $separator);
+						$this->display_loop($breadcrumb, $linked, $reverse, $template, $outer_template, $this->opt['hseparator_higher_dim'], $depth + 1), $separator);
 			}
 			else if($breadcrumb instanceof bcn_breadcrumb)
 			{
@@ -1261,7 +1283,9 @@ class bcn_breadcrumb_trail
 				//Filter li_attributes adding attributes to the li element
 				//TODO: Remove the bcn_li_attributes filter
 				$attribs = apply_filters_deprecated('bcn_li_attributes', array($attribs, $breadcrumb->get_types(), $breadcrumb->get_id()), '6.0.0', 'bcn_display_attributes');
+				//TODO: Deprecate this filter in favor of just using bcn_display_attributes_array
 				$attribs = apply_filters('bcn_display_attributes', $attribs, $breadcrumb->get_types(), $breadcrumb->get_id());
+				$separator = apply_filters('bcn_display_separator', $separator, $position, $last_position, $depth);
 				//Assemble the breadcrumb
 				$trail_str .= sprintf($template, $breadcrumb->assemble($linked, $position, ($key === 0)), $separator, $attribs);
 			}

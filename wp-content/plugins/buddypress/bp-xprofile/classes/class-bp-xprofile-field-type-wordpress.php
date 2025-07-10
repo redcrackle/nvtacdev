@@ -72,7 +72,7 @@ abstract class BP_XProfile_Field_Type_WordPress extends BP_XProfile_Field_Type {
 		 *
 		 * @since 8.0.0
 		 *
-		 * @param BP_XProfile_Field_Type_WordPress $this Instance of the field type object.
+		 * @param BP_XProfile_Field_Type_WordPress $field_type Current instance of the field type class.
 		 */
 		do_action( 'bp_xprofile_field_type_wordpress', $this );
 
@@ -118,7 +118,7 @@ abstract class BP_XProfile_Field_Type_WordPress extends BP_XProfile_Field_Type {
 	 *     @type mixed             $value          Value passed to xprofile_set_field_data().
 	 *     @type boolean           $is_required    Whether or not the field is required.
 	 * }
-	 * @return boolean Whether to shortcircuit the $bp->profile->table_name_data table.
+	 * @return bool Whether to shortcircuit the $bp->profile->table_name_data table.
 	 */
 	public function set_field_value( $retval = false, $field_args = array() ) {
 		// Check the wp_user_key is valid and supported.
@@ -155,6 +155,8 @@ abstract class BP_XProfile_Field_Type_WordPress extends BP_XProfile_Field_Type {
 	 * to include the WordPress field value into the xProfile fields loop.
 	 *
 	 * @since 8.0.0
+	 *
+	 * @global wpdb $wpdb WordPress database object.
 	 *
 	 * @param integer $user_id The user ID.
 	 * @param integer $field_id The xProfile field ID.

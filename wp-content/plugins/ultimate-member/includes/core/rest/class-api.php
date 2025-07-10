@@ -296,7 +296,7 @@ if ( ! class_exists( 'um\core\rest\API' ) ) {
 			$count = absint( $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}users" ) );
 			$response['stats']['total_users'] = $count;
 
-			$pending = UM()->user()->get_pending_users_count();
+			$pending = UM()->query()->get_pending_users_count();
 			$response['stats']['pending_users'] = absint( $pending );
 
 			/**
@@ -538,7 +538,7 @@ if ( ! class_exists( 'um\core\rest\API' ) ) {
 
 				case 'xml' :
 
-					require_once um_path . 'includes/lib/array2xml.php';
+					require_once UM_PATH . 'includes/lib/array2xml.php';
 					$xml = \Array2XML::createXML( 'um', $this->data );
 					echo $xml->saveXML();
 

@@ -249,7 +249,10 @@ add_action( 'groups_delete_group', 'groups_clear_group_type_cache' );
  */
 function bp_groups_clear_user_group_cache_on_membership_save( BP_Groups_Member $member ) {
 	wp_cache_delete( $member->user_id, 'bp_groups_memberships_for_user' );
-	wp_cache_delete( $member->id, 'bp_groups_memberships' );
+
+	if ( ! is_null( $member->id ) ) {
+		wp_cache_delete( $member->id, 'bp_groups_memberships' );
+	}
 }
 add_action( 'groups_member_before_save', 'bp_groups_clear_user_group_cache_on_membership_save' );
 add_action( 'groups_member_before_remove', 'bp_groups_clear_user_group_cache_on_membership_save' );
@@ -317,16 +320,17 @@ add_action( 'bp_groups_member_before_delete', 'bp_groups_clear_user_group_cache_
  *
  * @since 2.7.0
  *
- * @return bool True on success, false on failure.
+ * @return bool
  */
 function bp_groups_reset_cache_incrementor() {
 	return bp_core_reset_incrementor( 'bp_groups' );
 }
-add_action( 'groups_group_after_save', 'bp_groups_reset_cache_incrementor' );
-add_action( 'bp_groups_delete_group',  'bp_groups_reset_cache_incrementor' );
-add_action( 'updated_group_meta',      'bp_groups_reset_cache_incrementor' );
-add_action( 'deleted_group_meta',      'bp_groups_reset_cache_incrementor' );
-add_action( 'added_group_meta',        'bp_groups_reset_cache_incrementor' );
+add_action( 'groups_group_after_save',    'bp_groups_reset_cache_incrementor' );
+add_action( 'bp_groups_delete_group',     'bp_groups_reset_cache_incrementor' );
+add_action( 'updated_group_meta',         'bp_groups_reset_cache_incrementor' );
+add_action( 'deleted_group_meta',         'bp_groups_reset_cache_incrementor' );
+add_action( 'added_group_meta',           'bp_groups_reset_cache_incrementor' );
+add_action( 'groups_member_after_remove', 'bp_groups_reset_cache_incrementor' );
 
 /**
  * Reset cache incrementor for Groups component when a group's taxonomy terms change.
@@ -340,7 +344,7 @@ add_action( 'added_group_meta',        'bp_groups_reset_cache_incrementor' );
  * @param array  $terms     Array of object terms.
  * @param array  $tt_ids    Array of term taxonomy IDs.
  * @param string $taxonomy  Taxonomy slug.
- * @return bool True on success, false on failure.
+ * @return bool
  */
 function bp_groups_reset_cache_incrementor_on_group_term_change( $object_id, $terms, $tt_ids, $taxonomy ) {
 	$tax_object = get_taxonomy( $taxonomy );
@@ -363,7 +367,7 @@ add_action( 'bp_set_object_terms', 'bp_groups_reset_cache_incrementor_on_group_t
  * @param int    $object_id ID of the item whose terms are being modified.
  * @param array  $terms     Array of object terms.
  * @param string $taxonomy  Taxonomy slug.
- * @return bool True on success, false on failure.
+ * @return bool
  */
 function bp_groups_reset_cache_incrementor_on_group_term_remove( $object_id, $terms, $taxonomy ) {
 	$tax_object = get_taxonomy( $taxonomy );

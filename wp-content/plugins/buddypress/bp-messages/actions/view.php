@@ -45,7 +45,10 @@ function messages_action_conversation() {
 			bp_core_add_message( __( 'There was a problem sending your reply. Please try again.', 'buddypress' ), 'error' );
 		}
 
-		bp_core_redirect( bp_displayed_user_domain() . bp_get_messages_slug() . '/view/' . $thread_id . '/' );
+		$path_chunks = bp_members_get_path_chunks( array( bp_get_messages_slug(), 'view', $thread_id ) );
+		$redirect    = bp_displayed_user_url( $path_chunks );
+
+		bp_core_redirect( $redirect );
 	}
 
 	/*
@@ -53,6 +56,7 @@ function messages_action_conversation() {
 	 * If an admin visits a thread, it shouldn't change the read status.
 	 */
 	if ( bp_is_my_profile() ) {
+		// This is marking the messages as read inside the BP Messages component's recipient table.
 		messages_mark_thread_read( $thread_id );
 	}
 

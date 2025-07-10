@@ -16,6 +16,13 @@ class LcpCategory{
   }
 
   /**
+   * Used to store the single main category to filter by.
+   *
+   * @var int
+   */
+  private $main_cat;
+
+  /**
    * Parses category related shortcode parameters and returns
    * WP_Query compatible $args array. Also sets $lcp_category_id.
    *
@@ -32,6 +39,7 @@ class LcpCategory{
    *   @type string $name
    *   @type string $categorypage
    *   @type string $child_categories
+   *   @type string $main_cat_only
    * }
    * @param  mixed  &$lcp_category_id Optional. Updated by this method if necessary.
    * @return array                    WP_Query $args array, @see lcp_categories.
@@ -44,25 +52,27 @@ class LcpCategory{
 
     // In a category page:
     if ($params['categorypage'] &&
-         in_array($params['categorypage'], ['yes', 'all', 'other']) ||
-         $params['id'] == -1) {
+      in_array($params['categorypage'], ['yes', 'all', 'other'])) {
       // Use current category
-      $categories = $this->current_category($params['categorypage']);
+      $categories = $this->current_category($params['categorypage'], $params['id']);
     } elseif ($params['name']) {
       // Using the category name:
       $categories = $this->with_name($params['name']);
     } elseif ($params['id']) {
       // Using the id:
       $categories = $this->with_id($params['id']);
-      // If the 'exclude' array was added, excract it.
-      if (is_array($categories) && array_key_exists('exclude', $categories)) {
-        $exclude = $categories['exclude'];
-        unset($categories['exclude']);
-      }
+    }
+    // If the 'exclude' array was added, extract it.
+    if (is_array($categories) && array_key_exists('exclude', $categories)) {
+      $exclude = $categories['exclude'];
+      unset($categories['exclude']);
     }
 
     // This is where the lcp_category_id property of CatList is changed.
     $lcp_category_id = $categories;
+
+    // Check if only the main category should be used.
+    $this->check_main_cat_only( $params[ 'main_cat_only' ], $categories );
 
     return $this->lcp_categories(
       $categories, $params['child_categories'], $exclude);
@@ -165,50 +175,68 @@ class LcpCategory{
    * Handles the `categorypage` shortcode parameter with all its modes.
    *
    * This method accepts all valid `categorypage` shortcode parameters.
-   * Also accepts an empty string for compatibility with the widget.
    * Returns a single category ID when used on category archive page,
    * a comma separated string of IDs for the 'or' relationship,
-   * an array of IDs for the 'and' relationship. When no posts should be
-   * displayed it returns `[0]`.
+   * an array of IDs for the 'and' relationship. Also accepts optional
+   * $ids which is used to handle excluded category IDs for 'yes' and 'all'
+   * modes. When no posts should be displayed it returns `[0]`.
    *
-   * @param  string $mode     Accepts 'all', 'yes', 'other' and empty string.
+   * @param  string $mode     Accepts 'all', 'yes', 'other'.
+   * @param  string $ids      IDs of excluded categories as in the shortcode.
    * @return int|string|array Category ID(s).
    */
-  public function current_category($mode){
+  public function current_category($mode, $ids='') {
     // Only single post pages with assigned category and
     // category archives have a 'current category',
     // in all other cases no posts should be returned. (#69)
+    
+    // Should be overriden if any categories are found.
+    $cats = [0]; // workaround to display no posts
+    
     $category = get_category( get_query_var( 'cat' ) );
-    if( isset( $category->errors ) && $category->errors["invalid_term"][0] == __("Empty Term.") ){
-      global $post;
+    if( ! ( isset( $category->errors ) && $category->errors["invalid_term"][0] == __("Empty Term.") ) ) {
+      $cats = $category->cat_ID;
+    } else if ( is_singular() || in_the_loop() ) {
       /* Since WP 4.9 global $post is nullified in text widgets
        * when is_singular() is false.
        *
        * Added in_the_loop check to make the shortcode work
        * in posts listed in archives and home page (#358).
        */
-      if ( is_singular() || in_the_loop() ) {
-        $categories = get_the_category($post->ID);
-      }
-      if ( !empty($categories) ){
+      global $post;
+      $categories = get_the_category($post->ID);
+
+      if ( !empty($categories) ) {
         $cats = array_map(function($cat) {
           return $cat->cat_ID;
         }, $categories);
+        // Parse excluded categories if ids are used.
+        if (in_array($mode, ['all', 'yes']) && !empty($ids)) {
+          $ids = $this->validate_excluded_ids(explode(',', $ids));
+          // Remove excluded ids from $cats.
+          $cats = array_diff($cats, array_map('abs', $ids));
+        }
         // AND relationship
-        if ('all' === $mode) return $cats;
+        if ('all' === $mode) {
+          // Handle excluded categories
+          if (!empty($ids)) $cats['exclude'] = array_map('abs', $ids);
+        }
         // OR relationship, default
-        if ('yes' === $mode || '' === $mode) return implode(',', $cats);
+        if ('yes' === $mode) {
+          // Handle excluded categories
+          if (!empty($ids)) $cats = array_merge($cats, $ids);
+          $cats = implode(',', $cats);
+        }
         // Exclude current categories
-        if ('other' === $mode) return implode(',', array_map(function($cat) {
-          return "-$cat";
-        }, $cats));
-      } else {
-        return [0]; // workaround to display no posts
+        if ('other' === $mode) {
+          $cats = implode(',', array_map(function($cat) {
+            return "-$cat";
+          }, $cats));
+        }
       }
     }
-    return $category->cat_ID;
+    return $cats;
   }
-
 
   /**
    * Gets the category id from its name.
@@ -264,5 +292,99 @@ class LcpCategory{
     }
 
     return implode(',',$categories);
+  }
+
+  /**
+   * Handles the 'main_cat_only' shortcode parameter.
+   * 
+   * When filtering by main category is enabled, adds
+   * a proper filter function to the 'posts_results' hook.
+   * 
+   * @param string $main_cat_only Shortcode parameter value, 'yes' to enable.
+   * @param mixed  $categories    Category ID of the main category to filter by.
+   */
+  private function check_main_cat_only( $main_cat_only, $categories ) {
+    if ( 'yes' === $main_cat_only ) {
+      $this->main_cat = intval( $categories );
+      add_filter( 'posts_results', [ $this, 'filter_by_main_category' ] );
+    }
+  }
+
+  /**
+   * Filter method intended for the 'posts_results' hook.
+   * 
+   * Filters the posts array and returns only those that
+   * have their main/primary category matching the one saved
+   * in the $main_cat private property.
+   * 
+   * @param array $posts WP_Post objects.
+   * @return array       Filtered WP_Post objects.
+   */
+  public function filter_by_main_category( $posts ) {
+    /* array_values is necessary to fix indexes, WordPress expects posts
+       array to have proper numerical indexing but array_filter retains
+       original array's keys.
+     */
+    return array_values( array_filter( $posts, function( $post ) {
+      return $this->get_post_primary_category( $post )->term_id === $this->main_cat;
+    }));
+  }
+
+  /**
+   * Gets the main category of a post.
+   * 
+   * This method accepts a post ID and first tries to get the
+   * primary category (a Yoast SEO feature) of the post. If none is found
+   * it falls back to the first assigned category on the post's category list.
+   * 
+   * @link https://www.lab21.gr/blog/wordpress-get-primary-category-post/
+   * 
+   * @param int $post_id ID of the post to check.
+   * @return mixed       Category ID (int) of the post's main category or null if none found.
+   */
+  private function get_post_primary_category( $post_id ) {
+    $return = null;
+
+    if ( class_exists( 'WPSEO_Primary_Term' ) ) {
+      // Show Primary category by Yoast if it is enabled & set
+      $wpseo_primary_term = new WPSEO_Primary_Term( 'category', $post_id );
+      $primary_term = get_term( $wpseo_primary_term->get_primary_term() ) ;
+
+      if ( !is_wp_error( $primary_term ) ) {
+        $return = $primary_term;
+      }
+    }
+
+    if ( empty( $return ) ) {
+      $categories_list = get_the_terms( $post_id, 'category' );
+
+      if ( !empty( $categories_list ) ) {
+        $return = $categories_list[0];  //get the first category
+      }
+    }
+
+    return $return;
+  }
+
+  /**
+   * Validates excluded category ids for current categories.
+   * 
+   * This method takes an array of category IDs which users
+   * might use together with `categorypage`. Each id should be prefixed with
+   * a minus sign.
+   * 
+   * @param array $ids   Array of strings or ints.
+   * @return array       Only valid negative integers.
+   */
+  private function validate_excluded_ids($ids) {
+    $ids = array_map('intval', $ids);
+    $ids = array_filter($ids, function($id) {
+      if (is_int($id) && $id < 0) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+    return $ids;
   }
 }

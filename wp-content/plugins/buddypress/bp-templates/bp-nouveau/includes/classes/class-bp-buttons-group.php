@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * @since 3.0.0
  */
+#[AllowDynamicProperties]
 class BP_Buttons_Group {
 
 	/**
@@ -125,6 +126,18 @@ class BP_Buttons_Group {
 	 * @param array $args Optional. See the __constructor for a description of this argument.
 	 */
 	public function update( $args = array() ) {
+		$button_group = array();
+
+		if ( is_array( $this->group ) ) {
+			$button_group = $this->group;
+		}
+
+		// If the cached button group args contains a key that is missing from args, remove it.
+		$diff = array_diff_key( $button_group, $args );
+		if ( $diff ) {
+			$this->group = array_intersect_key( $button_group, $args );
+		}
+
 		foreach ( $args as $id => $params ) {
 			if ( isset( $this->group[ $id ] ) ) {
 				$this->group[ $id ] = bp_parse_args(
@@ -144,7 +157,7 @@ class BP_Buttons_Group {
 	 * @since 9.0.0
 	 *
 	 * @param array $args Required. See the __constructor for a description of this argument.
-	 * @return bool true on success, false on failure to add.
+	 * @return bool
 	 */
 	private function add( $args ) {
 		$r = bp_parse_args(

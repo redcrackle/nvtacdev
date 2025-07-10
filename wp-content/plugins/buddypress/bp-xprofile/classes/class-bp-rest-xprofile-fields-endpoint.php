@@ -130,11 +130,17 @@ class BP_REST_XProfile_Fields_Endpoint extends WP_REST_Controller {
 			'exclude_groups'         => $request->get_param( 'exclude_groups' ),
 			'exclude_fields'         => $request->get_param( 'exclude_fields' ),
 			'update_meta_cache'      => $request->get_param( 'update_meta_cache' ),
+			'signup_fields_only'     => $request->get_param( 'signup_fields_only' ),
 			'fetch_fields'           => true,
 		);
 
 		if ( empty( $request->get_param( 'member_type' ) ) ) {
 			$args['member_type'] = false;
+		}
+
+		$include_groups = $request->get_param( 'include_groups' );
+		if ( $include_groups && ! $args['profile_group_id'] ) {
+			$args['profile_group_id'] = $include_groups;
 		}
 
 		/**
@@ -147,8 +153,13 @@ class BP_REST_XProfile_Fields_Endpoint extends WP_REST_Controller {
 		 */
 		$args = apply_filters( 'bp_rest_xprofile_fields_get_items_query_args', $args, $request );
 
-		// Actually, query it.
-		$field_groups = bp_xprofile_get_groups( $args );
+		/**
+		 * Actually, query it.
+		 *
+		 * Let's not use `bp_xprofile_get_groups`, since `BP_XProfile_Data_Template` handles signup fields better.
+		 */
+		$template_query = new BP_XProfile_Data_Template( $args );
+		$field_groups   = (array) $template_query->groups;
 
 		$retval = array();
 		foreach ( $field_groups as $group ) {
@@ -162,11 +173,11 @@ class BP_REST_XProfile_Fields_Endpoint extends WP_REST_Controller {
 		$response = rest_ensure_response( $retval );
 
 		/**
-		 * Fires after a list of field are fetched via the REST API.
+		 * Fires after a list of XProfile group fields are fetched via the REST API.
 		 *
 		 * @since 5.0.0
 		 *
-		 * @param array            $field_groups  Fetched field groups.
+		 * @param array            $field_groups Fetched field groups.
 		 * @param WP_REST_Response $response     The response data.
 		 * @param WP_REST_Request  $request      The request sent to the API.
 		 */
@@ -184,16 +195,27 @@ class BP_REST_XProfile_Fields_Endpoint extends WP_REST_Controller {
 	 * @return true|WP_Error
 	 */
 	public function get_items_permissions_check( $request ) {
+		$retval = new WP_Error(
+			'bp_rest_authorization_required',
+			__( 'Sorry, you are not allowed to perform this action.', 'buddypress' ),
+			array(
+				'status' => rest_authorization_required_code(),
+			)
+		);
+
+		if ( bp_current_user_can( 'bp_view', array( 'bp_component' => 'xprofile' ) ) ) {
+			$retval = true;
+		}
 
 		/**
 		 * Filter the XProfile fields `get_items` permissions check.
 		 *
 		 * @since 5.0.0
 		 *
-		 * @param true|WP_Error   $retval  Returned value.
+		 * @param true|WP_Error   $retval  Whether the user has access to xprofile fields.
 		 * @param WP_REST_Request $request The request sent to the API.
 		 */
-		return apply_filters( 'bp_rest_xprofile_fields_get_items_permissions_check', true, $request );
+		return apply_filters( 'bp_rest_xprofile_fields_get_items_permissions_check', $retval, $request );
 	}
 
 	/**
@@ -262,16 +284,27 @@ class BP_REST_XProfile_Fields_Endpoint extends WP_REST_Controller {
 	 * @return true|WP_Error
 	 */
 	public function get_item_permissions_check( $request ) {
+		$retval = new WP_Error(
+			'bp_rest_authorization_required',
+			__( 'Sorry, you are not allowed to perform this action.', 'buddypress' ),
+			array(
+				'status' => rest_authorization_required_code(),
+			)
+		);
+
+		if ( bp_current_user_can( 'bp_view', array( 'bp_component' => 'xprofile' ) ) ) {
+			$retval = true;
+		}
 
 		/**
 		 * Filter the XProfile fields `get_item` permissions check.
 		 *
 		 * @since 5.0.0
 		 *
-		 * @param true|WP_Error   $retval  Returned value.
+		 * @param true|WP_Error   $retval  Whether the user has access to xprofile fields.
 		 * @param WP_REST_Request $request The request sent to the API.
 		 */
-		return apply_filters( 'bp_rest_xprofile_fields_get_item_permissions_check', true, $request );
+		return apply_filters( 'bp_rest_xprofile_fields_get_item_permissions_check', $retval, $request );
 	}
 
 	/**
@@ -709,7 +742,7 @@ class BP_REST_XProfile_Fields_Endpoint extends WP_REST_Controller {
 			'is_default_option' => (bool) $field->is_default_option,
 		);
 
-		if ( ! empty( $request->get_param( 'fetch_visibility_level' ) ) ) {
+		if ( ! empty( $request->get_param( 'fetch_visibility_level' ) && ! empty( $field->visibility_level ) ) ) {
 			$data['visibility_level'] = $field->visibility_level;
 		}
 
@@ -732,7 +765,7 @@ class BP_REST_XProfile_Fields_Endpoint extends WP_REST_Controller {
 		// Adding the options.
 		if ( method_exists( $field, 'get_children' ) ) {
 			$data['options'] = array_map(
-				function( $item ) use ( $request ) {
+				function ( $item ) use ( $request ) {
 					return $this->assemble_response_data( $item, $request );
 				},
 				$field->get_children()
@@ -756,7 +789,7 @@ class BP_REST_XProfile_Fields_Endpoint extends WP_REST_Controller {
 	 */
 	protected function prepare_links( $field ) {
 		$base       = sprintf( '/%s/%s/', $this->namespace, $this->rest_base );
-		$group_base = sprintf( '/%s/%s/', $this->namespace, '/xprofile/groups/' );
+		$group_base = sprintf( '/%s/%s/', $this->namespace, 'xprofile/groups' );
 
 		// Entity meta.
 		$links = array(
@@ -889,7 +922,8 @@ class BP_REST_XProfile_Fields_Endpoint extends WP_REST_Controller {
 		$key  = 'get_item';
 
 		if ( WP_REST_Server::CREATABLE === $method || WP_REST_Server::EDITABLE === $method ) {
-			$args['description']['type'] = 'string';
+			$args['description']['type']    = 'string';
+			$args['description']['default'] = '';
 			unset( $args['description']['properties'] );
 
 			// Add specific properties to the edit context.
@@ -1161,6 +1195,14 @@ class BP_REST_XProfile_Fields_Endpoint extends WP_REST_Controller {
 			'validate_callback' => 'rest_validate_request_arg',
 		);
 
+		$params['signup_fields_only'] = array(
+			'description'       => __( 'Whether to only return signup fields.', 'buddypress' ),
+			'default'           => false,
+			'type'              => 'boolean',
+			'sanitize_callback' => 'rest_sanitize_boolean',
+			'validate_callback' => 'rest_validate_request_arg',
+		);
+
 		$params['fetch_visibility_level'] = array(
 			'description'       => __( 'Whether to fetch the visibility level for each field.', 'buddypress' ),
 			'default'           => false,
@@ -1169,12 +1211,21 @@ class BP_REST_XProfile_Fields_Endpoint extends WP_REST_Controller {
 			'validate_callback' => 'rest_validate_request_arg',
 		);
 
+		$params['include_groups'] = array(
+			'description'       => __( 'Ensure result set inludes specific profile field groups.', 'buddypress' ),
+			'default'           => array(),
+			'type'              => 'array',
+			'items'             => array( 'type' => 'integer' ),
+			'sanitize_callback' => 'wp_parse_id_list',
+			'validate_callback' => 'rest_validate_request_arg',
+		);
+
 		$params['exclude_groups'] = array(
 			'description'       => __( 'Ensure result set excludes specific profile field groups.', 'buddypress' ),
 			'default'           => array(),
 			'type'              => 'array',
 			'items'             => array( 'type' => 'integer' ),
-			'sanitize_callback' => 'bp_rest_sanitize_string_list',
+			'sanitize_callback' => 'wp_parse_id_list',
 			'validate_callback' => 'rest_validate_request_arg',
 		);
 

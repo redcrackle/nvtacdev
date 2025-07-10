@@ -126,6 +126,21 @@ function bp_register_post_types() {
 }
 
 /**
+ * Fire the 'bp_register_post_statuses' action, where plugins should register post statuses.
+ *
+ * @since 12.0.0
+ */
+function bp_register_post_statuses() {
+
+	/**
+	 * Fires inside the 'bp_register_post_statuses' function, where plugins should register post statuses.
+	 *
+	 * @since 12.0.0
+	 */
+	do_action( 'bp_register_post_statuses' );
+}
+
+/**
  * Fire the 'bp_setup_globals' action, where plugins should initialize global settings.
  *
  * @since 1.2.0
@@ -141,14 +156,28 @@ function bp_setup_globals() {
 }
 
 /**
- * Fire the 'bp_setup_nav' action, where plugins should register their navigation items.
+ * Fire the 'bp_register_nav' action, where plugins should register their navigation items.
+ *
+ * @since 1.2.0
+ */
+function bp_register_nav() {
+	/**
+	 * Fires inside the 'bp_register_nav' function, where plugins should register their navigation items.
+	 *
+	 * @since 12.0.0
+	 */
+	do_action( 'bp_register_nav' );
+}
+
+/**
+ * Fire the 'bp_setup_nav' action, where navigation items are generated.
  *
  * @since 1.2.0
  */
 function bp_setup_nav() {
 
 	/**
-	 * Fires inside the 'bp_setup_nav' function, where plugins should register their navigation items.
+	 * Fires inside the 'bp_setup_nav' function, where navigation items are generated.
 	 *
 	 * @since 1.2.0
 	 */
@@ -161,17 +190,12 @@ function bp_setup_nav() {
  * @since 1.5.0
  */
 function bp_setup_admin_bar() {
-	if ( bp_use_wp_admin_bar() ) {
-
-		/**
-		 * Fires inside the 'bp_setup_admin_bar' function, where plugins should add items to the WP admin bar.
-		 *
-		 * This hook will only fire if bp_use_wp_admin_bar() returns true.
-		 *
-		 * @since 1.5.0
-		 */
-		do_action( 'bp_setup_admin_bar', array() );
-	}
+	/**
+	 * Fires inside the 'bp_setup_admin_bar' function, where plugins should add items to the WP admin bar.
+	 *
+	 * @since 1.5.0
+	 */
+	do_action( 'bp_setup_admin_bar', array() );
 }
 
 /**
@@ -448,25 +472,6 @@ function bp_template_redirect() {
 /** Theme Helpers *************************************************************/
 
 /**
- * Fire the 'bp_register_theme_directory' action.
- *
- * The main action used registering theme directories.
- *
- * @since 1.5.0
- */
-function bp_register_theme_directory() {
-
-	/**
-	 * Fires inside the 'bp_register_theme_directory' function.
-	 *
-	 * The main action used registering theme directories.
-	 *
-	 * @since 1.7.0
-	 */
-	do_action( 'bp_register_theme_directory' );
-}
-
-/**
  * Fire the 'bp_register_theme_packages' action.
  *
  * The main action used registering theme packages.
@@ -499,21 +504,58 @@ function bp_enqueue_scripts() {
 }
 
 /**
+ * Fires an action hook to enqueue scripts and styles for specific BuddyPress contexts.
+ *
+ * @since 11.0.0
+ *
+ * @param string $context The specific BuddyPress context. Supported values are `embed` and `community`.
+ *                        Default: `embed`.
+ */
+function bp_enqueue_context_scripts( $context = 'embed' ) {
+	$bp_pages_only_assets = false;
+
+	/**
+	 * Filter here & return `true` to restrict BP Assets loading to BP Pages.
+	 *
+	 * @since 11.0.0
+	 * @since 12.0.0 Default value has been switched from `false` to `true`.
+	 *
+	 * @param bool $value True to only load BP Assets inside BP generated pages. False otherwise.
+	 */
+	$bp_pages_only = apply_filters( 'bp_enqueue_assets_in_bp_pages_only', true );
+
+	if ( 'embed' === $context || $bp_pages_only ) {
+		$bp_pages_only_assets = true;
+	}
+
+	if ( $bp_pages_only_assets && ! is_buddypress() ) {
+		return;
+	}
+
+	/**
+	 * Enqueue CSS and JS files for a specific BuddyPress context.
+	 *
+	 * @since 11.0.0
+	 */
+	do_action( "bp_enqueue_{$context}_scripts" );
+}
+
+/**
  * Fires the 'bp_enqueue_embed_scripts' action in the <head> for BP oEmbeds.
  *
  * @since 2.6.0
  */
 function bp_enqueue_embed_scripts() {
-	if ( ! is_buddypress() ) {
-		return;
-	}
+	return bp_enqueue_context_scripts( 'embed' );
+}
 
-	/**
-	 * Enqueue CSS and JS files for BuddyPress embeds.
-	 *
-	 * @since 2.6.0
-	 */
-	do_action( 'bp_enqueue_embed_scripts' );
+/**
+ * Fires the  `bp_enqueue_community_scripts` action for Template packs scripts and styles.
+ *
+ * @since 11.0.0
+ */
+function bp_enqueue_community_scripts() {
+	return bp_enqueue_context_scripts( 'community' );
 }
 
 /**
@@ -753,7 +795,7 @@ function bp_post_request() {
 	 *
 	 * @param string $action The action being run.
 	 */
-	do_action( 'bp_post_request',   $action );
+	do_action( 'bp_post_request', $action );
 }
 
 /**
@@ -795,5 +837,5 @@ function bp_get_request() {
 	 *
 	 * @param string $action The action being run.
 	 */
-	do_action( 'bp_get_request',   $action );
+	do_action( 'bp_get_request', $action );
 }

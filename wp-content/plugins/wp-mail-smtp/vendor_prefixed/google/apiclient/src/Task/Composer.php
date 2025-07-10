@@ -18,16 +18,16 @@
 namespace WPMailSMTP\Vendor\Google\Task;
 
 use WPMailSMTP\Vendor\Composer\Script\Event;
+use InvalidArgumentException;
 use WPMailSMTP\Vendor\Symfony\Component\Filesystem\Filesystem;
 use WPMailSMTP\Vendor\Symfony\Component\Finder\Finder;
-use InvalidArgumentException;
 class Composer
 {
     /**
      * @param Event $event Composer event passed in for any script method
      * @param Filesystem $filesystem Optional. Used for testing.
      */
-    public static function cleanup(\WPMailSMTP\Vendor\Composer\Script\Event $event, \WPMailSMTP\Vendor\Symfony\Component\Filesystem\Filesystem $filesystem = null)
+    public static function cleanup(\WPMailSMTP\Vendor\Composer\Script\Event $event, ?\WPMailSMTP\Vendor\Symfony\Component\Filesystem\Filesystem $filesystem = null)
     {
         $composer = $event->getComposer();
         $extra = $composer->getPackage()->getExtra();

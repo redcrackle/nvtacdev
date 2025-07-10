@@ -3,7 +3,7 @@
 Plugin Name: Breadcrumb NavXT
 Plugin URI: http://mtekk.us/code/breadcrumb-navxt/
 Description: Adds a breadcrumb navigation showing the visitor&#39;s path to their current location. For details on how to use this plugin visit <a href="http://mtekk.us/code/breadcrumb-navxt/">Breadcrumb NavXT</a>. 
-Version: 7.0.2
+Version: 7.4.1
 Author: John Havlik
 Author URI: http://mtekk.us/
 License: GPL2
@@ -11,7 +11,7 @@ Text Domain: breadcrumb-navxt
 Domain Path: /languages
 */
 /*
-	Copyright 2007-2022  John Havlik  (email : john.havlik@mtekk.us)
+	Copyright 2007-2025  John Havlik  (email : john.havlik@mtekk.us)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ $breadcrumb_navxt = null;
 //TODO change to extends \mtekk\plugKit
 class breadcrumb_navxt
 {
-	const version = '7.0.2';
+	const version = '7.4.1';
 	protected $name = 'Breadcrumb NavXT';
 	protected $identifier = 'breadcrumb-navxt';
 	protected $unique_prefix = 'bcn';
@@ -75,39 +75,24 @@ class breadcrumb_navxt
 	protected $rest_controller = null;
 	/**
 	 * Constructor for a new breadcrumb_navxt object
-	 * 
-	 * @param bcn_breadcrumb_trail $breadcrumb_trail An instance of a bcn_breadcrumb_trail object to use for everything
+	 *
 	 */
-	public function __construct(bcn_breadcrumb_trail $breadcrumb_trail)
+	public function __construct()
 	{
-		//We get our breadcrumb trail object from our constructor
-		$this->breadcrumb_trail = $breadcrumb_trail;
 		//We set the plugin basename here
 		$this->plugin_basename = plugin_basename(__FILE__);
-		//We need to add in the defaults for CPTs and custom taxonomies after all other plugins are loaded
-		add_action('wp_loaded', array($this, 'wp_loaded'), 15);
 		add_action('rest_api_init', array($this, 'rest_api_init'), 10);
 		//Run much later than everyone else to give other plugins a chance to hook into the filters and actions in this
 		add_action('init', array($this, 'init'), 9000);
 		//Register the WordPress 2.8 Widget
 		add_action('widgets_init', array($this, 'register_widget'));
-		//Load our network admin if in the network dashboard (yes is_network_admin() doesn't exist)
-		if(defined('WP_NETWORK_ADMIN') && WP_NETWORK_ADMIN)
-		{
-			require_once(dirname(__FILE__) . '/class.bcn_network_admin.php');
-			//Instantiate our new admin object
-			$this->admin = new bcn_network_admin($this->breadcrumb_trail->opt, $this->plugin_basename, $this->settings);
-		}
-		//Load our main admin if in the dashboard, but only if we're not in the network dashboard (prevents goofy bugs)
-		else if(is_admin() || defined('WP_UNINSTALL_PLUGIN'))
-		{
-			require_once(dirname(__FILE__) . '/class.bcn_admin.php');
-			//Instantiate our new admin object
-			$this->admin = new bcn_admin($this->breadcrumb_trail->opt, $this->plugin_basename, $this->settings);
-		}
 	}
 	public function init()
 	{
+		//Create an instance of bcn_breadcrumb_trail
+		$bcn_breadcrumb_trail = new bcn_breadcrumb_trail();
+		//Allow others to swap out the breadcrumb trail object
+		$this->breadcrumb_trail = apply_filters('bcn_breadcrumb_trail_object', $bcn_breadcrumb_trail);
 		add_filter('bcn_allowed_html', array($this, 'allowed_html'), 1, 1);
 		add_filter('mtekk_adminkit_allowed_html', array($this, 'adminkit_allowed_html'), 1, 1);
 		//We want to run late for using our breadcrumbs
@@ -123,8 +108,22 @@ class breadcrumb_navxt
 		{
 			$this->get_settings(); //This breaks the reset options script, so only do it if we're not trying to reset the settings
 		}
-		//Register Guternberg
+		//Register Guternberg Block
 		$this->register_block();
+		//Load our network admin if in the network dashboard (yes is_network_admin() doesn't exist)
+		if(defined('WP_NETWORK_ADMIN') && WP_NETWORK_ADMIN)
+		{
+			require_once(dirname(__FILE__) . '/class.bcn_network_admin.php');
+			//Instantiate our new admin object
+			$this->admin = new bcn_network_admin($this->breadcrumb_trail->opt, $this->plugin_basename, $this->settings);
+		}
+		//Load our main admin if in the dashboard, but only if we're not in the network dashboard (prevents goofy bugs)
+		else if(is_admin() || defined('WP_UNINSTALL_PLUGIN'))
+		{
+			require_once(dirname(__FILE__) . '/class.bcn_admin.php');
+			//Instantiate our new admin object
+			$this->admin = new bcn_admin($this->breadcrumb_trail->opt, $this->plugin_basename, $this->settings);
+		}
 	}
 	public function rest_api_init()
 	{
@@ -135,48 +134,13 @@ class breadcrumb_navxt
 		return register_widget($this->unique_prefix . '_widget');
 	}
 	/**
-	 * Server-side rendering for front-end block display
-	 * 
-	 * @param array $attributes Array of attributes set by the Gutenberg sidebar
-	 * @return string The Breadcrumb Trail string
-	 */
-	public function render_block($attributes)
-	{
-		$extra_classs = '';
-		if(isset($attributes['className']))
-		{
-			$extra_classs = esc_attr($attributes['className']);
-		}
-		return sprintf('<div class="breadcrumbs %2$s" typeof="BreadcrumbList" vocab="https://schema.org/">%1$s</div>', bcn_display(true), $extra_classs);
-	}
-	/**
 	 * Handles registering the Breadcrumb Trail Gutenberg block
 	 */
 	public function register_block()
 	{
-		wp_register_script($this->unique_prefix . '-breadcrumb-trail-block-script', plugins_url('bcn_gutenberg_block.js', __FILE__), array('wp-blocks', 'wp-element', 'wp-i18n', 'wp-api'));
 		if(function_exists('register_block_type'))
 		{
-			register_block_type( $this->unique_prefix . '/breadcrumb-trail', array(
-				'editor_script' => $this->unique_prefix . '-breadcrumb-trail-block-script',
-				'render_callback' => array($this, 'render_block')
-				/*'editor_style' => ''/*,
-				'style' => ''*/
-			));
-			if(function_exists('wp_set_script_translations'))
-			{
-				//Setup our translation strings
-				wp_set_script_translations($this->unique_prefix . '-breadcrumb-trail-block-script', 'breadcrumb-navxt');
-			}
-			//Setup some bcn settings
-			//TODO: 3rd gen settings arch should make this easier
-			wp_add_inline_script($this->unique_prefix . '-breadcrumb-trail-block-script',
-					$this->unique_prefix . 'Opts = ' . json_encode(
-							array(
-									'bcurrent_item_linked' => $this->settings['bcurrent_item_linked']->get_value(),
-									'hseparator' => $this->settings['hseparator']->get_value()
-							)) . ';',
-					'before');
+			register_block_type( dirname(__FILE__) . '/includes/blocks/build/breadcrumb-trail');
 		}
 	}
 	public function api_enable_for_block($register_rest_endpoint, $endpoint, $version, $methods)
@@ -316,15 +280,15 @@ class breadcrumb_navxt
 						'itemprop' => true
 					)
 		);
+		if(!is_array($tags))
+		{
+			$tags = array();
+		}
 		return adminKit::array_merge_recursive($tags, $allowed_html);
 	}
 	public function get_version()
 	{
 		return self::version;
-	}
-	public function wp_loaded()
-	{
-		
 	}
 	public function uninstall()
 	{
@@ -386,8 +350,13 @@ class breadcrumb_navxt
 				false,
 				_x('Paged Breadcrumb', 'Paged as in when on an archive or post that is split into multiple pages', 'breadcrumb-navxt'));
 		//Post types
-		foreach($GLOBALS['wp_post_types']as $post_type)
+		foreach($GLOBALS['wp_post_types'] as $post_type)
 		{
+			//If we somehow end up with the WP_Post_Types array having a non-WP_Post_Type object, we should skip it
+			if(!($post_type instanceof WP_Post_Type))
+			{
+				continue;
+			}
 			$settings['Hpost_' . $post_type->name . '_template'] = new setting\setting_html(
 					'post_' . $post_type->name . '_template',
 					bcn_breadcrumb::get_default_template(),
@@ -598,6 +567,34 @@ class breadcrumb_navxt
 		//Return our breadcrumb trail
 		return $this->display(true);
 	}
+	public function show_paged()
+	{
+		return $this->settings['bpaged_display']->get_value();
+	}
+	public function _display_post($post, $return = false, $linked = true, $reverse = false, $force = false, $template = '%1$s%2$s', $outer_template = '%1$s')
+	{
+		if($post instanceof WP_Post)
+		{
+			//If we're being forced to fill the trail, clear it before calling fill
+			if($force)
+			{
+				$this->breadcrumb_trail->breadcrumbs = array();
+			}
+			//Generate the breadcrumb trail
+			$this->breadcrumb_trail->fill_REST($post);
+			$trail_string = $this->breadcrumb_trail->display($linked, $reverse, $template);
+			if($return)
+			{
+				return $trail_string;
+			}
+			else
+			{
+				//Helps track issues, please don't remove it
+				$credits = "<!-- Breadcrumb NavXT " . $this::version . " -->\n";
+				echo $credits . $trail_string;
+			}
+		}
+	}
 	/**
 	 * Function updates the breadcrumb_trail options array from the database in a semi intellegent manner
 	 * 
@@ -609,26 +606,27 @@ class breadcrumb_navxt
 		$opts = adminKit::settings_to_opts($this->settings);
 		//Run setup_options for compatibilty reasons
 		breadcrumb_navxt::setup_options($opts);
-		
+		//TODO: Unit tests needed to ensure the expected behavior exists
 		//Grab the current settings for the current local site from the db
 		$this->breadcrumb_trail->opt = wp_parse_args(get_option('bcn_options'), $opts);
 		//If we're in multisite mode, look at the three BCN_SETTINGS globals
 		if(is_multisite())
 		{
+			$multisite_opts = wp_parse_args(get_site_option('bcn_options'), $opts);
 			if(defined('BCN_SETTINGS_USE_NETWORK') && BCN_SETTINGS_USE_NETWORK)
 			{
 				//Grab the current network wide settings
-				$this->breadcrumb_trail->opt = wp_parse_args(get_site_option('bcn_options'), $opts);
+				$this->breadcrumb_trail->opt = $multisite_opts;
 			}
 			else if(defined('BCN_SETTINGS_FAVOR_LOCAL') && BCN_SETTINGS_FAVOR_LOCAL)
 			{
-				//Grab the current settings for the current local site from the db
-				$this->breadcrumb_trail->opt = wp_parse_args(get_option('bcn_options'), $this->breadcrumb_trail->opt);
+				//Grab the current local site settings and merge into network site settings + defaults
+				$this->breadcrumb_trail->opt = wp_parse_args(get_option('bcn_options'), $multisite_opts);
 			}
 			else if(defined('BCN_SETTINGS_FAVOR_NETWORK') && BCN_SETTINGS_FAVOR_NETWORK)
 			{
-				//Grab the current settings from the db
-				$this->breadcrumb_trail->opt = wp_parse_args(get_site_option('bcn_options'), get_option('bcn_options'));
+				//Grab the current network site settings and merge into local site settings + defaults
+				$this->breadcrumb_trail->opt = wp_parse_args(get_site_option('bcn_options'), $this->breadcrumb_trail->opt);
 			}
 		}
 		//Currently only support using post_parent for the page hierarchy
@@ -660,8 +658,8 @@ class breadcrumb_navxt
 			$this->breadcrumb_trail->breadcrumbs = array();
 		}
 		//Generate the breadcrumb trail
-		$this->breadcrumb_trail->fill();
-		$trail_string = $this->breadcrumb_trail->display($linked, $reverse, $template);
+		$this->breadcrumb_trail->fill($force);
+		$trail_string = $this->breadcrumb_trail->display($linked, $reverse, $template, $outer_template);
 		if($return)
 		{
 			return $trail_string;
@@ -709,8 +707,8 @@ class breadcrumb_navxt
 			$this->breadcrumb_trail->breadcrumbs = array();
 		}
 		//Generate the breadcrumb trail
-		$this->breadcrumb_trail->fill();
-		$trail_string = json_encode($this->breadcrumb_trail->display_json_ld($reverse), JSON_UNESCAPED_SLASHES);
+		$this->breadcrumb_trail->fill($force);
+		$trail_string = json_encode($this->breadcrumb_trail->display_json_ld($reverse), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 		if($return)
 		{
 			return $trail_string;
@@ -726,10 +724,7 @@ add_action('plugins_loaded', 'bcn_init', 15);
 function bcn_init()
 {
 	global $breadcrumb_navxt;
-	//Create an instance of bcn_breadcrumb_trail
-	$bcn_breadcrumb_trail = new bcn_breadcrumb_trail();
-	//Let's make an instance of our object that takes care of everything
-	$breadcrumb_navxt = new breadcrumb_navxt(apply_filters('bcn_breadcrumb_trail_object', $bcn_breadcrumb_trail));
+	$breadcrumb_navxt = new breadcrumb_navxt();
 }
 /**
  * Outputs the breadcrumb trail

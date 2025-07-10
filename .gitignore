@@ -6,7 +6,11 @@
 
 # Log files
 *.log
-/nvtac_db.sql
+*.sql
+
+/app
+/logs
+/conf
 # htaccess
 
 /.htaccess

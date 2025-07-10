@@ -1,5 +1,8 @@
 <?php
 
+// Exit if accessed directly
+defined( 'ABSPATH' ) || exit;
+
 
 // new widget to show topics, but with latest author
 
@@ -295,22 +298,22 @@ class bsp_Activity_Widget extends WP_Widget {
 	 */
 	public function update( $new_instance = array(), $old_instance = array() ) {
 		$instance                 = $old_instance;
-		$instance['title']        = strip_tags( $new_instance['title'] );
-		$instance['order_by']     = strip_tags( $new_instance['order_by'] );
-		$instance['exclude_forum']     = (bool) $new_instance['exclude_forum'] ;
-		$instance['excluded_forum']     = sanitize_text_field ($new_instance['excluded_forum'] );
-		$instance['parent_forum'] = sanitize_text_field( $new_instance['parent_forum'] );
-		$instance['show_freshness']    = (bool) $new_instance['show_freshness'];
-		$instance['show_user']    = (bool) $new_instance['show_user'];
-		$instance['topic_author_label']    = $new_instance['topic_author_label'];
-		$instance['reply_author_label']    = $new_instance['reply_author_label'];
-		$instance['show_forum']    = (bool) $new_instance['show_forum'];
-		$instance['show_parent_forum']    = (bool) $new_instance['show_parent_forum'];
-		$instance['show_count']    = (bool) $new_instance['show_count'];
-		$instance['reply_count_label']    = $new_instance['reply_count_label'];
-		$instance['max_shown']    = (int) $new_instance['max_shown'];
-		$instance['shorten_freshness']    = (int) $new_instance['shorten_freshness'];
-		$instance['hide_avatar']    = (int) $new_instance['hide_avatar'];
+		$instance['title']        = (!empty ($new_instance['title']) ? strip_tags( $new_instance['title']) : '' );
+		$instance['order_by']     = (!empty ($new_instance['order_by']) ? strip_tags( $new_instance['order_by']) : '' ); 
+		$instance['exclude_forum']   = (!empty ($new_instance['exclude_forum']) ? (bool)( $new_instance['exclude_forum']) : '' );  
+		$instance['excluded_forum']     =(!empty ($new_instance['excluded_forum']) ? sanitize_text_field( $new_instance['excluded_forum']) : '' ); 
+		$instance['parent_forum'] = (!empty ($new_instance['parent_forum']) ? sanitize_text_field( $new_instance['parent_forum']) : '' );
+		$instance['show_freshness']    = (!empty ($new_instance['show_freshness']) ? (bool)( $new_instance['show_freshness']) : '' );
+		$instance['show_user']    = (!empty ($new_instance['show_user']) ? (bool)( $new_instance['show_user']) : '' );
+		$instance['topic_author_label']    = (!empty ($new_instance['topic_author_label']) ?  $new_instance['topic_author_label'] : '' );
+		$instance['reply_author_label']    = (!empty ($new_instance['reply_author_label']) ? $new_instance['reply_author_label'] : '' );
+		$instance['show_forum']    = (!empty ($new_instance['show_forum']) ? (bool)( $new_instance['show_forum']) : '' );
+		$instance['show_parent_forum']    = (!empty ($new_instance['show_parent_forum']) ? (bool)( $new_instance['show_parent_forum']) : '' );
+		$instance['show_count']    = (!empty ($new_instance['show_count']) ? (bool)( $new_instance['show_count']) : '' );
+		$instance['reply_count_label']    = (!empty ($new_instance['reply_count_label']) ? strip_tags( $new_instance['reply_count_label']) : '' );
+		$instance['max_shown']    = (!empty ($new_instance['max_shown']) ? (int)( $new_instance['max_shown']) : '' );
+		$instance['shorten_freshness']    = (!empty ($new_instance['shorten_freshness']) ? (int)( $new_instance['shorten_freshness']) : '' );
+		$instance['hide_avatar']    = (!empty ($new_instance['hide_avatar']) ? (int)( $new_instance['hide_avatar']) : '' );
 
 		
 		
@@ -484,7 +487,7 @@ class bsp_Single_Topic_Widget extends WP_Widget {
 		$settings['title'] = apply_filters( 'widget_title',           $settings['title'], $instance, $this->id_base );
 
 		// bbPress filter
-		$settings['title'] = apply_filters( 'bsp_latest_activity_widget_title', $settings['title'], $instance, $this->id_base );
+		$settings['title'] = apply_filters( 'bsp_single_topic_widget_title', $settings['title'], $instance, $this->id_base );
 		echo '<div class="widget bsp-st-title-container">';
 		
 		if ( !empty( $settings['title'] ) ) {
@@ -652,7 +655,7 @@ class bsp_Single_Forum_Widget extends WP_Widget {
 		$settings['title'] = apply_filters( 'widget_title',           $settings['title'], $instance, $this->id_base );
 
 		// bbPress filter
-		$settings['title'] = apply_filters( 'bsp_latest_activity_widget_title', $settings['title'], $instance, $this->id_base );
+		$settings['title'] = apply_filters( 'bsp_single_forum_widget_title', $settings['title'], $instance, $this->id_base );
 		
 		echo '<div class="widget bsp-sf-title-container">';
 		if ( !empty( $settings['title'] ) ) {
@@ -684,7 +687,11 @@ class bsp_Single_Forum_Widget extends WP_Widget {
 
 		// Forum has no last active data
 		} else {
-			$topic_text      = sprintf( _n( '%s topic', '%s topics', $topic_count, 'bborg' ), bbp_number_format( $topic_count ) );
+			$topic_text      = sprintf(
+                                                /* translators: %s is topic count number formated as a string */
+                                                _n( '%s topic', '%s topics', $topic_count, 'bbp-style-pack' ), 
+                                                bbp_number_format( $topic_count ) 
+                                            );
 		}
 	
 		
@@ -728,7 +735,9 @@ class bsp_Single_Forum_Widget extends WP_Widget {
 		<?php endif; ?>
 		
 		<?php if ( is_user_logged_in() ) : ?>
-			<li class="forum-subscribe"><?php bbp_forum_subscription_link( array( 'forum_id' => $forum_id ) ); ?></li>
+		<?php // we add a 'button' into the array, so that this link doesn't get taken out by /includes/functions function bsp_remove_forum_subscribe_link 
+		?>
+			<li class="forum-subscribe"><?php bbp_forum_subscription_link( array( 'forum_id' => $forum_id, 'buton' => 'yes') ); ?></li>
 		<?php endif;
 		echo '</ul>' ;
 		echo '</div>'; // end of  '<div class="bsp-st-title-container">'; 
@@ -779,6 +788,192 @@ class bsp_Single_Forum_Widget extends WP_Widget {
 			'last_reply'        => __( 'Last Reply:', 'bbp-style-pack' ),
 			'last_activity'        => __( 'Last Activity:', 'bbp-style-pack' ),
 			
-		), 'single_topic_information_widget_settings' );
+		), 'single_forum_information_widget_settings' );
+	}
+}
+
+//forums list widget
+
+function register_forum_lists_widget() {
+    register_widget("bsp_Forum_Lists_Widget");
+
+}
+
+add_action('widgets_init', 'register_forum_lists_widget');
+
+
+
+class bsp_Forum_Lists_Widget extends WP_Widget {
+
+	
+	public function __construct() {
+		$widget_ops = apply_filters( 'bbp_forums_widget_options', array(
+			'classname'                   => 'bsp-widget-display-forums',
+			'description'                 => esc_html__( 'A list of forums with an option to set the parent.', 'bbpress' ),
+			'customize_selective_refresh' => true
+		) );
+
+		parent::__construct( false, esc_html__( '(Style Pack) Forums List', 'bbpress' ), $widget_ops );
+	}
+
+	
+	public function widget( $args, $instance ) {
+
+		// Get widget settings
+		$settings = $this->parse_settings( $instance );
+
+		// Typical WordPress filter
+		$settings['title'] = apply_filters( 'widget_title',           $settings['title'], $instance, $this->id_base );
+
+		// bbPress filter
+		$settings['title'] = apply_filters( 'bbp_forum_widget_title', $settings['title'], $instance, $this->id_base );
+
+		// Note: private and hidden forums will be excluded via the
+		// bbp_pre_get_posts_normalize_forum_visibility action and function.
+		$widget_query = new WP_Query( array(
+
+			// What and how
+			'post_type'      => bbp_get_forum_post_type(),
+			'post_status'    => bbp_get_public_status_id(),
+			'post_parent'    => $settings['parent_forum'],
+			'posts_per_page' => (int) get_option( '_bbp_forums_per_page', 50 ),
+
+			// Order
+			'orderby' => 'menu_order title',
+			'order'   => 'ASC',
+
+			// Performance
+			'ignore_sticky_posts'    => true,
+			'no_found_rows'          => true,
+			'update_post_term_cache' => false,
+			'update_post_meta_cache' => false
+		) );
+
+		// Bail if no posts
+		if ( ! $widget_query->have_posts() ) {
+			return;
+		}
+		echo '<div class="widget bsp-sf-title-container">';
+		echo $args['before_widget'];
+
+		if ( ! empty( $settings['title'] ) ) {
+			echo $args['before_title'] . $settings['title'] . $args['after_title'];
+		} ?>
+		<?php
+		/*
+		<li class="bbp-forum-info bsp-forum-info"><?php _e( 'Forum', 'bbpress' ); ?></li>
+	    <li class="bsp-forum-topic-count bsp-forum-info"><?php _e( 'Posts', 'bbpress' ); ?></li>
+		*/
+		?>
+		
+		 
+		<table>
+		
+		<tr>
+			<td class="bbp-forum-info bsp-forum-info">
+			<?php _e( 'Forum', 'bbpress' ); ?>
+			</td>
+			<td class="bsp-forum-topic-count bsp-forum-info">
+			<?php _e( 'Posts', 'bbpress' ); ?>
+			</td>
+		</tr>
+			
+		<?php while ( $widget_query->have_posts() ) : $widget_query->the_post(); ?>
+		<?php
+		/*
+				<li class="bbp-forum-info">
+					<a class="bbp-forum-title" href="<?php bbp_forum_permalink($widget_query->post->ID ); ?>" title="<?php bbp_forum_title( $widget_query->post->ID ); ?>"><?php bbp_forum_title( $widget_query->post->ID ); ?></a>
+				</li>
+				<li class="bsp-forum-topic-count"><?php bbp_forum_post_count($widget_query->post->ID); ?>
+				</li>
+		*/
+		?>
+		
+			<tr>
+			<td>
+			<a class="bbp-forum-title" href="<?php bbp_forum_permalink($widget_query->post->ID ); ?>" title="<?php bbp_forum_title( $widget_query->post->ID ); ?>"><?php bbp_forum_title( $widget_query->post->ID ); ?></a>
+			</td>
+			<td class="bsp-forum-topic-count">
+			<?php bbp_forum_post_count($widget_query->post->ID); ?>
+			</td>
+			</tr>
+			
+			
+		<?php endwhile; ?>
+		</table>
+		<br/>
+
+	
+		<?php echo $args['after_widget']; ?>
+		
+		</div>
+		<?php // Reset the $post global
+		wp_reset_postdata();
+	}
+
+	/**
+	 * Update the forum widget options
+	 *
+	 * @since 2.0.0 bbPress (r2653)
+	 *
+	 * @param array $new_instance The new instance options
+	 * @param array $old_instance The old instance options
+	 */
+	public function update( $new_instance, $old_instance ) {
+		$instance                 = $old_instance;
+		$instance['title']        = strip_tags( $new_instance['title'] );
+		$instance['parent_forum'] = sanitize_text_field( $new_instance['parent_forum'] );
+
+		// Force to any
+		if ( ! empty( $instance['parent_forum'] ) && ! is_numeric( $instance['parent_forum'] ) ) {
+			$instance['parent_forum'] = 'any';
+		}
+
+		return $instance;
+	}
+
+	/**
+	 * Output the forum widget options form
+	 *
+	 * @since 2.0.0 bbPress (r2653)
+	 *
+	 * @param $instance Instance
+	 */
+	public function form( $instance ) {
+
+		// Get widget settings
+		$settings = $this->parse_settings( $instance ); ?>
+
+		<p>
+			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php esc_html_e( 'Title:', 'bbpress' ); ?>
+				<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $settings['title'] ); ?>" />
+			</label>
+		</p>
+
+		<p>
+			<label for="<?php echo $this->get_field_id( 'parent_forum' ); ?>"><?php esc_html_e( 'Parent Forum ID:', 'bbpress' ); ?>
+				<input class="widefat" id="<?php echo $this->get_field_id( 'parent_forum' ); ?>" name="<?php echo $this->get_field_name( 'parent_forum' ); ?>" type="text" value="<?php echo esc_attr( $settings['parent_forum'] ); ?>" />
+			</label>
+
+			<br />
+
+			<small><?php esc_html_e( '"0" to show only root - "any" to show all', 'bbpress' ); ?></small>
+		</p>
+
+		<?php
+	}
+
+	/**
+	 * Merge the widget settings into defaults array.
+	 *
+	 * @since 2.3.0 bbPress (r4802)
+	 *
+	 * @param $instance Instance
+	 */
+	public function parse_settings( $instance = array() ) {
+		return bbp_parse_args( $instance, array(
+			'title'        => esc_html__( 'Forums List', 'bbp-style-pack' ),
+			'parent_forum' => 0
+		), 'bsp_forum_widget_settings' );
 	}
 }

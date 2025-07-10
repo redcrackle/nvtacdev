@@ -14,24 +14,111 @@ class Pp_Roles_Manager
     /**
      * Returns an array of all the available roles.
      * This method is used to show the roles list table.
+     * 
+     * @param $view string
+     * @param $capabilities bool whether to add capabilities to result or not
+     * @param $include_features bool whether to include all features count in result
      *
      * @return array[]
      */
-    public function get_roles_for_list_table()
+    public function get_roles_for_list_table($view = 'all', $capabilities = false, $include_features = false)
     {
+        global $wp_roles;
+
         $roles = wp_roles()->roles;
-        $count = count_users();
+        $current_user = wp_get_current_user();
+        $editable = function_exists('get_editable_roles') ? 
+                        array_keys(get_editable_roles()) : 
+                        array_keys(apply_filters('editable_roles', $roles));
+
+        $count = $this->ppc_role_count_users();
+
         $res = [];
+
         foreach ($roles as $role => $detail) {
+
+            //mine role filter
+            if ($view === 'mine' && !in_array($role, $current_user->roles)) {
+                continue;
+                //active role filter
+            } elseif ($view === 'active'
+                && (!isset($count['avail_roles'][$role])
+                || (isset($count['avail_roles'][$role]) && (int)$count['avail_roles'][$role] === 0))
+            ) {
+                continue;
+                //inactive role filter
+            } elseif ($view === 'inactive'
+                && (isset($count['avail_roles'][$role])
+                && (isset($count['avail_roles'][$role]) && (int)$count['avail_roles'][$role] > 0))
+            ) {
+                continue;
+                //editable role filter
+            } elseif ($view === 'editable' && !in_array($role, $editable)) {
+                continue;
+                //uneditable role filter
+            } elseif ($view === 'uneditable' && in_array($role, $editable)) {
+                continue;
+                //system role filter
+            } elseif ($view === 'system' && !$this->is_system_role($role)) {
+                continue;
+            }
+
             $res[] = [
-                'role' => $role,
-                'name' => $detail['name'],
-                'count' => isset($count['avail_roles'][$role]) ? $count['avail_roles'][$role] : 0,
-                'is_system' => $this->is_system_role($role)
+                'role'            => $role,
+                'name'            => $detail['name'],
+                'count'           => isset($count['avail_roles'][$role]) ? $count['avail_roles'][$role] : 0,
+                'editor_features' => pp_capabilities_roles_editor_features($role, $include_features),
+                'admin_features'  => pp_capabilities_roles_admin_features($role, $include_features),
+                'profile_features'  => pp_capabilities_roles_profile_features($role, $include_features),
+                'admin_menus'     => pp_capabilities_roles_admin_menus($role, $include_features),
+                'nav_menus'       => pp_capabilities_roles_nav_menus($role, $include_features),
+                'is_system'       => $this->is_system_role($role),
+                'capabilities'    => ($capabilities) ? $detail['capabilities'] : [],
             ];
         }
 
         return $res;
+    }
+
+    /**
+     * Count role users
+     *
+     * @return array
+     */
+    public function ppc_role_count_users() {
+
+        $cache_key = 'ppc_role_count_users_cache';
+
+        $count = wp_cache_get($cache_key, 'count');
+
+        if (!$count) {
+
+            /**
+             * The computational strategy to use when counting the users.
+             * 
+             * Using $strategy = ‘time’ this is CPU-intensive and should handle around 10^7 users.
+             * Using $strategy = ‘memory’ this is memory-intensive and should handle around 10^5 users, 
+             * but see WP Bug #12257. https://developer.wordpress.org/reference/functions/count_users/
+             */
+            $time_strategy = (bool) apply_filters('ppc_role_count_users_time_strategy', true);
+
+            if ($time_strategy) {
+                $strategy =  'time';
+            } else {
+                $strategy =  'memory';
+            }
+
+            $count = count_users($strategy);
+
+            $expire_days = 7;
+            $expire_days = apply_filters('ppc_role_count_users_cache_expire_days', $expire_days);
+
+            $expire = (int)$expire_days * DAY_IN_SECONDS;
+            wp_cache_set($cache_key, $count, 'count', $expire);
+
+        }
+
+        return $count;
     }
 
     /**
@@ -151,7 +238,7 @@ class Pp_Roles_Manager
                 "SELECT ID FROM $wpdb->usermeta INNER JOIN $wpdb->users "
                 . "ON $wpdb->usermeta.user_id = $wpdb->users.ID "
                 . "WHERE meta_key='{$wpdb->prefix}capabilities' AND meta_value LIKE %s", 
-                
+
                 $like
             )
         );

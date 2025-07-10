@@ -1,5 +1,9 @@
 <?php
 
+// Exit if accessed directly
+defined( 'ABSPATH' ) || exit;
+
+
 /**
  * Forums Loop
  *
@@ -22,10 +26,10 @@
 				<li class="bbp-header">
 
 					<ul class="forum-titles">
-						<li class="bbp-forum-info"><?php if(bbp_is_forum_category()) { ?><a class="bbp-forum-title" href="<?php bbp_forum_permalink(bbp_get_forum_parent_id()); ?>"><?php bbp_forum_title(bbp_get_forum_parent_id()); ?></a><?php } else { _e( 'Forum', 'bbpress' ); } ?></li>
-						<li class="bbp-forum-topic-count"><?php _e( 'Topics', 'bbpress' ); ?></li>
-						<li class="bbp-forum-reply-count"><?php bbp_show_lead_topic() ? _e( 'Replies', 'bbpress' ) : _e( 'Posts', 'bbpress' ); ?></li>
-						<li class="bbp-forum-freshness"><?php _e( 'Freshness', 'bbpress' ); ?></li>
+						<li class="bbp-forum-info"><?php if(bbp_is_forum_category()) { ?><a class="bbp-forum-title" href="<?php bbp_forum_permalink(bbp_get_forum_parent_id()); ?>"><?php bbp_forum_title(bbp_get_forum_parent_id()); ?></a><?php } else { esc_html_e( 'Forum', 'bbpress' ); } ?></li>
+						<li class="bbp-forum-topic-count"><?php esc_html_e( 'Topics', 'bbpress' ); ?></li>
+						<li class="bbp-forum-reply-count"><?php bbp_show_lead_topic() ? esc_html_e( 'Replies', 'bbpress' ) : esc_html_e( 'Posts', 'bbpress' ); ?></li>
+						<li class="bbp-forum-freshness"><?php esc_html_e( 'Freshness', 'bbpress' ); ?></li>
 					</ul>
 
 				</li><!-- .bbp-header -->

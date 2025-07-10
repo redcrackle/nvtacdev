@@ -34,7 +34,7 @@ class Cache {
      * @param    string               $key              The name of the cached data.
      * @return   mixed
      */
-    public static function get($key)
+    public static function get(string $key)
     {
         return get_transient($key);
     }
@@ -47,10 +47,11 @@ class Cache {
      * @param    string               $key              The name of the cached data.
      * @param    mixed                $data             The data being stored.
      */
-    public static function set($key = null, $data = [], $time_value = 1, $time_unit = 'minute')
+    public static function set(string $key = null, $data = [], int $time_value = 1, string $time_unit = 'minute') /** @TODO: starting PHP 8.0 $data can be declared as mixed $data */
     {
-        if ( !$key )
+        if ( ! $key ) {
             return false;
+        }
 
         if (
             false === filter_var($time_value, FILTER_VALIDATE_INT)
@@ -60,35 +61,27 @@ class Cache {
         }
 
         switch( $time_unit ){
-
             case 'minute':
                 $time = 60;
-            break;
-
+                break;
             case 'hour':
                 $time = 60 * 60;
-            break;
-
+                break;
             case 'day':
                 $time = 60 * 60 * 24;
-            break;
-
+                break;
             case 'week':
                 $time = 60 * 60 * 24 * 7;
-            break;
-
+                break;
             case 'month':
                 $time = 60 * 60 * 24 * 30;
-            break;
-
+                break;
             case 'year':
                 $time = 60 * 60 * 24 * 365;
-            break;
-
+                break;
             default:
                 $time = 60;
-            break;
-
+                break;
         }
 
         $expiration = $time * $time_value;
@@ -99,13 +92,19 @@ class Cache {
         // Store transient keys in WPP's transients table for garbage collection
         global $wpdb;
 
-        $wpdb->insert(
-            $wpdb->prefix . "popularpoststransients",
-            [
-                'tkey' => $key,
-                'tkey_date' => Helper::now()
-            ],
-            ['%s', '%s']
+        $now = Helper::now();
+
+        //phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
+        $wpdb->query(
+            $wpdb->prepare(
+                "INSERT INTO {$wpdb->prefix}popularpoststransients (tkey, tkey_date) VALUES (%s, %s) ON DUPLICATE KEY UPDATE tkey_date = %s;",
+                [
+                    $key,
+                    $now,
+                    $now
+                ]
+            )
         );
+        //phpcs:disable
     }
 }

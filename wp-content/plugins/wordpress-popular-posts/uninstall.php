@@ -6,7 +6,7 @@
  * @author    Hector Cabrera <me@cabrerahector.com>
  * @license   GPL-2.0+
  * @link      https://cabrerahector.com
- * @copyright 2008-2021 Hector Cabrera
+ * @copyright 2008-2022 Hector Cabrera
  */
 
 // If uninstall is not called from WordPress, exit
@@ -22,44 +22,45 @@ if (
     global $wpdb;
 
     $original_blog_id = get_current_blog_id();
-    $blogs_ids = $wpdb->get_col("SELECT blog_id FROM {$wpdb->blogs}");
+    $blogs_ids = $wpdb->get_col("SELECT blog_id FROM {$wpdb->blogs}"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 
-    foreach( $blogs_ids as $blog_id ) {
-        switch_to_blog($blog_id);
+    foreach( $blogs_ids as $b_id ) {
+        switch_to_blog($b_id);
         // delete tables and options
-        uninstall();
+        wordpress_popular_posts_uninstall();
         // delete thumbnails cache and its directory
-        delete_thumb_cache();
+        wordpress_popular_posts_delete_thumb_cache();
     }
 
     // Switch back to current blog
     switch_to_blog($original_blog_id);
 } else {
     // delete tables and options
-    uninstall();
+    wordpress_popular_posts_uninstall();
     // delete thumbnails cache and its directory
-    delete_thumb_cache();
+    wordpress_popular_posts_delete_thumb_cache();
 }
 
-function delete_thumb_cache() {
+function wordpress_popular_posts_delete_thumb_cache() {
     $wp_upload_dir = wp_get_upload_dir();
 
-    if ( is_dir($wp_upload_dir['basedir'] . "/wordpress-popular-posts") ) {
-        $files = glob($wp_upload_dir['basedir'] . "/wordpress-popular-posts/*"); // get all file names
+    if ( is_dir($wp_upload_dir['basedir'] . '/wordpress-popular-posts') ) {
+        $files = glob($wp_upload_dir['basedir'] . '/wordpress-popular-posts/*'); // get all file names
 
         if ( is_array($files) && ! empty($files) ) {
             foreach( $files as $file ){ // iterate files
-                if ( is_file($file) )
+                if ( is_file($file) ) {
                     @unlink($file); // delete file
+                }
             }
         }
 
         // Finally, delete WPP's upload directory
-        @rmdir($wp_upload_dir['basedir'] . "/wordpress-popular-posts");
+        @rmdir($wp_upload_dir['basedir'] . '/wordpress-popular-posts');
     }
 }
 
-function uninstall() {
+function wordpress_popular_posts_uninstall() {
     global $wpdb;
 
     // Delete plugin's options
@@ -71,11 +72,13 @@ function uninstall() {
     delete_option('wpp_performance_nag');
 
     // Delete WPP's DB tables
-    $prefix = $wpdb->prefix . "popularposts";
+    $prefix = $wpdb->prefix . 'popularposts';
+    //phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange
     $wpdb->query("DROP TABLE IF EXISTS {$prefix}data;");
     $wpdb->query("DROP TABLE IF EXISTS {$prefix}datacache;");
     $wpdb->query("DROP TABLE IF EXISTS {$prefix}datacache_backup;");
     $wpdb->query("DROP TABLE IF EXISTS {$prefix}log;");
     $wpdb->query("DROP TABLE IF EXISTS {$prefix}summary;");
     $wpdb->query("DROP TABLE IF EXISTS {$prefix}transients;");
+    //phpcs:enable
 }

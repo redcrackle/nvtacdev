@@ -7,6 +7,10 @@
  * @subpackage Theme
  */
 
+// Exit if accessed directly
+defined( 'ABSPATH' ) || exit;
+
+
 ?>
 
 <?php do_action( 'bbp_template_before_forums_loop' ); ?>
@@ -42,10 +46,27 @@
 				<li class="bbp-header">
 
 					<ul class="forum-titles">
-						<li class="bbp-forum-info"><?php echo $link ; ?></li>
-						<li class="bbp-forum-topic-count"><?php _e( 'Topics', 'bbpress' ); ?></li>
-						<li class="bbp-forum-reply-count"><?php bbp_show_lead_topic() ? _e( 'Replies', 'bbpress' ) : _e( 'Posts', 'bbpress' ); ?></li>
-						<li class="bbp-forum-freshness"><?php _e( 'Freshness', 'bbpress' ); ?></li>
+						<li class="bbp-forum-info"><?php echo wp_kses_post($link); ; ?></li>
+						<li class="bbp-forum-topic-count">
+							<?php 
+								global $bsp_style_settings_f ;
+								//only show topics if icons not set
+								if (empty ($bsp_style_settings_f['forum_icons'])) {
+									esc_html_e( 'Topics', 'bbpress' );
+								}
+								?>
+						</li>
+						<li class="bbp-forum-reply-count">
+							<?php
+							//only show posts if icons not set
+							if (empty ($bsp_style_settings_f['forum_icons'])) {
+								bbp_show_lead_topic()
+								? esc_html_e( 'Replies', 'bbpress' )
+								: esc_html_e( 'Posts',   'bbpress' );
+							}
+							?>
+						</li>
+						<li class="bbp-forum-freshness"><?php esc_html_e( 'Last Post', 'bbpress' ); ?></li>
 					</ul>
 
 				</li><!-- .bbp-header -->

@@ -3,7 +3,7 @@
  * Blogs Template tags
  *
  * @since 3.0.0
- * @version 6.0.0
+ * @version 12.0.0
  */
 
 // Exit if accessed directly.
@@ -99,6 +99,31 @@ function bp_nouveau_blogs_create_hook( $when = '', $suffix = '' ) {
 }
 
 /**
+ * Fire specific hooks into the blogs confirm template
+ *
+ * @since 12.0.0
+ *
+ * @param string $when   Optional. Either 'before' or 'after'.
+ * @param string $suffix Optional. Use it to add terms at the end of the hook name.
+ */
+function bp_nouveau_blogs_confirm_hook( $when = '', $suffix = '' ) {
+	$hook = array( 'bp' );
+
+	if ( $when ) {
+		$hook[] = $when;
+	}
+
+	// It's a create a blog hook
+	$hook[] = 'blog_confirmed';
+
+	if ( $suffix ) {
+		$hook[] = $suffix;
+	}
+
+	bp_nouveau_hook( $hook );
+}
+
+/**
  * Fire an isolated hook inside the blogs loop
  *
  * @since 3.0.0
@@ -183,44 +208,20 @@ function bp_nouveau_blogs_loop_buttons( $args = array() ) {
 			$parent_element = false;
 		}
 
-		/*
-		 * If we have a arg value for $button_element passed through
-		 * use it to default all the $buttons['button_element'] values
-		 * otherwise default to 'a' (anchor)
-		 * Or override & hardcode the 'element' string on $buttons array.
-		 *
-		 * Icons sets a class for icon display if not using the button element
-		 */
-		$icons = '';
 		if ( ! empty( $args['button_element'] ) ) {
 			$button_element = $args['button_element'] ;
 		} else {
 			$button_element = 'a';
-			$icons = ' icons';
 		}
 
-		/*
-		 * This filter workaround is waiting for a core adaptation
-		 * so that we can directly get the groups button arguments
-		 * instead of the button.
-		 *
-		 * See https://buddypress.trac.wordpress.org/ticket/7126
-		 */
-		add_filter( 'bp_get_blogs_visit_blog_button', 'bp_nouveau_blogs_catch_button_args', 100, 1 );
+		// If we pass through parent classes add them to `$button` array.
+		$parent_class = '';
+		if ( ! empty( $args['parent_attr']['class'] ) ) {
+			$parent_class = $args['parent_attr']['class'];
+		}
 
-		bp_get_blogs_visit_blog_button();
-
-		remove_filter( 'bp_get_blogs_visit_blog_button', 'bp_nouveau_blogs_catch_button_args', 100, 1 );
-
-		if ( isset( bp_nouveau()->blogs->button_args ) && bp_nouveau()->blogs->button_args ) {
-			$button_args = bp_nouveau()->blogs->button_args ;
-
-			// If we pass through parent classes add them to $button array
-			$parent_class = '';
-			if ( ! empty( $args['parent_attr']['class'] ) ) {
-				$parent_class = $args['parent_attr']['class'];
-			}
-
+		$button_args = bp_get_blogs_visit_blog_button_args();
+		if ( array_filter( $button_args ) ) {
 			// Set defaults if not set.
 			$button_args = array_merge( array(
 				'wrapper_id' => '',
@@ -237,6 +238,7 @@ function bp_nouveau_blogs_loop_buttons( $args = array() ) {
 				'parent_element'    => $parent_element,
 				'button_element'    => $button_element,
 				'link_text'         => $button_args['link_text'],
+				'link_title'        => $button_args['link_title'],
 				'parent_attr'       => array(
 					'id'              => $button_args['wrapper_id'],
 					'class'           => $parent_class,
@@ -249,8 +251,6 @@ function bp_nouveau_blogs_loop_buttons( $args = array() ) {
 					'title'            => '',
 				),
 			);
-
-			unset( bp_nouveau()->blogs->button_args );
 		}
 
 		/**

@@ -1,6 +1,14 @@
 <?php
 
-class bspunreadInformation{};
+// Exit if accessed directly
+defined( 'ABSPATH' ) || exit;
+
+
+//was class bspunreadInformation {};
+//the extends stdClass{} has been added to prevent deprecation errors for php 8.2 
+//'Deprecated: Creation of dynamic property bspunreadInformation::$unread '
+
+class bspunreadInformation extends stdClass{};
 
 //this function adds a class of bsp-topic-unread
 add_filter( 'bbp_get_topic_class', 'bsp_add_unread_class' , 30 , 3) ;
@@ -76,7 +84,7 @@ function bsp_unread_profile_actions () {
 //Mark as read all topics in current forum
 function bsp_test_mark_as_read () {
 	if (bsp_ur_is_mark_all_topics_as_read_requested ()) {
-		$forum_id = $_POST ["bsp_ur_mark_id"] ;
+		$forum_id = absint( filter_var( $_POST["bsp_ur_mark_id"], FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH ) );
 		bsp_forum_read($forum_id) ; 
 
 	}
@@ -84,7 +92,7 @@ function bsp_test_mark_as_read () {
 
 
 function bsp_get_icon ($is_unread_topic) {
-	global $bsp_style_settings_unread ;
+	global $bsp_style_settings_unread;
 	//sets the path into the appropriate icon
 	if (!empty($is_unread_topic)) {
 		//unread topic
@@ -122,15 +130,21 @@ return $path ;
 
 function bsp_display_icon ($path, $topic_id, $amount_div='') {
 	if ($path !='blank') {
-		echo '
+		//new code to take you to the last read item.  
+		//get last visit ID to this topic, if blank then no visit to this topic since this update, so use of method of getting latest reply
+		$last_id = get_post_meta ( $topic_id, bsp_ur_get_last_visit_meta_key_id (), true );
+		if (!empty ($last_id))	$url = bbp_get_reply_url ($last_id) ;
+		else $url = bbp_get_topic_last_reply_url ( $topic_id ) ;
+		$output = '
 			<div class="bbpresss_unread_posts_icon">
-				<a href="' . bbp_get_topic_last_reply_url ( $topic_id ) . '">
-					<img src="' . $path . '"/>
+				<a href="' . esc_url($url) . '">
+					<img src="' . esc_url($path) . '"/>
 				</a>
 				'. $amount_div. '
 			</div>
 			
 		';
+		echo wp_kses_post($output) ;
 	}
 }
 
@@ -145,10 +159,10 @@ function bsp_ur_icon_wrapper_begin(){
 
 
 function bsp_ur_get_current_looped_topic_id(){
-	return bbpress ()->topic_query->post->ID;
+	//check if set - not set on a 'search' for instance!
+	if (isset( bbpress()->topic_query->post->ID ) ) return bbpress()->topic_query->post->ID;
+	else return '' ;
 }
-
-
 
 function bsp_ur_on_topic_visit(){
 	$topic_id = bbpress ()->reply_query->query ["post_parent"];
@@ -157,12 +171,20 @@ function bsp_ur_on_topic_visit(){
 
 function bsp_ur_update_last_topic_visit($topic_id){
 	update_post_meta ( $topic_id, bsp_ur_get_last_visit_meta_key (), current_time ( 'timestamp' ) );
+	$last = get_post_meta ( $topic_id, '_bbp_last_active_id', true ) ;
+	update_post_meta ( $topic_id, bsp_ur_get_last_visit_meta_key_id (), $last);
 }
 
 function bsp_ur_get_last_visit_meta_key(){
 	 $current_user = wp_get_current_user();
 	 
 	return "bbpress_unread_posts_last_visit_" . $current_user->ID ;
+}
+
+function bsp_ur_get_last_visit_meta_key_id(){
+	 $current_user = wp_get_current_user();
+	 
+	return "bbpress_unread_posts_last_visit_id_" . $current_user->ID ;
 }
 
 
@@ -205,8 +227,8 @@ function bsp_unread_forum_icons(){
 		//get the last active topic for a link
 		$topic_id = get_post_meta( $forum_id , '_bbp_last_active_id', true );
 		//show the icon
-		bsp_display_icon ($path, $topic_id,$amount_div) ;
-		}
+		bsp_display_icon($path, $topic_id,$amount_div) ;
+        }
 }
 
 function bsp_is_forum_unread_amount($forum_id){
@@ -344,9 +366,9 @@ function bsp_unread_profile_information()  {
 			global $bsp_style_settings_unread ;
 			global $current_user;
 			if (isset($_REQUEST['user_id'])) {
-			$user_id = $_REQUEST['user_id'];
+                                $user_id = absint( filter_var( $_REQUEST['user_id'], FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH ) );
 			} else {
-			$user_id = $current_user->ID;
+                                $user_id = $current_user->ID;
 			}
 			//exit if users are not allowed to change
 			if ($bsp_style_settings_unread['optinout'] == 1) return ;
@@ -354,12 +376,12 @@ function bsp_unread_profile_information()  {
 			$optinout = (!empty (get_user_meta($user_id, 'bsp_unread_optinout', true)) ? get_user_meta($user_id, 'bsp_unread_optinout', true) :'') ; 
 			//then set default based on optinout value if user has not yet set something			
 			if (empty ($optinout) && $bsp_style_settings_unread['optinout'] == 2) {
-			//user must opt in, so set to opt out
-			$optinout = 2 ;
+                                //user must opt in, so set to opt out
+                                $optinout = 2 ;
 			}
 			if (empty ($optinout) && $bsp_style_settings_unread['optinout'] == 3) {
-			//user must opt out, so set to opt in
-			$optinout = 1 ;
+                                //user must opt out, so set to opt in
+                                $optinout = 1 ;
 			}
 			
 			$label1 = (!empty ($bsp_style_settings_unread['optin_desc']) ? $bsp_style_settings_unread['optin_desc']: 'Display unread icons')  ;
@@ -368,15 +390,15 @@ function bsp_unread_profile_information()  {
 			?>	
 			<table>
 				<tr>			
-					<td style="td style="text-align:left">
+					<td style="text-align:left">
 						<?php
 						$item =  'bsp_unread_optinout' ;
-						echo '<input name="'.$item.'" id="'.$item.'" type="radio" value="1" class="code"  ' . checked( 1,$optinout, false ) . ' />' ;
-						echo $label1 ;?>
+						echo '<input name="'.esc_html($item).'" id="'.esc_html($item).'" type="radio" value="1" class="code"  ' . checked( 1,$optinout, false ) . ' />' ;
+						echo esc_html($label1) ;?>
 						<br/>
 						<?php
-						echo '<input name="'.$item.'" id="'.$item.'" type="radio" value="2" class="code"  ' . checked( 2,$optinout, false ) . ' />' ;
-						echo $label2 ;?>
+						echo '<input name="'.esc_html($item).'" id="'.esc_html($item).'" type="radio" value="2" class="code"  ' . checked( 2,$optinout, false ) . ' />' ;
+						echo esc_html($label2) ;?>
 					</td>
 				</tr>
 			</table>
@@ -385,8 +407,8 @@ function bsp_unread_profile_information()  {
 
 //this function adds the updated items info to the usermeta database
 function bsp_update_unread_profile_information( $user_id ) {
-	$update = ( $_POST['bsp_unread_optinout'] ) ;
-		update_user_meta( $user_id, 'bsp_unread_optinout', $update);
+	$update = filter_var( $_POST['bsp_unread_optinout'], FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH );
+        update_user_meta( $user_id, 'bsp_unread_optinout', $update);
 }
 
 function bsp_add_unread_class ($post_classes, $topic_id, $classes ) {
@@ -398,6 +420,6 @@ function bsp_add_unread_class ($post_classes, $topic_id, $classes ) {
 	else {
 		array_push ($post_classes, 'bsp-topic-read') ;
 	}
-return $post_classes ;
+        return $post_classes ;
 }
 ?>

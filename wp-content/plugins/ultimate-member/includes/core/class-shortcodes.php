@@ -1,11 +1,11 @@
 <?php
 namespace um\core;
 
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 if ( ! class_exists( 'um\core\Shortcodes' ) ) {
-
 
 	/**
 	 * Class Shortcodes
@@ -13,18 +13,55 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 	 */
 	class Shortcodes {
 
-		var $profile_role = '';
+		/**
+		 * @var array
+		 */
+		public $forms_exist = array();
+
+		/**
+		 * @var string
+		 */
+		public $profile_role = '';
+
+		/**
+		 * @var bool
+		 */
+		public $message_mode = false;
+
+		/**
+		 * @var string
+		 */
+		public $custom_message = '';
+
+		/**
+		 * @var array
+		 */
+		public $loop = array();
+
+		/**
+		 * @var array
+		 */
+		public $emoji = array();
+
+		/**
+		 * @var null|int
+		 */
+		public $form_id = null;
+
+		/**
+		 * @var null|string
+		 */
+		public $form_status = null;
+
+		/**
+		 * @var array
+		 */
+		public $set_args = array();
 
 		/**
 		 * Shortcodes constructor.
 		 */
-		function __construct() {
-
-			$this->message_mode = false;
-			$this->custom_message = '';
-
-			$this->loop = array();
-
+		public function __construct() {
 			add_shortcode( 'ultimatemember', array( &$this, 'ultimatemember' ) );
 
 			add_shortcode( 'ultimatemember_login', array( &$this, 'ultimatemember_login' ) );
@@ -36,6 +73,8 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 			add_shortcode( 'um_loggedout', array( &$this, 'um_loggedout' ) );
 			add_shortcode( 'um_show_content', array( &$this, 'um_shortcode_show_content_for_role' ) );
 			add_shortcode( 'ultimatemember_searchform', array( &$this, 'ultimatemember_searchform' ) );
+
+			add_shortcode( 'um_author_profile_link', array( &$this, 'author_profile_link' ) );
 
 			add_filter( 'body_class', array( &$this, 'body_class' ), 0 );
 
@@ -123,9 +162,7 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 			$this->emoji[':innocent:'] = $base_uri . '72x72/1f607.png';
 			$this->emoji[':smirk:'] = $base_uri . '72x72/1f60f.png';
 			$this->emoji[':expressionless:'] = $base_uri . '72x72/1f611.png';
-
 		}
-
 
 		/**
 		 * Conditional logout form
@@ -168,7 +205,7 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 
 					if ( ! empty( $role ) && ! empty( $role['status'] ) ) {
 						$message_key = $role['status'] . '_message';
-						$this->custom_message = ! empty( $role[ $message_key ] ) ? stripslashes( $role[ $message_key ] ) : '';
+						$this->custom_message = ! empty( $role[ $message_key ] ) ? $this->convert_user_tags( stripslashes( $role[ $message_key ] ) ) : '';
 					}
 				}
 			}
@@ -207,15 +244,14 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 			}
 		}
 
-
 		/**
-		 * Extend body classes
+		 * Extend body classes.
 		 *
-		 * @param $classes
+		 * @param array $classes
 		 *
 		 * @return array
 		 */
-		function body_class( $classes ) {
+		public function body_class( $classes ) {
 			$array = UM()->config()->permalinks;
 			if ( ! $array ) {
 				return $classes;
@@ -223,7 +259,7 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 
 			foreach ( $array as $slug => $info ) {
 				if ( um_is_core_page( $slug ) ) {
-
+					$classes[] = 'um-page';
 					$classes[] = 'um-page-' . $slug;
 
 					if ( is_user_logged_in() ) {
@@ -231,7 +267,6 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 					} else {
 						$classes[] = 'um-page-loggedout';
 					}
-
 				}
 			}
 
@@ -267,23 +302,35 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 			if ( isset( $this->set_args ) && is_array( $this->set_args ) ) {
 				$args = $this->set_args;
 
-				unset( $args['file'] );
-				unset( $args['theme_file'] );
-				unset( $args['tpl'] );
+				unset( $args['file'], $args['theme_file'], $args['tpl'] );
 
 				$args = apply_filters( 'um_template_load_args', $args, $tpl );
 
-				extract( $args );
+				/*
+				 * This use of extract() cannot be removed. There are many possible ways that
+				 * templates could depend on variables that it creates existing, and no way to
+				 * detect and deprecate it.
+				 *
+				 * Passing the EXTR_SKIP flag is the safest option, ensuring globals and
+				 * function variables cannot be overwritten.
+				 */
+				// phpcs:ignore WordPress.PHP.DontExtract.extract_extract
+				extract( $args, EXTR_SKIP );
 			}
 
-			$file = um_path . "templates/{$tpl}.php";
+			$file       = UM_PATH . "templates/{$tpl}.php";
 			$theme_file = get_stylesheet_directory() . "/ultimate-member/templates/{$tpl}.php";
 			if ( file_exists( $theme_file ) ) {
 				$file = $theme_file;
 			}
 
 			if ( file_exists( $file ) ) {
-				include $file;
+				// Avoid Directory Traversal vulnerability by the checking the realpath.
+				// Templates can be situated only in the get_stylesheet_directory() or plugindir templates.
+				$real_file = wp_normalize_path( realpath( $file ) );
+				if ( 0 === strpos( $real_file, wp_normalize_path( UM_PATH . "templates" . DIRECTORY_SEPARATOR ) ) || 0 === strpos( $real_file, wp_normalize_path( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'ultimate-member' . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR ) ) ) {
+					include $file;
+				}
 			}
 		}
 
@@ -308,11 +355,11 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 				$classes .= ' um-err';
 			}
 
-			if (UM()->fields()->editing == true) {
+			if ( true === UM()->fields()->editing ) {
 				$classes .= ' um-editing';
 			}
 
-			if (UM()->fields()->viewing == true) {
+			if ( true === UM()->fields()->viewing ) {
 				$classes .= ' um-viewing';
 			}
 
@@ -345,72 +392,130 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 			return $classes;
 		}
 
-
 		/**
 		 * Logged-in only content
 		 *
-		 * @param array $args
+		 * @param array  $args
 		 * @param string $content
 		 *
 		 * @return string
 		 */
-		function um_loggedin( $args = array(), $content = "" ) {
-			ob_start();
-
-			$defaults = array(
-				'lock_text' => __( 'This content has been restricted to logged in users only. Please <a href="{login_referrer}">login</a> to view this content.', 'ultimate-member' ),
-				'show_lock' => 'yes',
+		public function um_loggedin( $args = array(), $content = '' ) {
+			$args = shortcode_atts(
+				array(
+					'lock_text' => __( 'This content has been restricted to logged-in users only. Please <a href="{login_referrer}">log in</a> to view this content.', 'ultimate-member' ),
+					'show_lock' => 'yes',
+				),
+				$args,
+				'um_loggedin'
 			);
 
-			$args = wp_parse_args( $args, $defaults );
-
 			if ( ! is_user_logged_in() ) {
-				if ( $args['show_lock'] == 'no' ) {
-					echo '';
-				} else {
-					$args['lock_text'] = $this->convert_locker_tags( $args['lock_text'] );
-					UM()->get_template( 'login-to-view.php', '', $args, true );
+				// Hide content for not logged-in users. Maybe display locked content notice.
+				if ( 'no' === $args['show_lock'] ) {
+					return '';
 				}
-			} else {
-				if ( version_compare( get_bloginfo('version'),'5.4', '<' ) ) {
-					echo do_shortcode( $this->convert_locker_tags( wpautop( $content ) ) );
-				} else {
-					echo apply_shortcodes( $this->convert_locker_tags( wpautop( $content ) ) );
-				}
+
+				$args['lock_text'] = $this->convert_locker_tags( $args['lock_text'] );
+				return UM()->get_template( 'login-to-view.php', '', $args );
 			}
 
-			$output = ob_get_clean();
-			
-			return htmlspecialchars_decode( $output, ENT_NOQUOTES );
-		}
+			$prepared_content = wp_kses( apply_shortcodes( $this->convert_locker_tags( wpautop( $content ) ) ), UM()->get_allowed_html( 'templates' ) );
 
+			/**
+			 * Filters prepared inner content via Ultimate Member handlers in [um_loggedin] shortcode.
+			 *
+			 * @since 2.8.7
+			 * @hook  um_loggedin_inner_content
+			 *
+			 * @param {string} $prepared_content Prepared inner content via Ultimate Member handlers.
+			 * @param {string} $content          Original inner content.
+			 *
+			 * @return {string} Prepared inner content.
+			 *
+			 * @example <caption>Change inner content with own handlers.</caption>
+			 * function my_um_loggedin_inner_content( $prepared_content, $content ) {
+			 *     $prepared_content = esc_html( $content );
+			 *     return $prepared_content;
+			 * }
+			 * add_filter( 'um_loggedin_inner_content', 'my_um_loggedin_inner_content', 10, 2 );
+			 */
+			return apply_filters( 'um_loggedin_inner_content', $prepared_content, $content );
+		}
 
 		/**
 		 * Logged-out only content
 		 *
-		 * @param array $args
+		 * @param array  $args
 		 * @param string $content
 		 *
 		 * @return string
 		 */
-		function um_loggedout( $args = array(), $content = '' ) {
-			ob_start();
-
-			// Hide for logged in users
+		public function um_loggedout( $args = array(), $content = '' ) {
 			if ( is_user_logged_in() ) {
-				echo '';
-			} else {
-				if ( version_compare( get_bloginfo('version'),'5.4', '<' ) ) {
-					echo do_shortcode( wpautop( $content ) );
-				} else {
-					echo apply_shortcodes( wpautop( $content ) );
-				}
+				// Hide for logged-in users
+				return '';
 			}
-
-			$output = ob_get_clean();
-			return $output;
+			return apply_shortcodes( $this->convert_locker_tags( wpautop( $content ) ) );
 		}
 
+		/**
+		 * Display post author's link to UM User Profile.
+		 *
+		 * @since 2.8.2
+		 *
+		 * Example 1: [um_author_profile_link] current post author User Profile URL
+		 * Example 2: [um_author_profile_link title="User profile" user_id="29"]
+		 * Example 3: [um_author_profile_link title="User profile" user_id="29"]Visit Author Profile[/um_author_profile_link]
+		 * Example 4: [um_author_profile_link raw="1"] for result like http://localhost:8000/user/janedoe/
+		 *
+		 * @param array  $attr {
+		 *     Attributes of the shortcode.
+		 *
+		 *     @type string $class   A link class.
+		 *     @type string $title   A link text.
+		 *     @type int    $user_id User ID. Author ID if empty.
+		 *     @type bool   $raw     Get raw URL or link layout. `false` by default.
+		 * }
+		 * @param string $content
+		 * @return string Profile link HTML or profile link URL if the link text is empty.
+		 */
+		public function author_profile_link( $attr = array(), $content = '' ) {
+			$default_user_id = 0;
+			if ( is_singular() ) {
+				$default_user_id = get_post()->post_author;
+			} elseif ( is_author() ) {
+				$default_user_id = get_the_author_meta( 'ID' );
+			}
+
+			$defaults_atts = array(
+				'class'   => 'um-link um-profile-link',
+				'title'   => __( 'Go to profile', 'ultimate-member' ),
+				'user_id' => $default_user_id,
+				'raw'     => false,
+			);
+
+			$atts = shortcode_atts( $defaults_atts, $attr, 'um_author_profile_link' );
+
+			if ( empty( $atts['user_id'] ) ) {
+				return '';
+			}
+
+			$user_id = absint( $atts['user_id'] );
+			$url     = um_user_profile_url( $user_id );
+			if ( empty( $url ) ) {
+				return '';
+			}
+
+			if ( ! empty( $atts['raw'] ) ) {
+				return $url;
+			}
+
+			$title     = ! empty( $atts['title'] ) ? $atts['title'] : __( 'Go to profile', 'ultimate-member' );
+			$link_html = empty( $content ) ? $title : $content;
+
+			return '<a class="' . esc_attr( $atts['class'] ) . '" href="' . esc_url( $url ) . '" title="' . esc_attr( $title ) . '">' . wp_kses_post( $link_html ) . '</a>';
+		}
 
 		/**
 		 * @param array $args
@@ -423,11 +528,11 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 			$args = ! empty( $args ) ? $args : array();
 
 			$default_login = $wpdb->get_var(
-				"SELECT pm.post_id 
-				FROM {$wpdb->postmeta} pm 
+				"SELECT pm.post_id
+				FROM {$wpdb->postmeta} pm
 				LEFT JOIN {$wpdb->postmeta} pm2 ON( pm.post_id = pm2.post_id AND pm2.meta_key = '_um_is_default' )
-				WHERE pm.meta_key = '_um_mode' AND 
-					  pm.meta_value = 'login' AND 
+				WHERE pm.meta_key = '_um_mode' AND
+					  pm.meta_value = 'login' AND
 					  pm2.meta_value = '1'"
 			);
 
@@ -456,11 +561,11 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 			$args = ! empty( $args ) ? $args : array();
 
 			$default_register = $wpdb->get_var(
-				"SELECT pm.post_id 
-				FROM {$wpdb->postmeta} pm 
+				"SELECT pm.post_id
+				FROM {$wpdb->postmeta} pm
 				LEFT JOIN {$wpdb->postmeta} pm2 ON( pm.post_id = pm2.post_id AND pm2.meta_key = '_um_is_default' )
-				WHERE pm.meta_key = '_um_mode' AND 
-					  pm.meta_value = 'register' AND 
+				WHERE pm.meta_key = '_um_mode' AND
+					  pm.meta_value = 'register' AND
 					  pm2.meta_value = '1'"
 			);
 
@@ -489,11 +594,11 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 			$args = ! empty( $args ) ? $args : array();
 
 			$default_profile = $wpdb->get_var(
-				"SELECT pm.post_id 
-				FROM {$wpdb->postmeta} pm 
+				"SELECT pm.post_id
+				FROM {$wpdb->postmeta} pm
 				LEFT JOIN {$wpdb->postmeta} pm2 ON( pm.post_id = pm2.post_id AND pm2.meta_key = '_um_is_default' )
-				WHERE pm.meta_key = '_um_mode' AND 
-					  pm.meta_value = 'profile' AND 
+				WHERE pm.meta_key = '_um_mode' AND
+					  pm.meta_value = 'profile' AND
 					  pm2.meta_value = '1'"
 			);
 
@@ -523,11 +628,11 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 			$args = ! empty( $args ) ? $args : array();
 
 			$default_directory = $wpdb->get_var(
-				"SELECT pm.post_id 
-				FROM {$wpdb->postmeta} pm 
+				"SELECT pm.post_id
+				FROM {$wpdb->postmeta} pm
 				LEFT JOIN {$wpdb->postmeta} pm2 ON( pm.post_id = pm2.post_id AND pm2.meta_key = '_um_is_default' )
-				WHERE pm.meta_key = '_um_mode' AND 
-					  pm.meta_value = 'directory' AND 
+				WHERE pm.meta_key = '_um_mode' AND
+					  pm.meta_value = 'directory' AND
 					  pm2.meta_value = '1'"
 			);
 
@@ -545,7 +650,6 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 			}
 		}
 
-
 		/**
 		 * Shortcode
 		 *
@@ -553,10 +657,67 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 		 *
 		 * @return string
 		 */
-		function ultimatemember( $args = array() ) {
+		public function ultimatemember( $args = array() ) {
+			// There is possible to use 'shortcode_atts_ultimatemember' filter for getting customized `$args`.
+			$args = shortcode_atts(
+				array(
+					'form_id'  => '',
+					'is_block' => false,
+				),
+				$args,
+				'ultimatemember'
+			);
+
+			// Sanitize shortcode arguments.
+			$args['form_id']  = ! empty( $args['form_id'] ) ? absint( $args['form_id'] ) : '';
+			$args['is_block'] = (bool) $args['is_block'];
+
+			$form_post = get_post( $args['form_id'] );
+			// Invalid post ID. Maybe post doesn't exist.
+			if ( empty( $form_post ) ) {
+				return '';
+			}
+
+			// Invalid post type. It can be only `um_form` or `um_directory`
+			$post_types = array( 'um_form' );
+			if ( UM()->options()->get( 'members_page' ) ) {
+				$post_types[] = 'um_directory';
+			}
+
+			if ( ! in_array( $form_post->post_type, $post_types, true ) ) {
+				return '';
+			}
+
+			/**
+			 * Filters variable for enable singleton shortcode loading on the same page.
+			 * Note: Set it to `false` if you don't need to render the same form twice or more on the same page.
+			 *
+			 * @since 2.6.8
+			 * @since 2.6.9 $disable argument set to `true` by default
+			 *
+			 * @hook  um_ultimatemember_shortcode_disable_singleton
+			 *
+			 * @param {bool}  $disable Disabled singleton. By default, it's `true`.
+			 * @param {array} $args    Shortcode arguments.
+			 *
+			 * @return {bool} Disabled singleton or not.
+			 *
+			 * @example <caption>Turn off ability to use ultimatemember shortcode twice.</caption>
+			 * add_filter( 'um_ultimatemember_shortcode_disable_singleton', '__return_false' );
+			 */
+			$disable_singleton_shortcode = apply_filters( 'um_ultimatemember_shortcode_disable_singleton', true, $args );
+			if ( false === $disable_singleton_shortcode ) {
+				if ( isset( $args['form_id'] ) ) {
+					$id = $args['form_id'];
+					if ( isset( $this->forms_exist[ $id ] ) && true === $this->forms_exist[ $id ] ) {
+						return '';
+					}
+					$this->forms_exist[ $id ] = true;
+				}
+			}
+
 			return $this->load( $args );
 		}
-
 
 		/**
 		 * Load a module with global function
@@ -565,47 +726,49 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 		 *
 		 * @return string
 		 */
-		function load( $args ) {
+		public function load( $args ) {
 			$defaults = array();
-			$args = wp_parse_args( $args, $defaults );
+			$args     = wp_parse_args( $args, $defaults );
 
-			// when to not continue
-			$this->form_id = isset( $args['form_id'] ) ? $args['form_id'] : null;
-			if ( ! $this->form_id ) {
-				return;
+			// When to not continue.
+			if ( ! array_key_exists( 'form_id', $args ) ) {
+				return '';
+			}
+
+			$this->form_id = $args['form_id'];
+			if ( empty( $this->form_id ) ) {
+				return '';
 			}
 
 			$this->form_status = get_post_status( $this->form_id );
-			if ( $this->form_status != 'publish' ) {
-				return;
+			if ( 'publish' !== $this->form_status ) {
+				return '';
 			}
+
+			UM()->fields()->set_id = absint( $this->form_id );
 
 			// get data into one global array
 			$post_data = UM()->query()->post_data( $this->form_id );
-			$args = array_merge( $args, $post_data );
+			$args      = array_merge( $args, $post_data );
 
 			ob_start();
 
 			/**
-			 * UM hook
+			 * Filters arguments for loading Ultimate Member shortcodes.
 			 *
-			 * @type filter
-			 * @title um_pre_args_setup
-			 * @description Change arguments on load shortcode
-			 * @input_vars
-			 * [{"var":"$post_data","type":"string","desc":"$_POST data"}]
-			 * @change_log
-			 * ["Since: 2.0"]
-			 * @usage
-			 * <?php add_filter( 'um_pre_args_setup', 'function_name', 10, 1 ); ?>
-			 * @example
-			 * <?php
-			 * add_filter( 'um_pre_args_setup', 'my_pre_args_setup', 10, 1 );
-			 * function my_pre_args_setup( $post_data ) {
+			 * @since 1.3.x
+			 * @hook  um_pre_args_setup
+			 *
+			 * @param {array} $args Data for loading shortcode.
+			 *
+			 * @return {array} Data for loading shortcode.
+			 *
+			 * @example <caption>Change arguments on load shortcode.</caption>
+			 * function my_pre_args_setup( $args ) {
 			 *     // your code here
-			 *     return $post_data;
+			 *     return $args;
 			 * }
-			 * ?>
+			 * add_filter( 'um_pre_args_setup', 'my_pre_args_setup' );
 			 */
 			$args = apply_filters( 'um_pre_args_setup', $args );
 
@@ -613,7 +776,7 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 				$args['template'] = '';
 			}
 
-			if ( isset( $post_data['template'] ) && $post_data['template'] != $args['template'] ) {
+			if ( isset( $post_data['template'] ) && $post_data['template'] !== $args['template'] ) {
 				$args['template'] = $post_data['template'];
 			}
 
@@ -625,16 +788,12 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 				$post_data['template'] = $post_data['mode'];
 			}
 
-			if ( 'directory' == $args['mode'] ) {
+			if ( 'directory' === $args['mode'] ) {
 				wp_enqueue_script( 'um_members' );
-				if ( is_rtl() ) {
-					wp_enqueue_style( 'um_members_rtl' );
-				} else {
-					wp_enqueue_style( 'um_members' );
-				}
+				wp_enqueue_style( 'um_members' );
 			}
 
-			if ( 'directory' != $args['mode'] ) {
+			if ( 'directory' !== $args['mode'] ) {
 				$args = array_merge( $post_data, $args );
 
 				if ( empty( $args['use_custom_settings'] ) ) {
@@ -643,178 +802,192 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 					$args = array_merge( $this->get_css_args( $args ), $args );
 				}
 			}
-			// filter for arguments
 
 			/**
-			 * UM hook
+			 * Filters change arguments on load shortcode.
 			 *
-			 * @type filter
-			 * @title um_shortcode_args_filter
-			 * @description Change arguments on load shortcode
-			 * @input_vars
-			 * [{"var":"$args","type":"string","desc":"Shortcode arguments"}]
-			 * @change_log
-			 * ["Since: 2.0"]
-			 * @usage
-			 * <?php add_filter( 'um_shortcode_args_filter', 'function_name', 10, 1 ); ?>
-			 * @example
-			 * <?php
-			 * add_filter( 'um_shortcode_args_filter', 'my_shortcode_args', 10, 1 );
+			 * @since 1.3.x
+			 * @hook  um_shortcode_args_filter
+			 *
+			 * @param {array} $args Shortcode arguments.
+			 *
+			 * @return {array} Shortcode arguments.
+			 *
+			 * @example <caption>Change arguments on load shortcode.</caption>
 			 * function my_shortcode_args( $args ) {
 			 *     // your code here
 			 *     return $args;
 			 * }
-			 * ?>
+			 * add_filter( 'um_shortcode_args_filter', 'my_shortcode_args' );
 			 */
 			$args = apply_filters( 'um_shortcode_args_filter', $args );
 
-			/**
-			 * @var string $mode
-			 */
-			extract( $args, EXTR_SKIP );
+			if ( ! array_key_exists( 'mode', $args ) || ! array_key_exists( 'template', $args ) ) {
+				ob_get_clean();
+				return '';
+			}
+			$mode = $args['mode'];
 
-			//not display on admin preview
-			if ( empty( $_POST['act_id'] ) || sanitize_key( $_POST['act_id'] ) !== 'um_admin_preview_form' ) {
-
+			// Not display on admin preview.
+			if ( empty( $_POST['act_id'] ) || 'um_admin_preview_form' !== sanitize_key( $_POST['act_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+				/**
+				 * Filters the ability to show registration form for the logged-in users.
+				 * Set it to true for displaying registration form for the logged-in users.
+				 *
+				 * @since 2.1.20
+				 * @hook um_registration_for_loggedin_users
+				 *
+				 * @param {bool}  $show Show registration form for the logged-in users. By default, it's false
+				 * @param {array} $args Shortcode arguments.
+				 *
+				 * @return {bool} Show registration form for the logged-in users.
+				 *
+				 * @example <caption>Show registration form for the logged-in users for all UM registration forms on your website.</caption>
+				 * add_filter( 'um_registration_for_loggedin_users', '__return_true' );
+				 */
 				$enable_loggedin_registration = apply_filters( 'um_registration_for_loggedin_users', false, $args );
 
-				if ( 'register' == $mode && is_user_logged_in() && ! $enable_loggedin_registration ) {
+				if ( ! $enable_loggedin_registration && 'register' === $mode && is_user_logged_in() ) {
 					ob_get_clean();
-					return __( 'You are already registered', 'ultimate-member' );
+					return __( 'You are already registered.', 'ultimate-member' );
 				}
 			}
 
-			// for profiles only
-			if ( $mode == 'profile' && um_profile_id() ) {
+			if ( 'profile' === $mode && ! empty( $args['is_block'] ) && ! is_user_logged_in() ) {
+				ob_get_clean();
+				return '';
+			}
 
-				//set requested user if it's not setup from permalinks (for not profile page in edit mode)
+			// For profiles only.
+			if ( 'profile' === $mode && um_profile_id() ) {
+				// Set requested user if it's not setup from permalinks (for not profile page in edit mode).
 				if ( ! um_get_requested_user() ) {
 					um_set_requested_user( um_profile_id() );
 				}
 
-				if ( ! empty( $args['use_custom_settings'] ) ) { // Option "Apply custom settings to this form"
-					if ( ! empty( $args['role'] ) ) { // Option "Make this profile form role-specific"
+				if ( ! empty( $args['use_custom_settings'] ) && ! empty( $args['role'] ) ) {
+					// Option "Apply custom settings to this form". Option "Make this profile form role-specific".
+					// Show the first Profile Form with role selected, don't show profile forms below the page with other role-specific setting.
+					if ( empty( $this->profile_role ) ) {
+						$current_user_roles = UM()->roles()->get_all_user_roles( um_profile_id() );
 
-						// show the first Profile Form with role selected, don't show profile forms below the page with other role-specific setting
-						if ( empty( $this->profile_role ) ) {
-							$current_user_roles = UM()->roles()->get_all_user_roles( um_profile_id() );
-
-							if ( empty( $current_user_roles ) ) {
-								ob_get_clean();
-								return '';
-							} elseif ( is_array( $args['role'] ) ) {
-								if ( ! count( array_intersect( $args['role'], $current_user_roles ) ) ) {
-									ob_get_clean();
-									return '';
-								}
-							} else {
-								if ( ! in_array( $args['role'], $current_user_roles ) ) {
-									ob_get_clean();
-									return '';
-								}
-							}
-
-							$this->profile_role = $args['role'];
-						} elseif ( $this->profile_role != $args['role'] ) {
+						if ( empty( $current_user_roles ) ) {
 							ob_get_clean();
 							return '';
 						}
+						if ( is_array( $args['role'] ) ) {
+							if ( ! count( array_intersect( $args['role'], $current_user_roles ) ) ) {
+								ob_get_clean();
+								return '';
+							}
+						} elseif ( ! in_array( $args['role'], $current_user_roles, true ) ) {
+							ob_get_clean();
+							return '';
+						}
+
+						$this->profile_role = $args['role'];
+					} elseif ( $this->profile_role !== $args['role'] ) {
+						ob_get_clean();
+						return '';
 					}
 				}
 			}
 
+			$content = apply_filters( 'um_force_shortcode_render', false, $args );
+			if ( false !== $content ) {
+				ob_get_clean();
+				return $content;
+			}
+
 			/**
-			 * UM hook
+			 * Fires before loading form shortcode.
 			 *
-			 * @type action
-			 * @title um_pre_{$mode}_shortcode
-			 * @description Action pre-load form shortcode
-			 * @input_vars
-			 * [{"var":"$args","type":"array","desc":"Form shortcode pre-loading"}]
-			 * @change_log
-			 * ["Since: 2.0"]
-			 * @usage add_action( 'um_pre_{$mode}_shortcode', 'function_name', 10, 1 );
-			 * @example
-			 * <?php
-			 * add_action( 'um_pre_{$mode}_shortcode', 'my_pre_shortcode', 10, 1 );
-			 * function my_pre_shortcode( $args ) {
+			 * Note: $mode can be 'profile', 'login', 'register', 'account'.
+			 *
+			 * @since 1.3.x
+			 * @hook  um_pre_{$mode}_shortcode
+			 *
+			 * @param {array} $args Form shortcode arguments.
+			 *
+			 * @example <caption>Make any custom action before loading a registration form shortcode.</caption>
+			 * function my_pre_register_shortcode( $args ) {
 			 *     // your code here
 			 * }
-			 * ?>
+			 * add_action( 'um_pre_register_shortcode', 'my_pre_register_shortcode' );
+			 * @example <caption>Make any custom action before loading a login form shortcode.</caption>
+			 * function my_pre_login_shortcode( $args ) {
+			 *     // your code here
+			 * }
+			 * add_action( 'um_pre_login_shortcode', 'my_pre_login_shortcode' );
+			 * @example <caption>Make any custom action before loading a password reset form shortcode.</caption>
+			 * function my_pre_password_shortcode( $args ) {
+			 *     // your code here
+			 * }
+			 * add_action( 'um_pre_password_shortcode', 'my_pre_password_shortcode' );
+			 * @example <caption>Make any custom action before loading a profile form shortcode.</caption>
+			 * function my_pre_profile_shortcode( $args ) {
+			 *     // your code here
+			 * }
+			 * add_action( 'um_pre_profile_shortcode', 'my_pre_profile_shortcode' );
+			 * @example <caption>Make any custom action before loading an account form shortcode.</caption>
+			 * function my_pre_account_shortcode( $args ) {
+			 *     // your code here
+			 * }
+			 * add_action( 'um_pre_account_shortcode', 'my_pre_account_shortcode' );
 			 */
 			do_action( "um_pre_{$mode}_shortcode", $args );
 			/**
-			 * UM hook
+			 * Fires before loading form shortcode.
 			 *
-			 * @type action
-			 * @title um_before_form_is_loaded
-			 * @description Action pre-load form shortcode
-			 * @input_vars
-			 * [{"var":"$args","type":"array","desc":"Form shortcode pre-loading"}]
-			 * @change_log
-			 * ["Since: 2.0"]
-			 * @usage add_action( 'um_before_form_is_loaded', 'function_name', 10, 1 );
-			 * @example
-			 * <?php
+			 * @since 1.3.x
+			 * @hook  um_before_form_is_loaded
+			 *
+			 * @param {array} $args Form shortcode arguments.
+			 *
+			 * @example <caption>Make any custom action before loading UM form shortcode.</caption>
+			 * function my_pre_shortcode( $args ) {
+			 *     // your code here
+			 * }
 			 * add_action( 'um_before_form_is_loaded', 'my_pre_shortcode', 10, 1 );
-			 * function my_pre_shortcode( $args ) {
-			 *     // your code here
-			 * }
-			 * ?>
 			 */
-			do_action( "um_before_form_is_loaded", $args );
+			do_action( 'um_before_form_is_loaded', $args );
 			/**
-			 * UM hook
+			 * Fires before loading a form shortcode.
 			 *
-			 * @type action
-			 * @title um_before_{$mode}_form_is_loaded
-			 * @description Action pre-load form shortcode
-			 * @input_vars
-			 * [{"var":"$args","type":"array","desc":"Form shortcode pre-loading"}]
-			 * @change_log
-			 * ["Since: 2.0"]
-			 * @usage add_action( 'um_before_{$mode}_form_is_loaded', 'function_name', 10, 1 );
-			 * @example
-			 * <?php
-			 * add_action( 'um_before_{$mode}_form_is_loaded', 'my_pre_shortcode', 10, 1 );
-			 * function my_pre_shortcode( $args ) {
-			 *     // your code here
-			 * }
-			 * ?>
+			 * @since 1.3.x
+			 * @todo Deprecate since 2.7.0. Use `um_pre_{$mode}_shortcode` or `um_before_form_is_loaded` instead.
+			 * @hook  um_before_{$mode}_form_is_loaded
+			 *
+			 * @param {array} $args Form shortcode arguments.
 			 */
 			do_action( "um_before_{$mode}_form_is_loaded", $args );
 
-			$this->template_load( $template, $args );
+			$this->template_load( $args['template'], $args );
 
 			$this->dynamic_css( $args );
 
-			if ( um_get_requested_user() || $mode == 'logout' ) {
+			if ( 'logout' === $mode || um_get_requested_user() ) {
 				um_reset_user();
 			}
 
 			/**
-			 * UM hook
+			 * Fires after load shortcode content.
 			 *
-			 * @type action
-			 * @title um_after_everything_output
-			 * @description Action after load shortcode content
-			 * @change_log
-			 * ["Since: 2.0"]
-			 * @usage add_action( 'um_after_everything_output', 'function_name', 10 );
-			 * @example
-			 * <?php
-			 * add_action( 'um_after_everything_output', 'my_after_everything_output', 10 );
-			 * function my_after_everything_output() {
+			 * @since 2.0
+			 * @hook  um_after_everything_output
+			 *
+			 * @param {array} $args Form shortcode arguments.
+			 *
+			 * @example <caption>Make any custom action after load shortcode content.</caption>
+			 * function my_pre_shortcode() {
 			 *     // your code here
 			 * }
-			 * ?>
+			 * add_action( 'um_after_everything_output', 'my_pre_shortcode', 10 );
 			 */
 			do_action( 'um_after_everything_output' );
 
-			$output = ob_get_clean();
-			return $output;
+			return ob_get_clean();
 		}
-
 
 		/**
 		 * Get dynamic CSS args
@@ -822,63 +995,60 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 		 * @param $args
 		 * @return array
 		 */
-		function get_css_args( $args ) {
+		public function get_css_args( $args ) {
 			$arr = um_styling_defaults( $args['mode'] );
-			$arr = array_merge( $arr, array( 'form_id' => $args['form_id'], 'mode' => $args['mode'] ) );
+			$arr = array_merge(
+				$arr,
+				array(
+					'form_id' => $args['form_id'],
+					'mode'    => $args['mode'],
+				)
+			);
 			return $arr;
 		}
 
-
 		/**
-		 * Load dynamic css
+		 * Load dynamic CSS.
 		 *
 		 * @param array $args
 		 *
 		 * @return string
 		 */
-		function dynamic_css( $args = array() ) {
+		public function dynamic_css( $args = array() ) {
 			/**
-			 * UM hook
+			 * Filters for disable global dynamic CSS. It's false by default, set it to true to disable.
 			 *
-			 * @type filter
-			 * @title um_disable_dynamic_global_css
-			 * @description Turn on for disable global dynamic CSS for fix the issue #306
-			 * @input_vars
-			 * [{"var":"$disable","type":"bool","desc":"Disable global CSS"}]
-			 * @change_log
-			 * ["Since: 2.0"]
-			 * @usage
-			 * <?php add_filter( 'um_disable_dynamic_global_css', 'function_name', 10, 1 ); ?>
-			 * @example
-			 * <?php
-			 * add_filter( 'um_disable_dynamic_global_css', 'my_disable_dynamic_global_css', 10, 1 );
-			 * function my_disable_dynamic_global_css( $disable ) {
-			 *     // your code here
-			 *     return $disable;
-			 * }
-			 * ?>
+			 * @since 2.0
+			 * @hook  um_disable_dynamic_global_css
+			 *
+			 * @param {bool} $disable Disable global CSS.
+			 *
+			 * @return {bool} Disable global CSS.
+			 *
+			 * @example <caption>Turn off enqueue of global dynamic CSS.</caption>
+			 * add_filter( 'um_disable_dynamic_global_css', '__return_true' );
 			 */
 			$disable_css = apply_filters( 'um_disable_dynamic_global_css', false );
-			if ( $disable_css )
+			if ( $disable_css ) {
 				return '';
+			}
 
-			/**
-			 * @var $mode
-			 */
-			extract( $args );
+			if ( empty( $args['form_id'] ) ) {
+				return '';
+			}
 
-			include_once um_path . 'assets/dynamic_css/dynamic_global.php';
+			include_once UM_PATH . 'assets/dynamic_css/dynamic-global.php';
 
-			if ( isset( $mode ) && in_array( $mode, array( 'profile', 'directory' ) ) ) {
-				$file = um_path . 'assets/dynamic_css/dynamic_' . $mode . '.php';
+			if ( array_key_exists( 'mode', $args ) && in_array( $args['mode'], array( 'profile', 'directory' ), true ) ) {
+				$file = UM_PATH . 'assets/dynamic_css/dynamic-' . $args['mode'] . '.php';
 
-				if ( file_exists( $file ) )
+				if ( file_exists( $file ) ) {
 					include_once $file;
+				}
 			}
 
 			return '';
 		}
-
 
 		/**
 		 * Loads a template file
@@ -886,7 +1056,7 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 		 * @param $template
 		 * @param array $args
 		 */
-		function template_load( $template, $args = array() ) {
+		public function template_load( $template, $args = array() ) {
 			if ( is_array( $args ) ) {
 				$this->set_args = $args;
 			}
@@ -903,7 +1073,7 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 		 */
 		function template_exists($template) {
 
-			$file = um_path . 'templates/' . $template . '.php';
+			$file = UM_PATH . 'templates/' . $template . '.php';
 			$theme_file = get_stylesheet_directory() . '/ultimate-member/templates/' . $template . '.php';
 
 			if (file_exists($theme_file) || file_exists($file)) {
@@ -941,7 +1111,7 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 				$array[ $excluded ] = __( 'Default Template', 'ultimate-member' );
 			}
 
-			$paths[] = glob( um_path . 'templates/' . '*.php' );
+			$paths[] = glob( UM_PATH . 'templates/' . '*.php' );
 
 			if ( file_exists( get_stylesheet_directory() . '/ultimate-member/templates/' ) ) {
 				$paths[] = glob( get_stylesheet_directory() . '/ultimate-member/templates/' . '*.php' );
@@ -1037,22 +1207,20 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 		 *
 		 * @return mixed|string
 		 */
-		function convert_locker_tags( $str ) {
-			add_filter( 'um_template_tags_patterns_hook', array( &$this, 'add_placeholder' ), 10, 1 );
-			add_filter( 'um_template_tags_replaces_hook', array( &$this, 'add_replace_placeholder' ), 10, 1 );
+		public function convert_locker_tags( $str ) {
+			add_filter( 'um_template_tags_patterns_hook', array( &$this, 'add_placeholder' ) );
+			add_filter( 'um_template_tags_replaces_hook', array( &$this, 'add_replace_placeholder' ) );
 			return um_convert_tags( $str, array(), false );
 		}
-
 
 		/**
 		 * Convert user tags in a string
 		 *
-		 * @param $str
+		 * @param string $str
 		 *
-		 * @return mixed
+		 * @return string
 		 */
-		function convert_user_tags( $str ) {
-
+		public function convert_user_tags( $str ) {
 			$pattern_array = array(
 				'{first_name}',
 				'{last_name}',
@@ -1060,88 +1228,96 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 				'{user_avatar_small}',
 				'{username}',
 				'{nickname}',
+				'{user_email}',
 			);
-
 			/**
-			 * UM hook
+			 * Filters the user placeholders patterns.
 			 *
-			 * @type filter
-			 * @title um_allowed_user_tags_patterns
-			 * @description Extend user placeholders patterns
-			 * @input_vars
-			 * [{"var":"$patterns","type":"array","desc":"Placeholders"}]
-			 * @change_log
-			 * ["Since: 2.0"]
-			 * @usage
-			 * <?php add_filter( 'um_allowed_user_tags_patterns', 'function_name', 10, 1 ); ?>
-			 * @example
-			 * <?php
-			 * add_filter( 'um_allowed_user_tags_patterns', 'my_allowed_user_tags', 10, 1 );
+			 * @since 1.3.x
+			 * @hook  um_allowed_user_tags_patterns
+			 *
+			 * @param {array} $patterns User Placeholders.
+			 *
+			 * @return {array} User Placeholders.
+			 *
+			 * @example <caption>Add the `{user_description}` placeholder.</caption>
 			 * function my_allowed_user_tags( $patterns ) {
-			 *     // your code here
+			 *     $patterns[] = '{user_description}';
 			 *     return $patterns;
 			 * }
-			 * ?>
+			 * add_filter( 'um_allowed_user_tags_patterns', 'my_allowed_user_tags' );
 			 */
 			$pattern_array = apply_filters( 'um_allowed_user_tags_patterns', $pattern_array );
-
-			//$matches = false;
 			foreach ( $pattern_array as $pattern ) {
-
 				if ( preg_match( $pattern, $str ) ) {
 
-					$value = '';
+					$value    = '';
+					$usermeta = str_replace( array( '{', '}' ), '', $pattern );
 					if ( is_user_logged_in() ) {
-						$usermeta = str_replace( '{', '', $pattern );
-						$usermeta = str_replace( '}', '', $usermeta );
-
-						if ( $usermeta == 'user_avatar_small' ) {
+						if ( 'user_avatar_small' === $usermeta ) {
 							$value = get_avatar( um_user( 'ID' ), 40 );
 						} elseif ( um_user( $usermeta ) ) {
 							$value = um_user( $usermeta );
 						}
 
-						if ( $usermeta == 'username' ) {
+						if ( 'username' === $usermeta ) {
 							$value = um_user( 'user_login' );
 						}
 
-						if ( $usermeta == 'nickname' ) {
+						if ( 'nickname' === $usermeta ) {
 							$value = um_profile( 'nickname' );
 						}
 
+						if ( 'user_email' === $usermeta ) {
+							$value = um_user( 'user_email' );
+						}
+
 						/**
-						 * UM hook
+						 * Filters the user placeholders value of pattern for logged-in user.
 						 *
-						 * @type filter
-						 * @title um_profile_tag_hook__{$usermeta}
-						 * @description Change usermeta field value
-						 * @input_vars
-						 * [{"var":"$value","type":"array","desc":"Meta field value"},
-						 * {"var":"$user_id","type":"array","desc":"User ID"}]
-						 * @change_log
-						 * ["Since: 2.0"]
-						 * @usage
-						 * <?php add_filter( 'um_profile_tag_hook__{$usermeta}', 'function_name', 10, 2 ); ?>
-						 * @example
-						 * <?php
-						 * add_filter( 'um_profile_tag_hook__{$usermeta}', 'my_profile_tag', 10, 2 );
-						 * function my_profile_tag( $value, $user_id ) {
-						 *     // your code here
+						 * @since 1.3.x
+						 * @hook  um_profile_tag_hook__{$usermeta}
+						 *
+						 * @param {string} $value User meta field value.
+						 * @param {int}    $id    User ID.
+						 *
+						 * @return {string} User meta field value.
+						 *
+						 * @example <caption>Add the replacement value for `{user_description}` placeholder.</caption>
+						 * function my_user_description( $value, $user_id ) {
+						 *     $value = get_user_meta( $user_id, 'user_description', true );
 						 *     return $value;
 						 * }
-						 * ?>
+						 * add_filter( 'um_profile_tag_hook__user_description', 'my_user_description', 10, 2 );
 						 */
 						$value = apply_filters( "um_profile_tag_hook__{$usermeta}", $value, um_user( 'ID' ) );
+					} else {
+						/**
+						 * Filters the user placeholders value of pattern for not logged-in user.
+						 *
+						 * @since 2.6.11
+						 * @hook  um_profile_nopriv_tag_hook__{$usermeta}
+						 *
+						 * @param {string} $value User meta field value.
+						 *
+						 * @return {string} User meta field value.
+						 *
+						 * @example <caption>Add the replacement value for `{user_description}` placeholder for not logged-in user.</caption>
+						 * function my_nopriv_user_description( $value ) {
+						 *     $value = ! empty( $_GET['user_description'] ) ? sanitize_text_field( $_GET['user_description'] ) : '';
+						 *     return $value;
+						 * }
+						 * add_filter( 'um_profile_nopriv_tag_hook__user_description', 'my_nopriv_user_description' );
+						 */
+						$value = apply_filters( "um_profile_nopriv_tag_hook__{$usermeta}", $value );
 					}
 
 					$str = preg_replace( '/' . $pattern . '/', $value, $str );
 				}
-
 			}
 
 			return $str;
 		}
-
 
 		/**
 		 * Shortcode: Show custom content to specific role
@@ -1158,18 +1334,22 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 		 * @param  string $content
 		 * @return string
 		 */
-		function um_shortcode_show_content_for_role( $atts = array() , $content = '' ) {
+		public function um_shortcode_show_content_for_role( $atts = array(), $content = '' ) {
 			global $user_ID;
 
 			if ( ! is_user_logged_in() ) {
-				return;
+				return '';
 			}
 
-			$a = shortcode_atts( array(
-				'roles' => '',
-				'not' => '',
-				'is_profile' => false,
-			), $atts );
+			$a = shortcode_atts(
+				array(
+					'roles'      => '',
+					'not'        => '',
+					'is_profile' => false,
+				),
+				$atts,
+				'um_show_content'
+			);
 
 			if ( $a['is_profile'] ) {
 				um_fetch_user( um_profile_id() );
@@ -1180,38 +1360,25 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 			$current_user_roles = um_user( 'roles' );
 
 			if ( ! empty( $a['not'] ) && ! empty( $a['roles'] ) ) {
-				if ( version_compare( get_bloginfo('version'),'5.4', '<' ) ) {
-					return do_shortcode( $this->convert_locker_tags( $content ) );
-				} else {
-					return apply_shortcodes( $this->convert_locker_tags( $content ) );
-				}
+				return apply_shortcodes( $this->convert_locker_tags( $content ) );
 			}
 
 			if ( ! empty( $a['not'] ) ) {
-				$not_in_roles = explode( ",", $a['not'] );
+				$not_in_roles = explode( ',', $a['not'] );
 
 				if ( is_array( $not_in_roles ) && ( empty( $current_user_roles ) || count( array_intersect( $current_user_roles, $not_in_roles ) ) <= 0 ) ) {
-					if ( version_compare( get_bloginfo('version'),'5.4', '<' ) ) {
-						return do_shortcode( $this->convert_locker_tags( $content ) );
-					} else {
-						return apply_shortcodes( $this->convert_locker_tags( $content ) );
-					}
+					return apply_shortcodes( $this->convert_locker_tags( $content ) );
 				}
 			} else {
-				$roles = explode( ",", $a['roles'] );
+				$roles = explode( ',', $a['roles'] );
 
 				if ( ! empty( $current_user_roles ) && is_array( $roles ) && count( array_intersect( $current_user_roles, $roles ) ) > 0 ) {
-					if ( version_compare( get_bloginfo('version'),'5.4', '<' ) ) {
-						return do_shortcode( $this->convert_locker_tags( $content ) );
-					} else {
-						return apply_shortcodes( $this->convert_locker_tags( $content ) );
-					}
+					return apply_shortcodes( $this->convert_locker_tags( $content ) );
 				}
 			}
 
 			return '';
 		}
-
 
 		/**
 		 * @param array $args
@@ -1219,7 +1386,7 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 		 *
 		 * @return string
 		 */
-		public function ultimatemember_searchform( $args = array(), $content = "" ) {
+		public function ultimatemember_searchform( $args = array(), $content = '' ) {
 			if ( ! UM()->options()->get( 'members_page' ) ) {
 				return '';
 			}
@@ -1228,15 +1395,7 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 
 			$page_id = UM()->config()->permalinks['members'];
 			if ( ! empty( $page_id ) ) {
-				$members_page = get_post( $page_id );
-				if ( ! empty( $members_page ) && ! is_wp_error( $members_page ) ) {
-					if ( ! empty( $members_page->post_content ) ) {
-						preg_match_all( '/\[ultimatemember[^\]]*?form_id\=[\'"]*?(\d+)[\'"]*?/i', $members_page->post_content, $matches );
-						if ( ! empty( $matches[1] ) && is_array( $matches[1] ) ) {
-							$member_directory_ids = array_map( 'absint', $matches[1] );
-						}
-					}
-				}
+				$member_directory_ids = UM()->member_directory()->get_member_directory_id( $page_id );
 			}
 
 			if ( empty( $member_directory_ids ) ) {
@@ -1273,36 +1432,36 @@ if ( ! class_exists( 'um\core\Shortcodes' ) ) {
 
 			$search_value = array_values( $query );
 
-			$template = UM()->get_template( 'searchform.php', '', array( 'query' => $query, 'search_value' => $search_value[0], 'members_page' => um_get_core_page( 'members' ) ) );
-
-			return $template;
+			$t_args = array(
+				'query'        => $query,
+				'search_value' => $search_value[0],
+				'members_page' => um_get_core_page( 'members' ),
+			);
+			return UM()->get_template( 'searchform.php', '', $t_args );
 		}
-
 
 		/**
 		 * UM Placeholders for login referrer
 		 *
-		 * @param $placeholders
+		 * @param array $placeholders
 		 *
 		 * @return array
 		 */
-		function add_placeholder( $placeholders ) {
+		public function add_placeholder( $placeholders ) {
 			$placeholders[] = '{login_referrer}';
 			return $placeholders;
 		}
 
-
 		/**
 		 * UM Replace Placeholders for login referrer
 		 *
-		 * @param $replace_placeholders
+		 * @param array $replace_placeholders
 		 *
 		 * @return array
 		 */
-		function add_replace_placeholder( $replace_placeholders ) {
+		public function add_replace_placeholder( $replace_placeholders ) {
 			$replace_placeholders[] = um_dynamic_login_page_redirect();
 			return $replace_placeholders;
 		}
-
 	}
 }

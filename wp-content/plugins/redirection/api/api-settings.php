@@ -42,7 +42,6 @@
  * @apiSuccess {String} settings.expire_redirect
  * @apiSuccess {String} settings.expire_404
  * @apiSuccess {String} settings.modules
- * @apiSuccess {String} settings.newsletter
  * @apiSuccess {String} settings.redirect_cache
  * @apiSuccess {String} settings.ip_logging
  * @apiSuccess {String} settings.last_group_id
@@ -111,7 +110,7 @@ class Redirection_Api_Settings extends Redirection_Api_Route {
 
 		if ( isset( $params['location'] ) && strlen( $params['location'] ) > 0 ) {
 			$module = Red_Module::get( 2 );
-			$result = $module->can_save( $params['location'] );
+			$result = $module->can_save( sanitize_text_field( $params['location'] ) );
 		}
 
 		red_set_options( $params );

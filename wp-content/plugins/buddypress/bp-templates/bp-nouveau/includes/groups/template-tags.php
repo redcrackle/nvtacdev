@@ -3,7 +3,7 @@
  * Groups Template tags
  *
  * @since 3.0.0
- * @version 10.0.0
+ * @version 12.0.0
  */
 
 // Exit if accessed directly.
@@ -253,53 +253,6 @@ function bp_nouveau_groups_get_group_invites_setting( $user_id = 0 ) {
 }
 
 /**
- * Outputs the group creation numbered steps navbar
- *
- * @since 3.0.0
- *
- * @todo This output isn't localised correctly.
- */
-function bp_nouveau_group_creation_tabs() {
-	$bp = buddypress();
-
-	if ( ! is_array( $bp->groups->group_creation_steps ) ) {
-		return;
-	}
-
-	if ( ! bp_get_groups_current_create_step() ) {
-		$keys                            = array_keys( $bp->groups->group_creation_steps );
-		$bp->groups->current_create_step = array_shift( $keys );
-	}
-
-	$counter = 1;
-
-	foreach ( (array) $bp->groups->group_creation_steps as $slug => $step ) {
-		$is_enabled = bp_are_previous_group_creation_steps_complete( $slug ); ?>
-
-		<li<?php if ( bp_get_groups_current_create_step() === $slug ) : ?> class="current"<?php endif; ?>>
-			<?php if ( $is_enabled ) : ?>
-				<a href="<?php echo esc_url( bp_groups_directory_permalink() . 'create/step/' . $slug . '/' ); ?>">
-					<?php echo (int) $counter; ?> <?php echo esc_html( $step['name'] ); ?>
-				</a>
-			<?php else : ?>
-				<?php echo (int) $counter; ?>. <?php echo esc_html( $step['name'] ); ?>
-			<?php endif ?>
-		</li>
-			<?php
-		$counter++;
-	}
-
-	unset( $is_enabled );
-
-	/**
-	 * Fires at the end of the creation of the group tabs.
-	 *
-	 * @since 1.0.0
-	 */
-	do_action( 'groups_creation_tabs' );
-}
-
-/**
  * Load the requested Create Screen for the new group.
  *
  * @since 3.0.0
@@ -482,7 +435,7 @@ function bp_nouveau_group_manage_screen() {
 	if ( 'group-invites' === bp_get_groups_current_create_step() ) {
 		printf(
 			'<form action="%s" method="post" enctype="multipart/form-data">',
-			bp_get_group_creation_form_action()
+			esc_url( bp_get_group_creation_form_action() )
 		);
 	}
 
@@ -495,7 +448,7 @@ function bp_nouveau_group_manage_screen() {
 		$is_group_create ? esc_attr( bp_get_new_group_id() ) : esc_attr( bp_get_group_id() )
 	);
 
-	// The submit actions
+	// phpcs:ignore WordPress.Security.EscapeOutput
 	echo $output;
 
 	if ( ! $is_group_create ) {
@@ -735,20 +688,10 @@ function bp_nouveau_groups_manage_members_buttons( $args = array() ) {
 			$parent_element = false;
 		}
 
-		/*
-		 * If we have a arg value for $button_element passed through
-		 * use it to default all the $buttons['button_element'] values
-		 * otherwise default to 'a' (anchor) o override & hardcode the
-		 * 'element' string on $buttons array.
-		 *
-		 * Icons sets a class for icon display if not using the button element
-		 */
-		$icons = '';
 		if ( ! empty( $args['button_element'] ) ) {
 			$button_element = $args['button_element'] ;
 		} else {
 			$button_element = 'a';
-			$icons = ' icons';
 		}
 
 		// If we pass through parent classes add them to $button array
@@ -996,29 +939,16 @@ function bp_nouveau_groups_manage_members_buttons( $args = array() ) {
 
 		// Membership button on groups loop or single group's header
 		} else {
-			/*
-			 * This filter workaround is waiting for a core adaptation
-			 * so that we can directly get the groups button arguments
-			 * instead of the button.
-			 *
-			 * See https://buddypress.trac.wordpress.org/ticket/7126
-			 */
-			add_filter( 'bp_get_group_join_button', 'bp_nouveau_groups_catch_button_args', 100, 1 );
+			$button_args = bp_groups_get_group_join_button_args( $group );
 
-			bp_get_group_join_button( $group );
-
-			remove_filter( 'bp_get_group_join_button', 'bp_nouveau_groups_catch_button_args', 100, 1 );
-
-			if ( isset( bp_nouveau()->groups->button_args ) && bp_nouveau()->groups->button_args ) {
-				$button_args = bp_nouveau()->groups->button_args;
-
-				// If we pass through parent classes merge those into the existing ones
+			if ( $button_args ) {
+				// If we pass through parent classes merge those into the existing ones.
 				if ( $parent_class ) {
 					$parent_class .= ' ' . $button_args['wrapper_class'];
 				}
 
-				// The join or leave group header button should default to 'button'
-				// Reverse the earler button var to set default as 'button' not 'a'
+				// The join or leave group header button should default to 'button'.
+				// Reverse the earlier button var to set default as 'button' not 'a'.
 				if ( empty( $args['button_element'] ) ) {
 					$button_element = 'button';
 				}
@@ -1032,6 +962,7 @@ function bp_nouveau_groups_manage_members_buttons( $args = array() ) {
 					'parent_element'    => $parent_element,
 					'button_element'    => $button_element,
 					'link_text'         => $button_args['link_text'],
+					'link_title'        => $button_args['link_title'],
 					'parent_attr'       => array(
 							'id'    => $button_args['wrapper_id'],
 							'class' => $parent_class,
@@ -1044,15 +975,13 @@ function bp_nouveau_groups_manage_members_buttons( $args = array() ) {
 					),
 				);
 
-			// If button element set add nonce 'href' link to data-attr attr.
-			if ( 'button' === $button_element ) {
-				$buttons['group_membership']['button_attr']['data-bp-nonce'] = $button_args['link_href'];
-			} else {
-			// Else this is an anchor so use an 'href' attr.
-				$buttons['group_membership']['button_attr']['href'] = $button_args['link_href'];
-			}
-
-				unset( bp_nouveau()->groups->button_args );
+				// If button element set add nonce 'href' link to data-attr attr.
+				if ( 'button' === $button_element ) {
+					$buttons['group_membership']['button_attr']['data-bp-nonce'] = $button_args['link_href'];
+				} else {
+					// Else this is an anchor so use an 'href' attr.
+					$buttons['group_membership']['button_attr']['href'] = $button_args['link_href'];
+				}
 			}
 		}
 
@@ -1068,9 +997,8 @@ function bp_nouveau_groups_manage_members_buttons( $args = array() ) {
 		 * @param array  $args    Button arguments.
 		 */
 		$buttons_group = apply_filters( 'bp_nouveau_get_groups_buttons', $buttons, $group, $type, $args );
-
 		if ( ! $buttons_group ) {
-			return $buttons;
+			return array();
 		}
 
 		// It's the first entry of the loop, so build the Group and sort it
@@ -1160,6 +1088,7 @@ function bp_nouveau_group_meta() {
 	$group_meta = new BP_Nouveau_Group_Meta();
 
 	if ( ! bp_is_group() ) {
+		// phpcs:ignore WordPress.Security.EscapeOutput
 		echo $group_meta->meta;
 	} else {
 		return $group_meta;
@@ -1210,6 +1139,7 @@ function bp_nouveau_the_group_meta( $args = array() ) {
 		return $meta;
 	}
 
+	// phpcs:ignore WordPress.Security.EscapeOutput
 	echo $meta;
 }
 
@@ -1436,11 +1366,18 @@ function bp_nouveau_groups_get_customizer_widgets_link() {
  * @param object $group Optional. The group being referenced.
  *                      Defaults to the group currently being iterated on in the groups loop.
  * @param int $length   Optional. Length of returned string, including ellipsis. Default: 100.
- *
- * @return string Excerpt.
  */
 function bp_nouveau_group_description_excerpt( $group = null, $length = null ) {
-	echo bp_nouveau_get_group_description_excerpt( $group, $length );
+	$group = bp_get_group( $group );
+
+	// Escaping is made in `bp-groups/bp-groups-filters.php`.
+	// phpcs:ignore WordPress.Security.EscapeOutput
+	echo apply_filters(
+		/** This filter is documented in bp-groups/bp-groups-template.php. */
+		'bp_get_group_description_excerpt',
+		bp_nouveau_get_group_description_excerpt( $group, $length ),
+		$group
+	);
 }
 
 /**
@@ -1476,15 +1413,21 @@ function bp_nouveau_get_group_description_excerpt( $group = null, $length = null
 		}
 	}
 
+	if ( $length ) {
+		$excerpt = bp_create_excerpt( $group->description, $length );
+	} else {
+		$excerpt = bp_create_excerpt( $group->description );
+	}
+
 	/**
 	 * Filters the excerpt of a group description.
 	 *
 	 * @since 3.0.0
 	 *
-	 * @param string $value Excerpt of a group description.
-	 * @param object $group Object for group whose description is made into an excerpt.
+	 * @param string $excerpt Excerpt of a group description.
+	 * @param object $group   Object for group whose description is made into an excerpt.
 	 */
-	return apply_filters( 'bp_nouveau_get_group_description_excerpt', bp_create_excerpt( $group->description, $length ), $group );
+	return apply_filters( 'bp_nouveau_get_group_description_excerpt', $excerpt, $group );
 }
 
 /**

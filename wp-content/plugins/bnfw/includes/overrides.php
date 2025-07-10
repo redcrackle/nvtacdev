@@ -96,7 +96,7 @@ if ( ! function_exists( 'wp_new_user_notification' ) ) {
 			// Now insert the key, hashed, into the DB.
 			if ( empty( $wp_hasher ) ) {
 				require_once ABSPATH . WPINC . '/class-phpass.php';
-				$wp_hasher = new PasswordHash( 8, true ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+				$wp_hasher = new PasswordHash( 8, true ); // phpcs:ignore
 			}
 			$hashed = time() . ':' . $wp_hasher->HashPassword( $key );
 
@@ -131,7 +131,7 @@ if ( ! function_exists( 'wp_new_user_notification' ) ) {
 			}
 		} else {
 
-			// for WordPress below 4.3,.
+			// for WordPress below 4.3.
 			$plaintext_pass = $deprecated;
 
 			// The blogname option is escaped with esc_html on the way into the database in sanitize_option

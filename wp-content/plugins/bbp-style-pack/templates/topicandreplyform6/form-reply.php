@@ -10,6 +10,7 @@
 // Exit if accessed directly
 defined( 'ABSPATH' ) || exit;
 
+
 if ( bbp_is_reply_edit() ) : ?>
 
 <div id="bbpress-forums" class="bbpress-wrapper">
@@ -27,7 +28,22 @@ if ( bbp_is_reply_edit() ) : ?>
 			<?php do_action( 'bbp_theme_before_reply_form' ); ?>
 
 			<fieldset class="bbp-form">
-				<legend><?php printf( esc_html__( 'Reply To: %s', 'bbpress' ), ( bbp_get_form_reply_to() ) ? sprintf( esc_html__( 'Reply #%1$s in %2$s', 'bbpress' ), bbp_get_form_reply_to(), bbp_get_topic_title() ) : bbp_get_topic_title() ); ?></legend>
+				<legend>
+                                        <?php 
+                                                printf( 
+                                                        /* translators: %s is string for reply-to form field */
+                                                        esc_html__( 'Reply To: %s', 'bbpress' ), 
+                                                        ( bbp_get_form_reply_to() ) 
+                                                        ? sprintf( 
+                                                                /* translators: %1$s is string for reply-to form field and %2$s is string for topic title */
+                                                                esc_html__( 'Reply #%1$s in %2$s', 'bbpress' ), 
+                                                                bbp_get_form_reply_to(), 
+                                                                bbp_get_topic_title() 
+                                                        ) 
+                                                        : bbp_get_topic_title() 
+                                                ); 
+                                        ?>
+                                </legend>
 
 				<?php do_action( 'bbp_theme_before_reply_form_notices' ); ?>
 
@@ -79,7 +95,15 @@ if ( bbp_is_reply_edit() ) : ?>
 					<?php if ( ! ( bbp_use_wp_editor() || current_user_can( 'unfiltered_html' ) ) ) : ?>
 
 						<p class="form-allowed-tags">
-							<label><?php esc_html_e( 'You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes:','bbpress' ); ?></label><br />
+                                                        <label>
+                                                                <?php 
+                                                                        printf( 
+                                                                                /* translators: %s is abbreviation HTML Tag */
+                                                                                esc_html__( 'You may use these %s tags and attributes:', 'bbpress' ), 
+                                                                                '<abbr title="HyperText Markup Language">HTML</abbr>' 
+                                                                        ); 
+                                                                ?>
+                                                        </label><br />
 							<code><?php bbp_allowed_tags(); ?></code>
 						</p>
 
@@ -229,7 +253,15 @@ if ( bbp_is_reply_edit() ) : ?>
 	<div id="no-reply-<?php bbp_topic_id(); ?>" class="bbp-no-reply">
 		<div class="bbp-template-notice">
 			<ul>
-				<li><?php printf( esc_html__( 'The topic &#8216;%s&#8217; is closed to new replies.', 'bbpress' ), bbp_get_topic_title() ); ?></li>
+				<li>
+                                        <?php 
+                                                printf( 
+                                                        /* translators: &#8216; and &#8217; are encoded apostrophes and %s is string for the topic title */
+                                                        esc_html__( 'The topic &#8216;%s&#8217; is closed to new replies.', 'bbpress' ), 
+                                                        bbp_get_topic_title() 
+                                                ); 
+                                        ?>
+                                </li>
 			</ul>
 		</div>
 	</div>
@@ -239,7 +271,15 @@ if ( bbp_is_reply_edit() ) : ?>
 	<div id="no-reply-<?php bbp_topic_id(); ?>" class="bbp-no-reply">
 		<div class="bbp-template-notice">
 			<ul>
-				<li><?php printf( esc_html__( 'The forum &#8216;%s&#8217; is closed to new topics and replies.', 'bbpress' ), bbp_get_forum_title( bbp_get_topic_forum_id() ) ); ?></li>
+				<li>
+                                        <?php 
+                                                printf( 
+                                                        /* translators: &#8216; and &#8217; are encoded apostrophes and %s is string for the forum title */
+                                                        esc_html__( 'The forum &#8216;%s&#8217; is closed to new topics and replies.', 'bbpress' ), 
+                                                        bbp_get_forum_title( bbp_get_topic_forum_id() ) 
+                                                ); 
+                                        ?>
+                                </li>
 			</ul>
 		</div>
 	</div>

@@ -6,9 +6,9 @@
  * Plugin Name: All in one Favicon
  * Plugin URI: http://www.techotronic.de/plugins/all-in-one-favicon/
  * Description: All in one Favicon management. Easily add a Favicon to your site and the WordPress admin pages. Complete with upload functionality. Supports all three Favicon types (ico,png,gif)
- * Version: 4.7
+ * Version: 4.8
  * Author: Arne Franken
- * Author URI: http://www.techotronic.de/
+ * Author URI: https://appsumo.com/tools/wordpress/?utm_source=sumo&utm_medium=wp-widget&utm_campaign=all-in-one-favicon
  * License: GPL
  *
  * This program is distributed in the hope that it will be useful,
@@ -23,7 +23,7 @@ require_once (dirname (__FILE__) . '/includes/donationloader.php');
 require_once (dirname (__FILE__) . '/includes/debugger.php');
 
 // define constants
-define('AIOFAVICON_VERSION', '4.7');
+define('AIOFAVICON_VERSION', '4.8');
 
 if (!defined('AIOFAVICON_PLUGIN_BASENAME')) {
   //all-in-one-favicon/all-in-one-favicon.php
@@ -202,8 +202,10 @@ function initAioFavicon() {
 
 //initAioFavicon()
 
+
 // add AllInOneFavicon() to WordPress initialization
 add_action('init', 'initAioFavicon', 7);
+
 
 //static call to constructor is only possible if constructor is 'public static', therefore not PHP4 compatible:
 //add_action('init', array('AllInOneFavicon','AllInOneFavicon'), 7);

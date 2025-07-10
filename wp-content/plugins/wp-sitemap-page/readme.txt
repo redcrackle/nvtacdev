@@ -3,8 +3,8 @@ Contributors: funnycat
 Donate link: https://www.infowebmaster.fr/dons.php
 Tags: sitemap, generator, page list, site map, html sitemap, sitemap generator, dynamic sitemap, seo
 Requires at least: 3.0
-Tested up to: 5.8.1
-Stable tag: 1.9.0
+Tested up to: 6.8
+Stable tag: 1.9.5
 License: GPLv2 or later
 
 
@@ -101,7 +101,25 @@ If you want to add another language, feel free to [contact me](http://en.tonyarc
 
 == Changelog ==
 
+= 1.9.5 =
+Release date: 15 april 2025
+
+* Compatible with WordPress 6.8
+= 1.9.4 =
+Release date: 19 april 2024
+
+* Compatible with WordPress 6.5
+= 1.9.3 =
+Release date: 25 november 2023
+
+* Compatible with WordPress 6.4
+= 1.9.2 =
+Release date: 07 november 2022
+
+* Compatible with WordPress 6.1
 = 1.9.1 =
+Release date: october 2021
+
 * fix PHP warning message
 = 1.9.0 =
 * security improvement

@@ -8,13 +8,6 @@
 namespace WordPressPopularPosts;
 
 class WordPressPopularPosts {
-    /**
-     * I18N class.
-     * 
-     * @var     I18N $i18n
-     * @access  private
-     */
-    private $i18n;
 
     /**
      * REST controller class.
@@ -57,6 +50,22 @@ class WordPressPopularPosts {
     private $block_widget;
 
     /**
+     * ShortcodeLoader class.
+     *
+     * @var     Shortcode\ShortcodeLoader $shortcode_loader
+     * @access  private
+     */
+    private $shortcode_loader;
+
+    /**
+     * Compatibility class.
+     *
+     * @var     Compatibility\Compatibility $compatibility
+     * @access  private
+     */
+    private $compatibility;
+
+    /**
      * Constructor.
      *
      * @since   5.0.0
@@ -66,14 +75,15 @@ class WordPressPopularPosts {
      * @param   Front\Front     $front
      * @param   Widget\Widget   $widget
      */
-    public function __construct(I18N $i18n, Rest\Controller $rest, Admin\Admin $admin, Front\Front $front, Widget\Widget $widget, Block\Widget\Widget $block_widget)
+    public function __construct(Rest\Controller $rest, Admin\Admin $admin, Front\Front $front, Widget\Widget $widget, Block\Widget\Widget $block_widget, Shortcode\ShortcodeLoader $shortcode_loader, Compatibility\Compatibility $compatibility)
     {
-        $this->i18n = $i18n;
         $this->rest = $rest;
         $this->admin = $admin;
         $this->front = $front;
         $this->widget = $widget;
         $this->block_widget = $block_widget;
+        $this->shortcode_loader = $shortcode_loader;
+        $this->compatibility = $compatibility;
     }
 
     /**
@@ -83,11 +93,12 @@ class WordPressPopularPosts {
      */
     public function init()
     {
-        $this->i18n->load_plugin_textdomain();
+        $this->compatibility->load();
         $this->rest->hooks();
         $this->admin->hooks();
         $this->front->hooks();
         $this->widget->hooks();
         $this->block_widget->hooks();
+        $this->shortcode_loader->load();
     }
 }

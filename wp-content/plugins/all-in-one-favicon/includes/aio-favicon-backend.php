@@ -69,10 +69,58 @@ class AioFaviconBackend {
       add_action('admin_enqueue_scripts', array(& $this->donationLoader, 'registerDonationJavaScript'));
       add_action('admin_enqueue_scripts', array(& $this, 'registerAdminScripts'));
     }
+
+    add_action("admin_menu", array(& $this, 'admin_menu_link'));
+
+    add_action( 'admin_init', [ $this, 'aiof_admin_init' ] );
   }
 
+  public function aiof_admin_init() {
+    $this->aoif_handle_external_redirects();
+
+    wp_enqueue_script('all-in-one-favicon-admin',plugin_dir_url( __FILE__ ). '../scripts/aiof-scripts.js',array('jquery'));
+    wp_enqueue_style('all-in-one-favicon-admin-style',plugin_dir_url( __FILE__ ).'../styles/aiof-style-common.css', array(), '3.1.1');
+  }
   //init()
 
+  function admin_menu_link() {
+    add_menu_page( 'All in one Favicon', 'All in one Favicon', 'manage_options', 'all-in-one-favicon', array(& $this, 'renderSettingsPage'), 'dashicons-star-filled');
+
+    add_submenu_page( 'all-in-one-favicon', 'Other Tools', 'Other Tools', 'manage_options', 'all-in-one-favicon-plugin-other-tools', array(& $this, 'aiof_other_tools_page'));
+
+    add_submenu_page(
+        'all-in-one-favicon',
+        'Appsumo',
+        '<span class="all-in-one-favicon-sidebar-appsumo-link"><span class="dashicons dashicons-star-filled" style="font-size: 17px"></span> AppSumo</span>',
+        'manage_options',
+        'aiof_go_appsumo_pro',
+        array(&$this,'aoif_handle_external_redirects')
+      );
+
+    add_filter( 'plugin_action_links_' . plugin_basename(__FILE__),'aiof_filter_plugin_actions', 10, 2 );
+  }
+
+  function aiof_filter_plugin_actions($links, $file) {
+    $settings_link = '<a href="admin.php?page=all-in-one-favicon">' . __('Settings') . '</a>';
+    array_unshift( $links, $settings_link );
+
+    return $links;
+  }
+
+  function aiof_other_tools_page() {
+    include(AIOFAVICON_PLUGIN_DIR.'/other_tools.php');
+  }
+
+  function aoif_handle_external_redirects() {
+    if ( empty( $_GET['page'] ) ) {
+      return;
+    }
+
+    if ( 'aiof_go_appsumo_pro' === $_GET['page'] ) {
+      wp_redirect( ( 'https://appsumo.com/tools/wordpress/?utm_source=sumo&utm_medium=wp-widget&utm_campaign=all-in-one-favicon' ) );
+      die;
+    }
+  }
 
   /**
    * Builds the JavaScript array of all uploaded Favicons.
@@ -133,7 +181,7 @@ class AioFaviconBackend {
    */
   //public function addPluginActionLinks($action_links) {
   function addPluginActionLinks($action_links) {
-    $settings_link = '<a href="options-general.php?page=' . AIOFAVICON_PLUGIN_BASENAME . '">' . __('Settings', AIOFAVICON_TEXTDOMAIN) . '</a>';
+    $settings_link = '<a href="admin.php?page=' . AIOFAVICON_PLUGIN_NAME . '">' . __('Settings', AIOFAVICON_TEXTDOMAIN) . '</a>';
     array_unshift($action_links, $settings_link);
 
     return $action_links;
@@ -315,6 +363,10 @@ class AioFaviconBackend {
   //private function deleteFile($faviconName) {
   function deleteFile($faviconName) {
     $url = $this->aioFaviconSettings[$faviconName];
+
+    // Sanitize the file path
+    $url = str_replace(['../', '..'], '', $url);
+
     if ($url != '') {
       $uploads = wp_upload_dir();
       $regex = '#' . $uploads['baseurl'] . '/(.*)#i';
@@ -363,7 +415,7 @@ class AioFaviconBackend {
   function registerSettingsPage() {
     if (current_user_can('manage_options')) {
       add_filter('plugin_action_links_' . AIOFAVICON_PLUGIN_BASENAME, array(& $this, 'addPluginActionLinks'));
-      add_options_page(AIOFAVICON_NAME, AIOFAVICON_NAME, 'manage_options', AIOFAVICON_PLUGIN_BASENAME, array(& $this, 'renderSettingsPage'));
+      //add_options_page(AIOFAVICON_NAME, AIOFAVICON_NAME, 'manage_options', AIOFAVICON_PLUGIN_BASENAME, array(& $this, 'renderSettingsPage'));
     }
   }
 

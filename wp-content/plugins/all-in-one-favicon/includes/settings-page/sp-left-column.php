@@ -9,7 +9,7 @@
  * Left column for settings page
  */
 ?>
-<div class="postbox-container">
+<div class="postbox-container all-in-one-favicon-content-left">
     <form id="aio-favicon-settings-update" name="aio-favicon-settings-update" enctype="multipart/form-data" method="post" action="admin-post.php">
       <?php if (function_exists('wp_nonce_field') === true) wp_nonce_field('aio-favicon-settings-form'); ?>
       <input type='hidden' value="<?php echo AIOFAVICON_SETTINGSNAME ?>" name="option_page"/>

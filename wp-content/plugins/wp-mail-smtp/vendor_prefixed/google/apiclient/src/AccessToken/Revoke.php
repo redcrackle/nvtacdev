@@ -36,7 +36,7 @@ class Revoke
      * Instantiates the class, but does not initiate the login flow, leaving it
      * to the discretion of the caller.
      */
-    public function __construct(\WPMailSMTP\Vendor\GuzzleHttp\ClientInterface $http = null)
+    public function __construct(?\WPMailSMTP\Vendor\GuzzleHttp\ClientInterface $http = null)
     {
         $this->http = $http;
     }
@@ -56,7 +56,7 @@ class Revoke
                 $token = $token['access_token'];
             }
         }
-        $body = \WPMailSMTP\Vendor\GuzzleHttp\Psr7\Utils::streamFor(\http_build_query(array('token' => $token)));
+        $body = \WPMailSMTP\Vendor\GuzzleHttp\Psr7\Utils::streamFor(\http_build_query(['token' => $token]));
         $request = new \WPMailSMTP\Vendor\GuzzleHttp\Psr7\Request('POST', \WPMailSMTP\Vendor\Google\Client::OAUTH2_REVOKE_URI, ['Cache-Control' => 'no-store', 'Content-Type' => 'application/x-www-form-urlencoded'], $body);
         $httpHandler = \WPMailSMTP\Vendor\Google\Auth\HttpHandler\HttpHandlerFactory::build($this->http);
         $response = $httpHandler($request);

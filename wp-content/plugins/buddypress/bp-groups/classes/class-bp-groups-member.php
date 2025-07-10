@@ -255,7 +255,7 @@ class BP_Groups_Member {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @return bool True on success, false on failure.
+	 * @return bool
 	 */
 	public function save() {
 		global $wpdb;
@@ -281,7 +281,7 @@ class BP_Groups_Member {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param BP_Groups_Member $this Current instance of the group membership item being saved. Passed by reference.
+		 * @param BP_Groups_Member $group_membership Current instance of the group membership item being saved. Passed by reference.
 		 */
 		do_action_ref_array( 'groups_member_before_save', array( &$this ) );
 
@@ -309,9 +309,6 @@ class BP_Groups_Member {
 		// Update the user's group count.
 		self::refresh_total_group_count_for_user( $this->user_id );
 
-		// Update the group's member count.
-		self::refresh_total_member_count_for_group( $this->group_id );
-
 		/**
 		 * Fires after the current group membership item has been saved.
 		 *
@@ -319,7 +316,7 @@ class BP_Groups_Member {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param BP_Groups_Member $this Current instance of the group membership item has been saved. Passed by reference.
+		 * @param BP_Groups_Member $member Current instance of the group membership item has been saved. Passed by reference.
 		 */
 		do_action_ref_array( 'groups_member_after_save', array( &$this ) );
 
@@ -332,7 +329,7 @@ class BP_Groups_Member {
 	 * @since 1.6.0
 	 *
 	 * @param string $status The new status. 'mod' or 'admin'.
-	 * @return bool True on success, false on failure.
+	 * @return bool
 	 */
 	public function promote( $status = 'mod' ) {
 		if ( 'mod' == $status ) {
@@ -355,7 +352,7 @@ class BP_Groups_Member {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @return bool True on success, false on failure.
+	 * @return bool
 	 */
 	public function demote() {
 		$this->is_mod     = 0;
@@ -370,7 +367,7 @@ class BP_Groups_Member {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @return bool True on success, false on failure.
+	 * @return bool
 	 */
 	public function ban() {
 		if ( !empty( $this->is_admin ) )
@@ -387,7 +384,7 @@ class BP_Groups_Member {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @return bool True on success, false on failure.
+	 * @return bool
 	 */
 	public function unban() {
 		if ( !empty( $this->is_admin ) )
@@ -424,7 +421,7 @@ class BP_Groups_Member {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @return bool True on success, false on failure.
+	 * @return bool
 	 */
 	public function remove() {
 		global $wpdb;
@@ -434,7 +431,7 @@ class BP_Groups_Member {
 		 *
 		 * @since 2.3.0
 		 *
-		 * @param BP_Groups_Member $this Current group membership object.
+		 * @param BP_Groups_Member $group_membership Current group membership class.
 		 */
 		do_action_ref_array( 'groups_member_before_remove', array( $this ) );
 
@@ -447,15 +444,12 @@ class BP_Groups_Member {
 		// Update the user's group count.
 		self::refresh_total_group_count_for_user( $this->user_id );
 
-		// Update the group's member count.
-		self::refresh_total_member_count_for_group( $this->group_id );
-
 		/**
 		 * Fires after a member is removed from a group.
 		 *
 		 * @since 2.3.0
 		 *
-		 * @param BP_Groups_Member $this Current group membership object.
+		 * @param BP_Groups_Member $member Current group membership object.
 		 */
 		do_action_ref_array( 'groups_member_after_remove', array( $this ) );
 
@@ -496,7 +490,7 @@ class BP_Groups_Member {
 	 *
 	 * @param int $user_id  ID of the user.
 	 * @param int $group_id ID of the group.
-	 * @return bool True on success, false on failure.
+	 * @return bool
 	 */
 	public static function delete( $user_id, $group_id ) {
 		global $wpdb;
@@ -516,9 +510,6 @@ class BP_Groups_Member {
 
 		// Update the user's group count.
 		self::refresh_total_group_count_for_user( $user_id );
-
-		// Update the group's member count.
-		self::refresh_total_member_count_for_group( $group_id );
 
 		/**
 		 * Fires after a member is removed from a group.
@@ -907,7 +898,7 @@ class BP_Groups_Member {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @global WPDB $wpdb
+	 * @global wpdb $wpdb WordPress database object.
 	 *
 	 * @param  int $user_id    ID of the user.
 	 * @param  int $group_id   ID of the group.
@@ -1106,12 +1097,10 @@ class BP_Groups_Member {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param int $group_id ID of the group.
-	 * @return array Info about group admins (user_id + date_modified).
+	 * @param  int   $group_id ID of the group.
+	 * @return array           Info about group admins (user_id + date_modified).
 	 */
 	public static function get_group_administrator_ids( $group_id ) {
-		global $wpdb;
-
 		if ( empty( $group_id ) ) {
 			return array();
 		}
@@ -1142,7 +1131,7 @@ class BP_Groups_Member {
 	 * @since 2.7.0
 	 *
 	 * @param array $group_ids IDs of the groups.
-	 * @return bool True on success.
+	 * @return bool
 	 */
 	public static function prime_group_admins_mods_cache( $group_ids ) {
 		global $wpdb;

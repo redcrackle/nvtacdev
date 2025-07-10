@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * @since 1.6.0
  */
+#[AllowDynamicProperties]
 class BP_XProfile_ProfileData {
 
 	/**
@@ -66,7 +67,7 @@ class BP_XProfile_ProfileData {
 	 * @param int|null $user_id  User ID to instantiate for.
 	 */
 	public function __construct( $field_id = null, $user_id = null ) {
-		if ( !empty( $field_id ) ) {
+		if ( ! empty( $field_id ) ) {
 			$this->populate( $field_id, $user_id );
 		}
 	}
@@ -75,6 +76,8 @@ class BP_XProfile_ProfileData {
 	 * Populates the XProfile profile data.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @global wpdb $wpdb WordPress database object.
 	 *
 	 * @param int $field_id Field ID to populate.
 	 * @param int $user_id  User ID to populate for.
@@ -100,9 +103,10 @@ class BP_XProfile_ProfileData {
 			$this->id           = (int) $profiledata->id;
 			$this->user_id      = (int) $profiledata->user_id;
 			$this->field_id     = (int) $profiledata->field_id;
-			$this->value        = stripslashes( $profiledata->value );
 			$this->last_updated = $profiledata->last_updated;
 
+			// If the value is serializable, do not stripslashes.
+			$this->value        = is_serialized( $profiledata->value ) ? $profiledata->value : stripslashes( $profiledata->value );
 		} else {
 			// When no row is found, we'll need to set these properties manually.
 			$this->field_id	    = (int) $field_id;
@@ -115,8 +119,7 @@ class BP_XProfile_ProfileData {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @global object $wpdb
-	 * @global array $bp
+	 * @global wpdb $wpdb WordPress database object.
 	 *
 	 * @return bool
 	 */
@@ -130,7 +133,7 @@ class BP_XProfile_ProfileData {
 		if ( $cached && ! empty( $cached->id ) ) {
 			$retval = true;
 		} else {
-			$bp = buddypress();
+			$bp     = buddypress();
 			$retval = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$bp->profile->table_name_data} WHERE user_id = %d AND field_id = %d", $this->user_id, $this->field_id ) );
 		}
 
@@ -139,8 +142,8 @@ class BP_XProfile_ProfileData {
 		 *
 		 * @since 1.2.7
 		 *
-		 * @param bool                    $retval Whether or not data already exists.
-		 * @param BP_XProfile_ProfileData $this   Instance of the current BP_XProfile_ProfileData class.
+		 * @param bool                    $retval       Whether or not data already exists.
+		 * @param BP_XProfile_ProfileData $profile_data Instance of the current BP_XProfile_ProfileData class.
 		 */
 		return apply_filters_ref_array( 'xprofile_data_exists', array( (bool)$retval, $this ) );
 	}
@@ -150,15 +153,14 @@ class BP_XProfile_ProfileData {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @global object $wpdb
+	 * @global wpdb $wpdb WordPress database object.
 	 *
 	 * @return bool
 	 */
 	public function is_valid_field() {
 		global $wpdb;
 
-		$bp = buddypress();
-
+		$bp     = buddypress();
 		$retval = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$bp->profile->table_name_fields} WHERE id = %d", $this->field_id ) );
 
 		/**
@@ -166,8 +168,8 @@ class BP_XProfile_ProfileData {
 		 *
 		 * @since 1.2.7
 		 *
-		 * @param bool                    $retval Whether or not data is valid.
-		 * @param BP_XProfile_ProfileData $this   Instance of the current BP_XProfile_ProfileData class.
+		 * @param bool                    $retval       Whether or not data is valid.
+		 * @param BP_XProfile_ProfileData $profile_data Instance of the current BP_XProfile_ProfileData class.
 		 */
 		return apply_filters_ref_array( 'xprofile_data_is_valid_field', array( (bool)$retval, $this ) );
 	}
@@ -176,6 +178,8 @@ class BP_XProfile_ProfileData {
 	 * Save the data for the XProfile field.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @global wpdb $wpdb WordPress database object.
 	 *
 	 * @return bool
 	 */
@@ -210,10 +214,10 @@ class BP_XProfile_ProfileData {
 		 * @since 1.0.0
 		 * @since 2.1.0 Added `$reserialize` and `$this` parameters.
 		 *
-		 * @param string                  $field_value The field value.
-		 * @param int                     $data_id     The field data ID.
-		 * @param bool                    $reserialize Whether to reserialize arrays before returning. Defaults to true.
-		 * @param BP_XProfile_ProfileData $this        Current instance of the profile data being saved.
+		 * @param string                  $field_value  The field value.
+		 * @param int                     $data_id      The field data ID.
+		 * @param bool                    $reserialize  Whether to reserialize arrays before returning. Defaults to true.
+		 * @param BP_XProfile_ProfileData $profile_data Current instance of the profile data being saved.
 		 */
 		$this->value = apply_filters( 'xprofile_data_value_before_save', $this->value, $this->id, true, $this );
 
@@ -234,7 +238,7 @@ class BP_XProfile_ProfileData {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param BP_XProfile_ProfileData $this Current instance of the profile data being saved.
+		 * @param BP_XProfile_ProfileData $profile_data Current instance of the profile data being saved.
 		 */
 		do_action_ref_array( 'xprofile_data_before_save', array( $this ) );
 
@@ -260,7 +264,7 @@ class BP_XProfile_ProfileData {
 			 *
 			 * @since 1.0.0
 			 *
-			 * @param BP_XProfile_ProfileData $this Current instance of the profile data being saved.
+			 * @param BP_XProfile_ProfileData $profile_data Current instance of the profile data being saved.
 			 */
 			do_action_ref_array( 'xprofile_data_after_save', array( $this ) );
 
@@ -275,9 +279,9 @@ class BP_XProfile_ProfileData {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @global object $wpdb
+	 * @global wpdb $wpdb WordPress database object.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function delete() {
 		global $wpdb;
@@ -289,7 +293,7 @@ class BP_XProfile_ProfileData {
 		 *
 		 * @since 1.9.0
 		 *
-		 * @param BP_XProfile_ProfileData $this Current instance of the profile data being deleted.
+		 * @param BP_XProfile_ProfileData $profile_data Current instance of the profile data being deleted.
 		 */
 		do_action_ref_array( 'xprofile_data_before_delete', array( $this ) );
 
@@ -303,7 +307,7 @@ class BP_XProfile_ProfileData {
 		 *
 		 * @since 1.9.0
 		 *
-		 * @param BP_XProfile_ProfileData $this Current instance of the profile data being deleted.
+		 * @param BP_XProfile_ProfileData $profile_data Current instance of the profile data being deleted.
 		 */
 		do_action_ref_array( 'xprofile_data_after_delete', array( $this ) );
 
@@ -318,6 +322,8 @@ class BP_XProfile_ProfileData {
 	 * @since 2.0.0
 	 * @since 8.0.0 Checks if a null field data is an xProfile WP Field.
 	 *              Adds a new parameter `$field_type_objects` to pass the list of field type objects.
+	 *
+	 * @global wpdb $wpdb WordPress database object.
 	 *
 	 * @param int   $user_id            ID of user whose data is being queried.
 	 * @param array $field_ids          Array of field IDs to query for.
@@ -476,6 +482,8 @@ class BP_XProfile_ProfileData {
 	 *
 	 * @since 1.6.0
 	 *
+	 * @global wpdb $wpdb WordPress database object.
+	 *
 	 * @param int $field_id Field ID being queried for.
 	 * @param int $user_id  User ID associated with field.
 	 * @return int $fielddata_id
@@ -508,6 +516,8 @@ class BP_XProfile_ProfileData {
 	 *
 	 * @since 1.0.0
 	 * @since 8.0.0 Checks if a null field data is an xProfile WP Field.
+	 *
+	 * @global wpdb $wpdb WordPress database object.
 	 *
 	 * @param int            $field_id ID of the field.
 	 * @param int|array|null $user_ids ID or IDs of user(s).
@@ -616,6 +626,9 @@ class BP_XProfile_ProfileData {
 	 * Get profile field values by field name and user ID.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @global wpdb $wpdb WordPress database object.
+	 *
 	 * @deprecated 8.0.0 This function is not used anymore.
 	 *
 	 * @param array|string $fields  Field(s) to get.
@@ -641,9 +654,9 @@ class BP_XProfile_ProfileData {
 		if ( is_array( $fields ) ) {
 			for ( $i = 0, $count = count( $fields ); $i < $count; ++$i ) {
 				if ( $i == 0 ) {
-					$field_sql .= $wpdb->prepare( "AND ( f.name = %s ", $fields[$i] );
+					$field_sql .= $wpdb->prepare( "AND ( f.name = %s ", $fields[ $i ] );
 				} else {
-					$field_sql .= $wpdb->prepare( "OR f.name = %s ", $fields[$i] );
+					$field_sql .= $wpdb->prepare( "OR f.name = %s ", $fields[ $i ] );
 				}
 			}
 
@@ -664,10 +677,10 @@ class BP_XProfile_ProfileData {
 		if ( is_array( $fields ) ) {
 			for ( $i = 0, $count = count( $values ); $i < $count; ++$i ) {
 				for ( $j = 0; $j < count( $fields ); $j++ ) {
-					if ( $values[$i]->name == $fields[$j] ) {
-						$new_values[$fields[$j]] = $values[$i]->value;
-					} elseif ( !array_key_exists( $fields[$j], $new_values ) ) {
-						$new_values[$fields[$j]] = NULL;
+					if ( $values[ $i ]->name == $fields[ $j ] ) {
+						$new_values[ $fields[ $j ] ] = $values[ $i ]->value;
+					} elseif ( ! array_key_exists( $fields[ $j ], $new_values ) ) {
+						$new_values[ $fields[ $j ] ] = NULL;
 					}
 				}
 			}
@@ -682,6 +695,8 @@ class BP_XProfile_ProfileData {
 	 * Delete field.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @global wpdb $wpdb WordPress database object.
 	 *
 	 * @param int $field_id ID of the field to delete.
 	 * @return bool
@@ -703,6 +718,8 @@ class BP_XProfile_ProfileData {
 	 *
 	 * @since 1.0.0
 	 *
+	 * @global wpdb $wpdb WordPress database object.
+	 *
 	 * @param int $user_id User ID to get time for.
 	 * @return null|string
 	 */
@@ -720,6 +737,8 @@ class BP_XProfile_ProfileData {
 	 * Delete all data for provided user ID.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @global wpdb $wpdb WordPress database object.
 	 *
 	 * @param int $user_id User ID to remove data for.
 	 * @return false|int
@@ -746,6 +765,8 @@ class BP_XProfile_ProfileData {
 	 * Get random field type by user ID.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @global wpdb $wpdb WordPress database object.
 	 *
 	 * @param int    $user_id          User ID to query for.
 	 * @param string $exclude_fullname SQL portion used to exclude by field ID.

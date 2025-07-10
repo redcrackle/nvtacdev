@@ -6,28 +6,31 @@
     window.wp.gdbto = window.wp.gdbto || {};
 
     window.wp.gdbto.front = {
-        storage: { },
+        storage: {},
         get_selection: function() {
             var t = '';
 
-            if (window.getSelection){
+            if (window.getSelection) {
                 t = window.getSelection();
-            } else if (document.getSelection){
+            } else if (document.getSelection) {
                 t = document.getSelection();
-            } else if (document.selection){
+            } else if (document.selection) {
                 t = document.selection.createRange().text;
             }
 
-            return jQuery.trim(t.toString());
+            return t.toString().trim();
         },
         init: function() {
-            $(document).on("click", ".d4p-bbt-quote-link", function(e){
+            $(document).on("click", ".d4p-bbt-quote-link", function(e) {
                 e.preventDefault();
 
-                if ($("#bbp_reply_content").length > 0) {
-                    var qout = wp.gdbto.front.get_selection();
-                    var id = $(this).attr("href").substr(1);
-                    var quote_id = '#d4p-bbp-quote-' + id;
+                var rc = $("#bbp_reply_content"),
+                    button = $(this);
+
+                if (rc.length > 0) {
+                    var qout = wp.gdbto.front.get_selection(),
+                        id = button.data("id"),
+                        quote_id = '#d4p-bbp-quote-' + id;
 
                     if (qout === "") {
                         qout = $(quote_id).html();
@@ -41,31 +44,25 @@
                     if (gdbbPressToolsInit.quote_method === "bbcode") {
                         qout = "[quote quote=" + id + "]" + qout + "[/quote]";
                     } else {
-                        var title = '<div class="d4p-bbp-quote-title"><a href="' + $(this).attr("bbp-url") + '">';
-                        title+= $(this).attr("bbp-author") + ' ' + gdbbPressToolsInit.quote_wrote + ':</a></div>';
+                        var title = '<div class="d4p-bbp-quote-title"><a href="' + button.data("url") + '">';
+
+                        title += button.data("author") + ' ' + gdbbPressToolsInit.quote_wrote + ':</a></div>';
                         qout = '<blockquote class="d4pbbc-quote">' + title + qout + '</blockquote>';
                     }
 
-                    if (gdbbPressToolsInit.wp_editor == 1 && !$("#bbp_reply_content").is(":visible")) {
+                    if (gdbbPressToolsInit.wp_editor === "1" && !rc.is(":visible")) {
                         tinymce.get("bbp_reply_content").execCommand("mceInsertContent", false, qout);
                     } else {
-                        var txtr = $("#bbp_reply_content");
-                        var cntn = txtr.val();
+                        var cntn = rc.val();
 
-                        if ($.trim(cntn) != '') {
+                        if (cntn.trim() !== '') {
                             qout = "\n\n" + qout;
                         }
 
-                        txtr.val(cntn + qout);
+                        rc.val(cntn + qout);
                     }
 
-                    var old_ie = $.browser.msie && parseInt($.browser.version) < 9;
-
-                    if (!old_ie) {
-                        $("html, body").animate({scrollTop: $("#new-post").offset().top}, 1000);
-                    } else {
-                        document.location.href = "#new-post";
-                    }
+                    $("html, body").animate({scrollTop: $("#new-post").offset().top}, 1000);
                 }
             });
         }

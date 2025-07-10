@@ -1,5 +1,9 @@
 <?php
 
+// Exit if accessed directly
+defined( 'ABSPATH' ) || exit;
+
+
 //login settings page
 
 function bsp_css_location() {
@@ -23,40 +27,43 @@ $location = $bsp_css_location ['location'] ;
 						<th colspan="2">
 						
 						<h3>
-						<?php _e ('CSS Location' , 'bbp-style-pack' ) ; ?>
+						<?php esc_html_e ('CSS Location' , 'bbp-style-pack' ) ; ?>
 						</h3>
 	<?php
 	//create a style.css on entry and on saving
-	generate_style_css() ;
+	generate_style_css();
+        bsp_clear_cache();
 	?>
 			
 <p>
-<?php _e ('This plugin creates a Cascade Style Sheet (css file) which allows the user\'s browser to know what styling to apply.' , 'bbp-style-pack' ) ; ?>
+<?php esc_html_e ('This plugin creates a Cascade Style Sheet (css file) which allows the user\'s browser to know what styling to apply.' , 'bbp-style-pack' ) ; ?>
 </p>
 <p>
-<?php _e ('By default this is set to store this file in the plugins css directory as wp-content/plugins/bbp-style-pack/css/bspstyle.css' , 'bbp-style-pack' ) ; ?>
+<?php esc_html_e ('By default this is set to store this file in the plugins css directory as wp-content/plugins/bbp-style-pack/css/bspstyle.css' , 'bbp-style-pack' ) ; ?>
 </p>
 <p>
-<?php _e ('Some users may have issues with using this directory under permissions on their server, and some advanced users may wish to store this file elsewhere.' , 'bbp-style-pack' ) ; ?>
+<?php esc_html_e ('Some users may have issues with using this directory under permissions on their server, and some advanced users may wish to store this file elsewhere.' , 'bbp-style-pack' ) ; ?>
 </p>
 <p>
-<?php _e ('To allow flexibility, this tab allows you to amend where this file is stored.' , 'bbp-style-pack' ) ; ?>
+<?php esc_html_e ('To allow flexibility, this tab allows you to amend where this file is stored.' , 'bbp-style-pack' ) ; ?>
 </p>
 <p>
-<?php _e ('If you don\'t understand any of the above, just exit from this tab - you should really only change this if you understand or on advice.' , 'bbp-style-pack' ) ; ?>
+<?php esc_html_e ('If you don\'t understand any of the above, just exit from this tab - you should really only change this if you understand or on advice.' , 'bbp-style-pack' ) ; ?>
 </p>
 <p>
-<?php _e ('<i>Default location</i> : ' , 'bbp-style-pack' ) ; ?>
-<?php echo plugins_url('css/',dirname(__FILE__) ) ; ?>
+<?php echo '<i>' ;
+esc_html_e ('Default location: ' , 'bbp-style-pack' ) ;
+echo '</i>'  ; ?>
+<?php esc_html_e(plugins_url('css/',dirname(__FILE__) )) ; ?>
 </p>
 
 <p>
-<?php _e ('Current location : ' , 'bbp-style-pack' ) ; ?>
+<?php esc_html_e ('Current location : ' , 'bbp-style-pack' ) ; ?>
 <?php if (!empty ($bsp_css_location ['activate css location']) && !empty($bsp_css_location ['location'])) {
 	$url = home_url();
-	echo esc_url( $url ).'/'.$bsp_css_location ['location'] ; 
+	echo esc_url( $url ).'/'.esc_html($bsp_css_location ['location']) ; 
 	}
-	else echo plugins_url('css/',dirname(__FILE__) ) ; ?>
+	else esc_html_e( plugins_url('css/',dirname(__FILE__) )) ; ?>
 </p>
 
 
@@ -64,7 +71,7 @@ $location = $bsp_css_location ['location'] ;
 <?php 
 global $bsp_css_location ;
 	?>
-	 <Form method="post" action="options.php">
+	 <form method="post" action="options.php">
 	<?php wp_nonce_field( 'csslocation', 'login-nonce' ) ?>
 	<?php settings_fields( 'bsp_css_location' );
 	?>	
@@ -84,23 +91,23 @@ global $bsp_css_location ;
 			$item2="bsp_css_location[".$area2."]" ;
 			$value1 = (!empty($bsp_css_location[$area1] ) ? $bsp_css_location[$area1]  : '') ;
 			$value2 = (!empty($bsp_css_location[$area2] ) ? $bsp_css_location[$area2]  : '') ;
-			_e ('Click to activate' , 'bbp-style-pack' ) ;
+			esc_html_e ('Click to activate' , 'bbp-style-pack' ) ;
 			?>
 			</td><td>
-			<?php echo '<input name="'.$item1.'" id="'.$item1.'" type="checkbox" value="1" class="code" ' . checked( 1,$value1, false ) . ' />';
+			<?php echo '<input name="'.esc_html($item1).'" id="'.esc_html($item1).'" type="checkbox" value="1" class="code" ' . checked( 1,$value1, false ) . ' />';
 			
   			?>
 	</td></tr>
 	<tr>
-			<td style="vertical-align:top"> <?php echo $name1 ; ?> </td>
+			<td style="vertical-align:top"> <?php echo esc_html($name1) ; ?> </td>
 			<td colpsan="2">
 			 <?php $url = home_url();
 			echo esc_url( $url ).'/'; ?>
-			<?php echo '<input id="'.$item2.'" class="regular-text" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
+			<?php echo '<input id="'.esc_html($item2).'" class="regular-text" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
 			</td></tr><tr><td></td><td>
-			<label class="description"><?php _e( 'Enter the path to the file', 'bbp-style-pack' ); ?></label><br/>
-			<label class="description"><?php _e( 'Don\'t forget to end with a "/" !!', 'bbp-style-pack' ); ?></label><br/>
-			<label class="description"><?php _e( 'Don\'t include the bspstyle.css in the location', 'bbp-style-pack' ); ?></label><br/>
+			<label class="description"><?php esc_html_e( 'Enter the path to the file', 'bbp-style-pack' ); ?></label><br/>
+			<label class="description"><?php esc_html_e( 'Don\'t forget to end with a "/" !!', 'bbp-style-pack' ); ?></label><br/>
+			<label class="description"><?php esc_html_e( 'Don\'t include the bspstyle.css in the location', 'bbp-style-pack' ); ?></label><br/>
 			</td>
 			</tr>
 				
@@ -108,7 +115,7 @@ global $bsp_css_location ;
 				</table>
 <!-- save the options -->
 		<p class="submit">
-			<input type="submit" class="button-primary" value="<?php _e( 'Save changes', 'bbp-style-pack' ); ?>" />
+			<input type="submit" class="button-primary" value="<?php esc_html_e( 'Save changes', 'bbp-style-pack' ); ?>" />
 				</p>
 				</form>
 		</div><!--end sf-wrap-->

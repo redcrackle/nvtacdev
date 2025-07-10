@@ -10,6 +10,7 @@ require_once 'lcp-templater.php';
 
 class CatListDisplayer {
   public $catlist;
+  private $parent;
   private $wrapper;
   private $templater;
   private $params = array();
@@ -38,6 +39,9 @@ class CatListDisplayer {
       wp_reset_query();
     }
 
+    // This filter needs to be removed after template code has executed, not before.
+    remove_filter( 'the_posts', [ LcpParameters::get_instance(), 'move_sticky_to_top' ] );
+
     return $this->lcp_output;
   }
 
@@ -57,7 +61,7 @@ class CatListDisplayer {
   }
 
   private function close_outer_tag() {
-    return '</' . $this->templater->outer_tag . '>';
+    return '</' . esc_attr($this->templater->outer_tag) . '>';
   }
 
   public function get_morelink($tag = null, $css_class = null){
@@ -101,7 +105,7 @@ class CatListDisplayer {
   }
 
   private function close_inner_tag() {
-    return '</' . $this->templater->inner_tag . '>';
+    return '</' . esc_attr($this->templater->inner_tag) . '>';
   }
 
   private function get_comments($single, $tag = null, $css_class = null){
@@ -175,7 +179,9 @@ class CatListDisplayer {
       break;
     case 'excerpt':
       $info = $this->catlist->get_excerpt($post);
-      $info = preg_replace('/\[.*\]/', '', $info);
+      if ( ! empty( $info ) ) {
+        $info = preg_replace('/\[.*\]/', '', $info);
+      }
       break;
     case 'date_modified':
       $info = $this->catlist->get_modified_date_to_show($post);
@@ -226,14 +232,14 @@ class CatListDisplayer {
 
   private function get_post_link($single, $text, $class = null){
 
-    $props = ['href' => get_permalink($single->ID)];
+    $props = ['href' => esc_url(get_permalink($single->ID))];
 
     if (!empty($class)) {
-      $props['class'] = $class;
+      $props['class'] = esc_attr($class);
     }
 
     if (!empty($this->params['link_target'])) {
-      $props['target'] = $this->params['link_target'];
+      $props['target'] = esc_attr($this->params['link_target']);
     }
 
     $output = $this->wrapper->to_html('a', $props, $text);
@@ -257,7 +263,8 @@ class CatListDisplayer {
 
     // Shortcode parameters take precedence.
     $tag = $this->params['title_tag'] ?: $tag;
-    $css_class = $this->params['title_class'] ?: $css_class;
+    $tag = $tag ? tag_escape($tag) : $tag;
+    $css_class = esc_attr($this->params['title_class']) ?: esc_attr($css_class);
     $suffix = $this->params['post_suffix'] ? ' ' . $this->params['post_suffix'] : '';
 
     if ('no' === $this->params['link_current']) {
@@ -275,11 +282,11 @@ class CatListDisplayer {
 
     if (!$link) {
       $post_title .= $suffix;
-      $output = $this->wrapper->wrap($post_title, $tag, $css_class);
+      $output = $this->wrapper->wrap(wp_kses_post($post_title), $tag, $css_class);
     } else if (empty($tag)) {
-      $output = $this->get_post_link($single, $post_title, $css_class) . $suffix;
+      $output = $this->get_post_link($single, wp_kses_post($post_title), $css_class) . esc_html($suffix);
     } else if (!empty($tag)) {
-      $output = $this->get_post_link($single, $post_title) . $suffix;
+      $output = $this->get_post_link($single, wp_kses_post($post_title)) . esc_html($suffix);
       $output = $this->wrapper->wrap($output, $tag, $css_class);
     }
 

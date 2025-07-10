@@ -1,71 +1,292 @@
 === Broken Link Checker ===
 Contributors: managewp, wpmudev
-Tags: links, broken links, internal link, external link, broken images, seo, test links, check links, bad links
-Requires at least: 4.6
-Tested up to: 5.8
-Stable tag: 1.11.16
+Tags: links, broken links, internal link, external link, broken images
+Requires at least: 5.2
+Tested up to: 6.8
+Stable tag: 2.4.6
+Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Check posts, pages & all content for broken links & missing images to improve SEO. Get notified when bad links are found.
-
+Broken Link Checker helps you catch broken links & images fast, before they hurt your SEO or UX. Scan and bulk-fix issues from one easy dashboard.
 == Description ==
-Broken Link Checker monitors and tests all internal links & external links on your site looking for broken links. It helps you fix bad links to improve SEO and user experience.
+Automatically monitor your WordPress site for broken links and missing images, so you can fix them proactively and protect your SEO.
 
-**Features**
+Broken links aren’t just annoying for your visitors, they negatively impact your rankings and make your site look outdated and untrustworthy. But manually checking hundreds of links? Ain’t nobody got time for that!
 
-* Monitors external links and internal links in your posts, pages, comments, the blogroll, and custom fields (optional).
-* Detects links that don't work, missing images and redirects.
-* Notifies you either via the Dashboard or by email.
-* Makes broken links display differently in posts (optional).
-* Prevents search engines from following broken links (optional).
-* You can search and filter links by URL, anchor text and so on.
-* Links can be edited directly from the plugin's page, without manually updating each post.
-* Highly configurable.
+Broken Link Checker detects issues 20x faster and more accurately than other plugins, thanks to cloud-based link checking. This powerful plugin scans your pages, posts, comments and custom fields, spotting broken or redirected URLs and giving you a quick way to fix them all from one centralized dashboard.
 
-**Basic Usage**
+With over 17 million downloads and 50,000+ broken links found daily, Broken Link Checker leaves no URL behind. You can even receive email alerts when something breaks, so you’re never caught off guard.
 
-Once installed, the plugin will begin parsing your posts, bookmarks (AKA blogroll) and other content and looking for links. Depending on the size of your site this can take from a few minutes up to an hour or more. When parsing is complete, the plugin will start checking each link to see if it works. Again, how long this takes depends on how big your site is and how many links there are. You can monitor the progress and tweak various link checking options in *Settings -> Link Checker*.
+## TL;DR: Broken Link Checker’s Key Features at a Glance
 
-The broken links, if any are found, will show up in a new tab of the WP admin panel - *Tools -> Broken Links*. A notification will also appear in the "Broken Link Checker" widget on the Dashboard. To save display space, you can keep the widget closed and configure it to expand automatically when problematic links are detected. E-mail notifications need to be enabled separately (in *Settings -> Link Checker*).
+–   Automatic Link Monitoring: Scans your posts, pages, comments, and more.
+    
+–   Comprehensive Reports: Get breakdowns of broken links, with search and filtering options.
+    
+–   Quick Fixes: Edit, unlink, or ignore your broken links in seconds.
+    
+–   Cloud & Local Options: Choose cloud-based scans or use your server.
+    
+–   Custom Filters: Exclude post types, categories, and domains.
+    
+–   Crawl Everything: Pages, posts, even images and redirects. No URL is missed.
+    
+–   Broken Image Alerts: Catch missing visuals before anyone notices.
+    
+–   Multisite Support: Perfect for agencies managing multiple sites.
+    
 
-The "Broken Links" tab will by default display a list of broken links that have been detected so far. However, you can use the links on that page to view redirects or see a listing of all links - working or not - instead. You can also create new link filters by performing a search and clicking the "Create Custom Filter" button. For example, this can be used to create a filter that only shows comment links.
+## Why Broken Link Checker?
 
-There are several actions associated with each link. They show up when you move your mouse over to one of the links listed the aforementioned tab -
+Every broken link is a strike against your credibility, and your SEO score. But staying on top of them can feel like fighting a never-ending battle. Broken Link Checker gives you an easy way to scan your content and fix issues before anyone notices.
 
-* "Edit URL" lets you change the URL of that link. If the link is present in more than one place (e.g. both in a post and in the blogroll), all occurrences of that URL will be changed.
-* "Unlink" removes the link but leaves the link text intact.
-* "Not broken" lets you manually mark a "broken" link as working. This is useful if you know it was incorrectly detected as broken due to a network glitch or a bug. The marked link will still be checked periodically, but the plugin won't consider it broken unless it gets a new result.
-* "Dismiss" hides the link from the "Broken Links" and "Redirects" views. It will still be checked as normal and get the normal link styles (e.g. a strike-through effect for broken links), but won't be reported again unless its status changes. Useful if you want to acknowledge a link as broken/redirected and just leave as it is.
+Whether you’re maintaining a personal blog, a client-heavy agency setup, or a content-rich eCommerce site, this plugin saves hours of manual work and helps you keep things tidy.
 
-You can also click on the contents of the "Status" or "Link Text" columns to get more info about the status of each link.
+### Real-Time Link Monitoring
+**Scan everything, automatically.**
+Broken Link Checker scans your site deeply and frequently, to make sure no broken links are missed. The plugin will scan every inch of your sites, including within posts, pages, custom post types, comments and even embedded media, to ensure your site’s SEO and user experience are not compromised in any way.
 
-**Other Credits**
+### Email Alerts & Dashboard Notifications
+**Never get blindsided by a broken link again.**
+Choose how and when you want to be notified about broken links. You can receive instant email alerts, get a summary in your WordPress dashboard, and stay in control with flexible scan settings that meet your needs.
 
-This plugin uses some icons from the [Font Awesome icon font](http://fortawesome.github.io/Font-Awesome/). Font Awesome is licensed under SIL OFL 1.1.
+### Advanced Search Filtering
+**Tailor your search to your workflow.**
+Broken Link Checker makes it easy to fine-tune your scan settings, with search and filtering tools that help you check what really matters. Look for specific URLs, or filter by status or error type.
 
-**Contribute**
+### Two Link Checking Engines
+**Choose the right option for your site.**
+Broken Link Checker gives you the option of using two unique engines based on your needs. Scan your content locally, or opt for the cloud-based checker for better performance and reduced server load.
 
-Broken Link Checker is now on [GitHub](https://github.com/wpmudev/broken-link-checker). Pull Requests welcome.
+### Fix Links Without Leaving the Page
+**Manage broken links efficiently.**
+No need to dig through old posts. Broken Link Checker lets you resolve all detected links right from your BLC dashboard. Bulk action means you can clean up dozens of links from the plugin interface with just a few clicks.
 
-== Installation ==
+### Multisite & Agency Ready
+**One plugin to manage them all.**
+Handle broken links across multiple sites – not just one! Perfect for if you’re running a multisite network or managing multiple client installs.
 
-To do a new installation of the plugin, please follow these steps
+## Broken Link Checker: Choose The Right Link Checking Engine for Your Needs
 
-1. Download the broken-link-checker.zip file to your computer.
-1. Unzip the file
-1. Upload `broken-link-checker` folder to the `/wp-content/plugins/` directory
-1. Activate the plugin through the 'Plugins' menu in WordPress
+With Broken Link Checker, you’ll have the flexibility to choose between a fast, cloud-based engine or a reliable, local solution. You can scan your site either way, and even switch between them without losing your saved settings.
 
-To enable/disable various features and tweak the plugin's configuration go to *Settings -> Link Checker*.
+  
 
-To upgrade your installation
+Not sure which one is right for you? Here’s a quick breakdown to help you decide:
 
-1. Deactivate the plugin
-1. Retrieve and upload the new files (do steps 1. - 3. from "new installation" instructions)
-1. Reactivate the plugin. Your settings will be retained from the previous version.
+### Cloud-Based Engine:
+
+–   20x faster scans with zero server strain
+    
+–   Unlimited page & URL checks, perfect for large or multiple sites
+    
+–   Fewer errors and less chance of being blocked by external sites
+    
+–   Crawls everything: posts, pages, menus, categories, and more
+    
+–   Manage broken links across all your sites in one place
+    
+–   Edit and unlink broken links from your dashboard
+    
+
+### Local Engine:
+
+–   Runs directly on your server, no external connection needed
+    
+–   Scans internal & external links in posts, pages, comments, and more
+    
+–   Edit links inline and get dashboard//email notifications
+    
+–   Customize how broken links appear and control SEO behavior
+    
+–   Filter and search links by URL, anchor text, and other fields
+    
+
+## What Users are Saying About Broken Link Checker
+
+★★★★★
+
+“One of my must-haves. It does a great job checking and classifying all the links on your site and making them searchable and easily editable. I particularly like that it can update redirected links, check the Wayback Machine for missing ones, and makes it easy to update one at a time or in bulk.” – [kelson](https://wordpress.org/support/users/kelson/)
+
+★★★★★
+
+“My site has thousands of links. This plugin ensures the site doesn’t go stale. The tools for URL updating are clever and well-designed.” – [Flaneuring](https://wordpress.org/support/users/flaneuring/)
+
+★★★★★
+
+“This plugin did exactly what I needed. I had a big problem with image links becoming broken on my site. With this plugin, I was able to see the list of broken image links and, without knowing this was a feature, I was able to fix the links! This was more than I could have asked for and it worked perfectly.” – [Rectorsquidd](https://wordpress.org/support/users/rectorsquidd/)
+
+### A Note from Broken Link Checker
+
+Hey there! I’m Broken Link Checker, your trusty tool for keeping your WordPress site clean, polished, and error-free. I scan your site for broken links, missing images, and redirects, so your visitors (and search engines) always get the best experience.
+
+Whether you're managing one site or many, I make it easy to catch link issues early, fix them fast, and keep your content in top shape. You can even choose between my cloud-based and local engines depending on your needs.
+
+Like my fellow plugin heroes, I’m part of the WPMU DEV family, home to some of the most powerful site management tools in the WordPress world:
+
+–   [Smush](https://wordpress.org/plugins/wp-smushit/): Image compression & optimization
+    
+–   [Forminator](https://wordpress.org/plugins/forminator/): Forms, polls, quizzes & surveys
+    
+–   [Hummingbird](https://wordpress.org/plugins/hummingbird-performance/): Page speed & performance booster
+    
+–   [Hustle](https://wordpress.org/plugins/wordpress-popup/): Pop-ups, slide-ins & email opt-ins
+    
+–   [Defender](https://wordpress.org/plugins/defender-security/): Security, monitoring & hack protection
+    
+–   [SmartCrawl](https://wordpress.org/plugins/smartcrawl-seo/): SEO checker, analyzer & optimizer
+    
+
+Want to level up your WordPress skills? Dive into the [WPMU DEV Blog](https://wpmudev.com/blog/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=blc-readme&utm_content=wpmu_dev_blog_link) for expert tutorials, tips, and inspiration.
+
+Thanks for checking me out. I'm here to help you build a stronger, smoother, more professional website.
+
+-Broken Link Checker
+    
+
+### Broken Link Checker: Use Cases
+✔ You’re a content creator who wants to protect SEO rankings  
+✔ You run a blog with hundreds of posts and external links  
+✔ You manage client websites and want a clean, reliable backend  
+✔ You’re an agency looking to scale QA across multiple sites  
+✔ You want to automate error detection and save time
+
+### Installation: Get Started in 5 Minutes
+Broken Link Checker is super simple to set up.  
+Install the plugin from the WordPress Plugin Directory or upload it manually.
+
+1.  Activate it through the 'Plugins' menu in WordPress
+    
+2.  Choose between cloud or local mode in the settings
+    
+3.  Start scanning, and fix broken links right from your dashboard
+    
+
+Need help? Check out the [full documentation on wpmudev.com](https://wpmudev.com/docs/wpmu-dev-plugins/broken-link-checker/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=blc-readme&utm_content=fully_documented).
+
+### About Us
+
+At WPMU DEV, we’re dedicated to helping WordPress users build faster, smarter, more secure websites with our suite of powerful plugins, site tools, and expert support.
+
+Join our community of developers, designers, and site owners at [wpmudev.com](https://wpmudev.com/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=blc-readme&utm_content=wpmu_dev_link), your all-in-one destination for WordPress success.
+
+Want to sharpen your skills and stay on top of the latest tips and trends? The [WPMU DEV Blog](https://wpmudev.com/blog/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=blc-readme_about-us&utm_content=wpmu_dev_blog_link) is your go-to source for top-tier tutorials, updates, and insights.
+
+And hey, thanks for [using our free plugins](https://profiles.wordpress.org/wpmudev/#content-plugins)! We’ve loved building them for you, and we’re excited to see what you create with them.
+
+#### Ready to banish broken links for good?
+
+Download Broken Link Checker and keep your site sharp, speedy, and SEO-friendly, no manual checking required.
+
+ == Frequently Asked Questions ==
+=Is Broken Link Checker really free?=  
+Yes! The plugin is completely free and includes all the core scanning features. The plugin works either locally on your own server, or 20x faster, better and more accurately on WPMU DEV cloud servers. The Local version only works in your site admin, while the Cloud version works in both your site admin and in your Hub.
+
+The cloud version requires a connection to WPMU DEV to access its API. However, you don’t need to be a premium WPMU DEV member to access the cloud version! You can create a free Hub account (with some restrictions) directly in the plugin while settings things up.
+
+=Does it work with custom post types and fields?=  
+Absolutely. You can scan everything from custom fields to WooCommerce product links.
+
+=Can I use it on Multisite?=  
+Yes, Broken Link Checker supports WordPress Multisite and gives you full flexibility.
+
+=Will it mess up my theme or content?=  
+Nope. The plugin doesn’t modify your content. It just finds the broken links and gives you options to manage them.
+
+= How can I report security issues or bugs? =
+We take plugin security incredibly seriously; if you have a bug or vulnerability to report, you can do so through the Patchstack Vulnerability Disclosure Program. It’s fast, easy, and you will be notified when the issue is fixed. [Report a vulnerability](https://patchstack.com/database/wordpress/plugin/broken-link-checker/vdp).
+
+== Screenshots ==
+
+1. Cloud Broken Link Checker
+2. Scheduled Broken Link Checker Scanning
+3. In plugin broken links summary dashboard
+4. Cloud Broken Link Checker Full Dashboard
+5. Local Broken Link Checker engine
+6. Local Broken Link Checker engine settings
 
 == Changelog ==
+
+= 2.4.6 =
+* Fix: Patched a vulnerability issue.
+
+= 2.4.5 =
+* Fix: Patched a vulnerability issue.
+
+= 2.4.4 =
+* Fix: Resolved issue where editing a link would get stuck in the Hub.
+* Fix: Updated the Hub link to correctly point to the BLC page within the Hub.
+
+= 2.4.3 =
+* Enhance: PHP 8.4 compatibility.
+* Enhance: Compatibility with WordPress 6.8.
+* Enhance: Add a new menu item to help you discover other free plugins by WPMU DEV and more
+
+= 2.4.2 =
+* Fix: Patched a vulnerability issue.
+* Fix: Notice about _load_textdomain_just_in_time.
+
+= 2.4.1 =
+* Security Fix: Cross-Site Scripting (XSS) vulnerability.
+
+= 2.4.0 =
+* Enhance: Improved editing and unlinking of URLs with query parameters.
+* Fix: Resolved issue with implicit conversion from float to int in YouTube links.
+
+= 2.3.0 =
+* New: Connect to the Cloud Engine API directly without installing the Dashboard plugin.
+* Fix: PHP8 Deprecation message.
+* Fix: Recipient confirmation link from scheduled scan email not working.
+* Fix: User role conflict with Solidwp
+
+= 2.2.4 =
+* Enhance: Code stability improvements.
+
+= 2.2.3 =
+* Enhance: Optimize local db tables.
+* Fix: Rare but possible Fatal error when unlinking a link.
+* Fix: Removed deprecated Defender hooks.
+
+= 2.2.2 =
+* Fix: Exclusions list spacing in Local settings.
+* Fix: Database error Illegal mix of collations.
+* Enhance: Use WP_HTML_Tag_Processor and DOMDocument instead of regex in Cloud Edit/Unlink.
+
+= 2.2.1 =
+* Fix: Youtube playlist show as not found (Local engine).
+* Fix: In Scheduled scan, users can be added twice in list.
+* Fix: PHP8 Deprecation messages.
+* Fix: Callback missing from Local cron jobs.
+* Enhance: Added BLC bot UA in Defender's bot allowlist.
+
+= 2.2.0 =
+* New: Edit and Unlink broken links in Cloud Engine.
+* Fix: Editor access blocked in Local Engine.
+* Enhance: PHP 8.1 and 8.2 compatibility.
+
+= 2.1.0 =
+* Improved admin menus, so they are separated to Cloud and Local Engine.
+* Fix multiple emails issue.
+* Fix Dashboard fonts.
+* Fix insisting line-through text decoration on links in front end.
+
+= 2.0.0 =
+* Version 2 release
+* Added connection to free Hub features for cloud based Broken Link Checker.
+
+= 1.11.21 =
+* Fix strict comparison causing db queries
+
+= 1.11.20 =
+* Fix XSS vulnerability
+
+= 1.11.19 =
+* Enhance compatibility with WordPress 6.1
+* Fix deprecated sanitization filter FILTER_SANITIZE_STRING
+
+= 1.11.18 =
+* Updated UA string
 
 = 1.11.16 =
 * Enhance compatibility with PHP 8
@@ -197,7 +418,7 @@ To upgrade your installation
 
 = 1.10.2 =
 * Fixed an XSS vulnerability on the link checker settings page.
-* Fixed old YouTube embed code parsing - now it should pick up self-closing embed tags without an `<object>` wrapper.
+* Fixed old YouTube embed code parsing – now it should pick up self-closing embed tags without an `<object>` wrapper.
 * Updated German translation.
 * Updated Simplified Chinese translation.
 * Link actions will now wrap properly on small screens.
@@ -360,7 +581,7 @@ To upgrade your installation
 * Added a "Redirect URL" column. For redirects this will display the URL that the link redirects to. For normal, non-redirected links, it will be empty. This column is hidden by default. You can enable it in the "Screen Options" panel.
 * Updated French translation.
 * Tested on WP 3.4.1.
-* Replace the "More plugins..." link on the "Broken Links" page with a link to the Admin Menu Editor page. This link will be hidden for users who have donated.
+* Replace the "More plugins…" link on the "Broken Links" page with a link to the Admin Menu Editor page. This link will be hidden for users who have donated.
 * A number of minor fixes.
 
 = 1.5.5 =
@@ -433,7 +654,7 @@ To upgrade your installation
 * Made the "database not up to date" error message a bit more helpful.
 * Shortcodes in image URLs should work now.
 * The Dashboard widget is no longer visible to non-privileged users.
-* Replaced multiple instances of get_option('home') and get_option('siteurl') - both now deprecated - with home_url().
+* Replaced multiple instances of get_option('home') and get_option('siteurl') – both now deprecated – with home_url().
 
 = 1.2.4 =
 * Fixed a very stupid bug where links would be checked very slowly or not at all.
@@ -509,7 +730,7 @@ To upgrade your installation
 * Replaced the "Delete sources" action with "Move sources to Trash" (except on blogs where Trash is disabled).
 * New URL editor interface, now more consistent with the look-n-feel of the inline editor for posts.
 * New status icon to help distinguish "maybe broken" and "definitely broken" links.
-* Tweaked table layout - links first, posts/etc last.
+* Tweaked table layout – links first, posts/etc last.
 * Added "Compact" and "Detailed" table views (for now, the differences are quite minor).
 * Split the settings page into several tabs.
 * Removed the "Details" links as redundant. To display link details, click the contents of the "Status" or "Link text" columns instead.
@@ -748,7 +969,7 @@ To upgrade your installation
 
 = 0.4.11 =
 * Set the Referer header to blog's home address when checking a link. This should help deal with some bot traps.
-* I know, I know - there haven't been any major updates for a while. But there will be eventually :)
+* I know, I know – there haven't been any major updates for a while. But there will be eventually :)
 * Fix SQL error when a post is deleted.
 
 = 0.4.10 =
@@ -777,7 +998,7 @@ To upgrade your installation
 * More substantive improvements will hopefully follow next week.
 
 = 0.4.6 =
-* Minor compatibility enhancement in wsblc\_ajax.php - don't load wpdb if it's already loaded.
+* Minor compatibility enhancement in wsblc\_ajax.php – don't load wpdb if it's already loaded.
 
 = 0.4.5 =
 * Bugfixes. Nothing more, nothing less.
@@ -844,7 +1065,7 @@ To upgrade your installation
 * Lots of new features in version 0.3
 
 = 0.2.4 =
-* Bigfix - use GET when HEAD fails
+* Bigfix – use GET when HEAD fails
 
 = 0.2.3 =
 * MySQL 4.0 compatibility + recheck\_all\_posts function

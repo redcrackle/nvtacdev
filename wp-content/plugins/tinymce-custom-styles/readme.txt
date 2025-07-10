@@ -1,17 +1,22 @@
 === TinyMCE Custom Styles ===
-Contributors:  Tim Reeves, Blackbam
+Contributors:  Tim Reeves, Blackbam, rawrly
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NBW9FDZHW42GY
-Tags: tinymce, visual, editor, style, format, custom
+Tags: tinymce, visual, editor, style, format
 Requires at least: 5.0
 Requires PHP: 5.6
-Tested up to: 5.8.1
+Tested up to: 6.5.5
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Enhance the TinyMCE visual editor with a dedicated stylesheet, a stylesheet shared with the frontend, and custom styles in the 'Formats' dropdown.
+Enhance TinyMCE visual editor with a dedicated stylesheet, a stylesheet shared with the frontend, and custom styles in the Formats dropdown.
 
 == Description ==
+
+**Please someone take over maintaining this plugin, or it will get abandoned - with over 9.000 active installations.**
+
+I'm now 69 and although retired, all my time is taken up with other projects, while I still have the energy for them. Why you might want to take it over? It's really useful:
+
 Make your editing experience as simple and good as possible by improving the way you work with the TinyMCE visual editor (including Gutenberg Classic block). This plugin adds custom CSS file(s) to the frontend and to the TinyMCE editor; and it allows you to populate TinyMCE's 'Formats' dropdown with your own styles. The features in more detail:
 
 **1.** Installs two CSS stylesheet files into your chosen location (so you can still do updates of the active theme and this plugin and even switch to another theme). In general you will need to fetch the auto-created stub files via FTP, edit them locally and upload them, overwriting the previous versions.
@@ -51,7 +56,7 @@ Although it does not check for MultiSite, the plugin works in the MultiSite envi
 == Background Information ==
 
 **Then and Now**
-This plugin was originally written by David Stöckl in 2013 - long before Gutenberg had been conceived, and at a time when several different plugins all tried to enhance the TinyMCE editor in different ways. It was abandoned a year later by David and I forked it in 2016, renamed to TinyMCE Custom Styles" ("TCS"). Most of those other TinyMCE-related plugins, notably WP Edit, are now abandoned; apart from this plugin, only TinyMCE Advanced, now also handling Gutenberg and renamed to <a href="https://wordpress.org/plugins/tinymce-advanced/" target="_blank">Advanced Editor Tools</a> (abbreviated hereafter to "AET"), and <a href="https://wordpress.org/plugins/just-tinymce-styles/">Just TinyMCE Custom Styles</a>, seem to still be notably active in this area. AET is a great plugin - you can also check out its companion for developers <a href="https://wordpress.org/plugins/advanced-tinymce-configuration/" target="_blank">Advanced TinyMCE Configuration</a>. I use AET myself on most websites - but there are a few things it's not designed to do, and that's where this plugin fills the gap. You can consider it as AET's sidekick :) If you do not need the feature with the two CSS stylesheet files, then you might consider using "Just TinyMCE Custom Styles", which offers only the 'Formats' and has a modern user interface (however, the description here of how to use the features is probably more exhaustive).
+This plugin was originally written by David Stöckl in 2013 - long before Gutenberg had been conceived, and at a time when several different plugins all tried to enhance the TinyMCE editor in different ways. It was abandoned a year later by David and I forked it in 2016, renamed to TinyMCE Custom Styles" ("TCS"). Most of those other TinyMCE-related plugins, notably WP Edit, are now abandoned; apart from this plugin, only TinyMCE Advanced, now also handling Gutenberg and renamed to <a href="https://wordpress.org/plugins/tinymce-advanced/" target="_blank">Advanced Editor Tools</a> (abbreviated hereafter to "AET") seems to still be notably active in this area. AET is a great plugin - you can also check out its companion for developers <a href="https://wordpress.org/plugins/advanced-tinymce-configuration/" target="_blank">Advanced TinyMCE Configuration</a>. I use AET myself on most websites - but there are a few things it's not designed to do, and that's where this plugin fills the gap. You can consider it as AET's sidekick :)
 
 **TinyMCE and the WordPress theme**
 The goal is to configure the TinyMCE backend editor so that its 'Visual' tab displays content as closely as possible to how it will look on the content area of the actual website. To this end, WordPress has for years provided a feature which can be used by themes, called 'editor styles'. This allows a theme to make known to WordPress one or more CSS files, which should contain a subset of the theme's styles, those which apply to the display of content in the content area (i.e. excluding styles applying to headers, sidebars, footers, archives, comments, ...). If the theme provides this feature, that CSS file (or files) are loaded to TinyMCE to achieve the goal. The default location is one file named 'editor-style.css' in the theme's root directory. In fact, WordPress seems to find this file, if present, even if the theme does not register it. All good modern themes provide this feature.
@@ -83,7 +88,12 @@ When the AET plugin is active, it offers an option "Create CSS classes menu" (su
 This plugin is a fork of <a href="https://wordpress.org/plugins/tinymce-and-tinymce-advanced-professsional-formats-and-styles/" target="_blank">TinyMCE Advanced Professsional Formats and Styles</a> which has been abandoned by the original author. Initially I just fixed a JavaScript bug so that it worked again, and cleaned up the code and messages a bit. Since then, a number of further improvements, see the changelog. I was born in 1954 and would be glad if someone else would now take over this plugin and further improve it. Translations are also very welcome.
 
 - <a href="https://blog.blackbam.at/" target="_blank">David Stöckl</a>, Vienna, the original author. Many thanks!
-- The plugin icon (<a href="https://timreeves.de/kompetenz/" target="_blank">Der Bitkönig</a>) was drawn by <a href="https://vorher.meischner.world/" target="_blank">Gabriele Meischner</a>, muchas Gracias!
+- The plugin icon (<a href="https://timreeves.de/kompetenz/" target="_blank">Der Bitkönig</a>) was drawn by Gabriele Meischner, muchas Gracias!
+- <a href="https://profiles.wordpress.org/rawrly/" target="_blank">Rawrly</a> for providing security updates.
+
+== Report Security Bugs ==
+
+Please report all security bugs found in this project by following the <a href="https://patchstack.com/database/vdp/tinymce-custom-styles">vulnerability disclosure process</a>.
 
 == Installation ==
 1. Upload the Plugin to your wp-content/plugins/ folder
@@ -135,37 +145,50 @@ An image for example, when inserted via the media library, will show as the [cap
 
 == Changelog ==
 
-= 1.1.1 =
+= 1.1.5 (2023-08-05) =
+* Security - Overzealous sanitization relaxed to allow "/" in directory path input
+
+= 1.1.4 (2023-06-06) =
+* Security - More sanitize and escape admin panel settings inputs, as requested by Jetpack Support
+
+= 1.1.3 (2023-01-27) =
+* Security - Sanitize and escape admin panel settings inputs (rawrly)
+* Documentation - Add note in description to report security bugs through Patchstack
+
+= 1.1.2 (2023-01-24) =
+* Removed broken link in credits
+
+= 1.1.1 (2021-10-25) =
 * Bugfix - call of wp_enqueue_scripts corrected to wp_enqueue_style
 * Enhancement - enqueue both stylesheets also as Gutenberg block assets
 
-= 1.1.0 =
+= 1.1.0 (2021-04-07) =
 * editor-style.css and editor-style-shared.css: Both files must be present or a (non-empty) stub will be created; but if a file is zero bytes long, it will not be loaded / enqueued at all
 * Styles defined for the 'Formats' dropdown which do not have a class now do not create an empty class attribute in HTML
 * Regrouping of items on the settings page to make clearer which elements belong to which functionality
 * Very major rework of the documentation - both in the description page and on the settings page (backend)
 
-= 1.0.10 =
+= 1.0.10 (2021-03-07) =
 * Fixed a typo which prevented custom style deletion
 * Documented that Gutenberg classic blocks not supported
 
-= 1.0.9 =
+= 1.0.9 (2020-07-01) =
 * Typo-correction in plugin description
 
-= 1.0.8 =
+= 1.0.8 (2018-01-13) =
 * Improved plugin description
 
-= 1.0.7 =
+= 1.0.7 (2017-12-28) =
 * Learned more on SVN and really deleted/added language files
 
-= 1.0.6 =
+= 1.0.6 (2017-12-28) =
 * Removed unneccesary and outdated translation files
 
-= 1.0.5 =
+= 1.0.5 (2017-12-28) =
 * Small formal improvements re translation
 * Added .pot string translation file
 
-= 1.0.4 =
+= 1.0.4 (2017-08-10) =
 * Standard entries and any other previous entries (from other plugins) in TinyMCE's Formats dropdown are now preserved
 * Added a checkbox option to allow inserting the custom styles in a submenu "Custom Styles" in the Formats dropdown
 * Added a checkbox option to govern whether to preserve the standard Formats entries or remove them. This option gets overwritten (to 'preserve') by the 'WP Edit' plugin with option 'Add Pre-defined Styles' checked.

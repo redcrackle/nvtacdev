@@ -3,7 +3,7 @@
 /*  1 ----------------------  forum list backgrounds --------------------------*/
 				#bbpress-forums ul.odd
 			{
-				background-color: #eaeaea  ;
+				background-color: #eaeaea;
 			}
 			
 	 
@@ -17,7 +17,7 @@
 				#bbpress-forums li.bbp-header,
 			#bbpress-forums li.bbp-footer 
 			{
-				background-color:  #355390 ;
+				background-color: #355390;
 			}
 		
 	  
@@ -25,92 +25,92 @@
  
 				#bbpress-forums ul.forum-titles li.bbp-forum-info
 			{
-				font-size:  18px ;
+				font-size: 18px;
 			}
 		 
 			#bbpress-forums ul.forum-titles li.bbp-forum-topic-count{
-				font-size:  18px ;
+				font-size: 18px;
 			}
 
 			#bbpress-forums ul.forum-titles li.bbp-forum-reply-count{
-				font-size:  18px ;
+				font-size: 18px;
 
 			}
 
 			#bbpress-forums ul.forum-titles li.bbp-forum-freshness{
-				font-size:  18px ;
+				font-size: 18px;
 			}
 		 
 			#bbpress-forums ul.forum-titles li.bbp-forum-info
 		{
-			color:  #ffffff ;
+			color: #ffffff;
 		}
 	 
 				#bbpress-forums ul.forum-titles a.bsp-forum-name
 		{
-			color:  #ffffff ;
+			color: #ffffff;
 		}
 
 		#bbpress-forums ul.forum-titles li.bbp-forum-topic-count
 		{
-			color:  #ffffff ;
+			color: #ffffff;
 		}
 
-	#bbpress-forums ul.forum-titles li.bbp-forum-reply-count
+                #bbpress-forums ul.forum-titles li.bbp-forum-reply-count
 		{
-		   color:  #ffffff ;
+		   color: #ffffff;
 		}
 
-	#bbpress-forums ul.forum-titles li.bbp-forum-freshness 
+                #bbpress-forums ul.forum-titles li.bbp-forum-freshness 
 		{
-			color:  #ffffff ;
+			color: #ffffff;
 		}
 	 
 				#bbpress-forums ul.forum-titles li.bbp-forum-info
 			{
-				Font-Family:  Archivo ;
+				font-family: Archivo;
 			}
 	 
 			#bbpress-forums ul.forum-titles li.bbp-forum-topic-count
 			{
-				Font-Family:  Archivo ;
+				font-family: Archivo;
 			}
 
 			#bbpress-forums ul.forum-titles li.bbp-forum-reply-count
 			{
-				Font-Family:  Archivo ;
+				font-family: Archivo;
 			}
 
 			#bbpress-forums ul.forum-titles li.bbp-forum-freshness
 			{
-				Font-Family:  Archivo ;
+				font-family: Archivo;
 			}
 				
 				#bbpress-forums ul.forum-titles li.bbp-forum-info
 			{
-				Font-weight:  bold ; 
+				font-weight: bold; 
 			}
 	 
 			#bbpress-forums ul.forum-titles li.bbp-forum-topic-count
 			{
-				Font-weight:  bold ; 
+				font-weight: bold; 
 			}
 
 			#bbpress-forums ul.forum-titles li.bbp-forum-reply-count
 			{
-				Font-weight:  bold ; 
+				font-weight: bold; 
 			}
 
 			#bbpress-forums ul.forum-titles li.bbp-forum-freshness 
 			{
-				Font-weight:  bold ; 
+				font-weight: bold; 
 			}
 		
 /*  4 ----------------------  Font - breadcrumb --------------------------*/
  
 				#bbpress-forums .bbp-breadcrumb p
 			{
-				font-size:  13px ;
+				font-size: 13px;
 			}
 		 
 	 
@@ -120,7 +120,7 @@
  
 				#bbpress-forums a:link
 			{
-				color:  #8f3f34 ;
+				color: #8f3f34;
 			}
 		 
 	 
@@ -130,17 +130,17 @@
  
 				#bbpress-forums .bbp-forum-title
 			{
-				font-size:  18px ;
+				font-size: 18px;
 			}
 			
 				#bbpress-forums .bbp-forum-title
 			{
-				Font-Family:  Archivo ;
+				font-family: Archivo;
 			}
 		 
 					#bbpress-forums .bbp-forum-title
 				{
-					Font-weight:  normal ; 
+					font-weight: normal; 
 				}
 			
 /*  7 ----------------------  Font - Sub Forum lists --------------------------*/
@@ -157,14 +157,14 @@
 			#bbpress-forums .bsp-forum-content,
 			#bbpress-forums .bbp-forum-info .bbp-forum-content
 			{
-				font-size:  14px ;
+				font-size: 14px;
 			}
 		 
 				#bbpress-forums .bbp-forum-content,
 			#bbpress-forums .bsp-forum-content,
 			#bbpress-forums .bbp-forum-info .bbp-forum-content
 			{
-				color:  #4f4f4f ;
+				color: #4f4f4f;
 			}
 		 
 	 
@@ -172,7 +172,7 @@
 				 #bbpress-forums .bsp-forum-content,
 				 #bbpress-forums .bbp-forum-info .bbp-forum-content
 				{
-					Font-weight:  normal ; 
+					font-weight: normal; 
 				}
 				 
 
@@ -202,7 +202,7 @@
 			#bbpress-forums div.even,
 			#bbpress-forums ul.bbp-replies
 			{
-				Border:  3px solid #355390 ;
+				border: 3px solid #355390;
 			}
 		 
 			#bbpress-forums li.bbp-header,
@@ -211,12 +211,12 @@
 			#bbpress-forums li.bbp-footer,
 			#bbpress-forums ul.forum
 			{
-				Border-top:  3px solid #355390 ;
+				Border-top: 3px solid #355390;
 			}
 		
 			#bbpress-forums li.bbp-footer
 			{
-				Border-bottom:  3px solid #355390 ;
+				Border-bottom: 3px solid #355390;
 			}
 	 
 						
@@ -229,12 +229,12 @@
  
 					#bbpress-forums li.bbp-forum-topic-count
 				{
-					font-size:  14px ;
+					font-size: 14px;
 				}
 		 
 				#bbpress-forums li.bbp-forum-topic-count
 			{
-				color:  #355390 ;
+				color: #355390;
 			}
 		 
 	 
@@ -243,16 +243,20 @@
  
 				#bbpress-forums li.bbp-forum-reply-count
 			{
-				font-size:  14px ;
+				font-size: 14px;
 			}
 		 
 				#bbpress-forums li.bbp-forum-reply-count
 			{
-				color:  #355390 ;
+				color: #355390;
 			}
 		 
 	 
-	
+	                                
+/*  15 ----------------------  Message - empty forum --------------------------*/
+
+         
+
  
 /********______________TOPIC INDEX___________________________________________*/ 
 
@@ -267,7 +271,7 @@
  
 				#bbpress-forums li.bbp-topic-voice-count, li.bbp-topic-reply-count
 			{
-				font-size:  16px ;
+				font-size: 16px;
 			}
 		 
 	 
@@ -277,29 +281,29 @@
  
 				#bbpress-forums a.bbp-topic-permalink:link
 			{
-				color:  #355390 ;
+				color: #355390;
 			}
 		 
 				#bbpress-forums a.bbp-topic-permalink:visited
 			{
-				color:  #9a3637 ;
+				color: #9a3637;
 			}
 		 
 	/*  4 ----------------------  Font - Topic Title --------------------------*/
  
 					#bbpress-forums .bbp-topic-title
 		 		{
-				font-size:  14px ;
+				font-size: 14px;
 				}
 		 
 				#bbpress-forums .bbp-topic-title
 			{
-				Font-Family:  Archivo ;
+				font-family: Archivo;
 			}
 		 
 					#bbpress-forums .bbp-topic-title
 				{
-					Font-weight:  normal ; 
+					font-weight: normal; 
 				}
 		 
 /*   5 ----------------------  Font - template notice --------------------------*/
@@ -341,22 +345,22 @@
 	 
 				#bbpress-forums ul.forum-titles li.bbp-topic-title
 			{
-				color:  #ffffff ;
+				color: #ffffff;
 			}
 			 
 			#bbpress-forums ul.forum-titles li.bbp-topic-voice-count
 			{
-				color:  #ffffff ;
+				color: #ffffff;
 			}
 
 			#bbpress-forums ul.forum-titles li.bbp-topic-reply-count
 			{
-				color:  #ffffff ;
+				color: #ffffff;
 			}
 
 			#bbpress-forums ul.forum-titles li.bbp-topic-freshness
 			{
-				color:  #ffffff ;
+				color: #ffffff;
 			}
 		 
 	 
@@ -369,12 +373,12 @@
 
 				#bbpress-forums div.odd
 			{
-				background-color: #d2d2d2 ;
+				background-color: #d2d2d2;
 			}
 		
 				#bbpress-forums div.even
 			{
-				background-color: #fbfbfb ;
+				background-color: #fbfbfb;
 			}
 		 
 /*   2 ----------------------  Topic/reply header background --------------------------*/
@@ -382,7 +386,7 @@
 				#bbpress-forums div.bbp-reply-header,
 			#bbpress-forums div.bbp-topic-header
 			{
-				background-color: #f4f4f4 ;
+				background-color: #f4f4f4;
 			}
 				 
 /*   3 ----------------------  Trash/Spam backgrounds --------------------------*/
@@ -390,13 +394,13 @@
 				#bbpress-forums .status-trash.odd,
 			#bbpress-forums .status-spam.odd 
 			{
-				background-color: #fdd ;
+				background-color: #fdd;
 			}
 		
 				#bbpress-forums .status-trash.even,
 			#bbpress-forums .status-spam.even
 			{
-				background-color: #fee ;
+				background-color: #fee;
 			}
 		 
 /*   4 ----------------------  Closed Topic backgrounds --------------------------*/
@@ -404,7 +408,7 @@
 				#bbpress-forums .status-closed,
 			#bbpress-forums .status-closed a
 			{
-				background-color: #fdd ;
+				background-color: #fdd;
 			}
 		 
 /*   5 ----------------------  Font - topic/reply date --------------------------*/
@@ -424,9 +428,9 @@
  
 	 
 	 
-					#bbpress-forums a.bbp-author-name
+					#bbpress-forums div.bbp-reply-author .bbp-author-name
 				{
-					Font-weight:  bold ; 
+					font-weight: bold; 
 				}
 					
 /*   8 ----------------------  Font - reply permalink --------------------------*/
@@ -450,7 +454,7 @@
 			#bbpress-forums li.bbp-footer .bbp-reply-content,
 			#bbpress-forums li.bbp-footer  .bbp-reply-author
 			{
-				color:  #355390 ;
+				color: #355390;
 			}
 		 
 	 
@@ -462,7 +466,7 @@
 				#bbpress-forums span.bbp-admin-links a,
 			#bbpress-forums span.bbp-admin-links 
 			{
-				color:  #ffffff ;
+				color: #ffffff;
 			}
 		 
 	 
@@ -516,7 +520,13 @@
 			{
 				display: none;
 			}
-		
+				
+/*********_________________SINGLE FORUM WIDGET___________________________________________*/ 
+
+ul.bsp-sf-info-list a.subscription-toggle {
+float : left ;
+}	
+
  
 /*********_________________LATEST ACTIVITY WIDGET___________________________________________*/ 
  
@@ -566,7 +576,7 @@
 /* ----------------------  Move breadcrumb --------------------------*/
 				.subscription-toggle
 			{	
-				float:right ;
+				float:right;
 			}
 		 
  
@@ -575,8 +585,8 @@
 		#bbpress-forums div.bsp-forum-content
 		{
 		clear:both;
-		margin-left: 0px ;
-		padding: 0 0 0 0 ;
+		margin-left: 0px;
+		padding: 0 0 0 0;
 		}
 	
 /* ----------------------  Rounded corners --------------------------*/
@@ -584,10 +594,10 @@
 		
 			.bbp-forums , .bbp-topics  , .bbp-replies
 			{			
-				border-top-left-radius: 10px ;
-				border-top-right-radius: 10px ;
-				border-bottom-left-radius: 10px ;
-				border-bottom-right-radius: 10px ;
+				border-top-left-radius: 10px;
+				border-top-right-radius: 10px;
+				border-bottom-left-radius: 10px;
+				border-bottom-right-radius: 10px;
 			}
 			
 		
@@ -597,12 +607,12 @@
 			.bsp_thumbnail
 			{
 				display: flex;
-				align-items: center;
+				align-items: flex-start;
 			}	
 
 			.bsp_thumbnail a
 			{
-				padding-left: 10px ;
+				padding-left: 10px;
 			}
 			
 		/*----------------------------------------- ROLES--------------------------------------------------------------------*/
@@ -638,23 +648,24 @@
 /*----------------------  Create new topic button Button--------------------------*/
 
 				.bsp_button1
-			{
-				font-size:  10px !important;
+						{
+				font-size: 10px !important;
 				
 			}
 		
 
-				.bsp_button1 {
+				.bsp_button1
+						{
 				font-family: Arial;
 			}
 		
 				.bsp_button1
-			{
-				color: #ffffff !important ;
+									{
+				color: #ffffff !important;
 			}
 		
 				.bsp_button1
-			{
+						{
 				background: #3498db;
 				background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
 				background-image: -moz-linear-gradient(top, #3498db, #2980b9);
@@ -664,7 +675,7 @@
 			}
 		
 				.bsp_button1:hover
-			{
+						{
 				background: #3cb0fd;
 				background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
 				background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
@@ -674,19 +685,19 @@
 			}
 		
 					.bsp_button1
-				{
-					Font-weight:  normal ; 
+								{
+					font-weight: normal; 
 				}
 		
 		.bsp_button1
-		{  
+				{  
 			-webkit-border-radius: 28;
 			-moz-border-radius: 28;
 			border-radius: 28px;
 			padding: 7px 15px 7px 15px;
 			text-decoration: none;  
-			border : none ;
-			cursor : pointer ;
+			border : none;
+			cursor : pointer;
 			line-height : 15px !important;
 		}
 
@@ -695,27 +706,32 @@
 		   text-decoration: none;
 		}
 
+                /* fix for Mark All Topics Read offset */
+                div.bsp-center > form > input.bsp_button1 {
+                        margin-top: -7px;	
+                }
+                
 		.bsp-center
 		{
 			width: 100%;
 			max-width: 100%;
 			float: none;
 			text-align: center;
-			margin-top: 20px;
+			margin: 10px 0px 10px 0px;
 		}
 	
 		.bsp-one-half
 		{
 			float: left;
-			width: 48%;
-			margin-right: 4%;
+			width: 50%;
+			margin-right: 0;
 		}
 
 		.bsp-one-third
 		{
-			width: 30.66%;
+			width: 33.33%;
 			float: left;
-			margin-right: 4%;
+			margin-right: 0;
 			position: relative;
 		}
 		
@@ -730,7 +746,7 @@
 			 float: left;
 			 text-align: left;
 			 margin-top: 10px;
-			 margin-bottom : 10px ;
+			 margin-bottom : 10px;
 			 }
 
 			.bsp-one-half
@@ -754,7 +770,7 @@
 		#bsp-spinner-load
 		{
 			background: url(/wp-admin/images/spinner.gif) no-repeat;
-			display : none ;
+			display : none;
 		}
 
 		.bsp-spinner
@@ -773,12 +789,12 @@
 
 		#bsp_topic_submit
 		{
-			display : none ;
+			display : none;
 		}
 
 		#bsp_reply_submit
 		{
-			display : none ;
+			display : none;
 		}
 
 
@@ -786,13 +802,13 @@
 
 		#bsp_search_submit2
 		{
-			display : none ;
+			display : none;
 		}
 
 		.bsp-search-submitting
 		{
-			font-size : 16px ;
-			line-height : 24px ;
+			font-size : 16px;
+			line-height : 24px;
 		
 		}
 /*********_________________TOPIC PREVIEW___________________________________________*/ 		
@@ -818,7 +834,7 @@
 	
 					#bbp_search_submit, #bsp_search_submit1, #bsp_search_submit2
 			{			
-			background-color:  #355390 !important ;
+			background-color: #355390 !important;
 			}	
 				
 		
@@ -844,12 +860,12 @@
 
 				#bbpress-forums ul.sticky li.bbp-topic-title a.bbp-topic-permalink::before, #bbpress-forums ul.super-sticky li.bbp-topic-title a.bbp-topic-permalink::before
 			{
-				font-size:  12px ;
+				font-size: 12px;
 			}	
 
 						#bbpress-forums ul.sticky li.bbp-topic-title a.bbp-topic-permalink::before, #bbpress-forums ul.super-sticky li.bbp-topic-title a.bbp-topic-permalink::before
 				{
-					color:  #ffb900 ;
+					color: #ffb900;
 				}	
 
 		
@@ -865,7 +881,7 @@
 	
 				.bsp-home-icon::before
 			{
-			font-size:  12px ;
+			font-size: 12px;
 			}	
 		
 			
@@ -875,11 +891,6 @@
 	 
 			
 	
-		
-		
-		
-		
-		
 		
 
 /*----------------------  topic lock icon-----------------------------------------------------------------------------------------------------*/
@@ -895,7 +906,7 @@
 
 				#bbpress-forums ul.status-closed li.bbp-topic-title a.bbp-topic-permalink::before
 			{
-			font-size:  12px ;
+			font-size: 12px;
 			}	
 		
 		
@@ -947,54 +958,54 @@
 			}
 
 			.show-iconf::before {
-					 font-family: 'dashicons' ;
+					 font-family: 'dashicons';
 				content : "\f449";
 			}
 
 			.show-iconr::before {
-					 font-family: 'dashicons' ;
+					 font-family: 'dashicons';
 				content : "\f451";
 			}
 
 			.show-icont::before {
-					 font-family: 'dashicons' ;
+					 font-family: 'dashicons';
 				content : "\f450";
 			}
 
 			.show-iconv::before {
-					 font-family: 'dashicons' ;
+					 font-family: 'dashicons';
 				content : "\f307";
 			}
 
 			.show-iconlr::before {
-					 font-family: 'dashicons' ;
+					 font-family: 'dashicons';
 				content : "\f338";
 			}
 
 			.show-iconla::before {
-					 font-family: 'dashicons' ;
+					 font-family: 'dashicons';
 				content : "\f469";
 			}
 
 			.show-iconfa::before {
-					 font-family: 'dashicons' ;
+					 font-family: 'dashicons';
 				content : "\f147";
 			}
 
 			.show-iconsu::before {
-					 font-family: 'dashicons' ;
+					 font-family: 'dashicons';
 				content : "\f155";
 			}
 
 
 
 			ul.bsp-st-info-list li.topic-subscribe a.subscription-toggle {
-			float : none ;
+			float : none;
 			} 
 
 			.hide-list-style {
 				list-style: none !important;
-				margin-left : 0 !important ;
+				margin-left : 0 !important;
 			}
 			
 	/*----------------------  prevent hide/cancel being displayed in profile following 5.6 release--------------------------*/
@@ -1002,12 +1013,85 @@
 			#bbpress-forums #bbp-your-profile fieldset fieldset.password {
 		display: none;
 }
+
+
+/*----------------------  Quotes Styling --------------------------*/
+
+/*----------------------  mod tools--------------------------*/
+
+/*----------------------  theme support--------------------------*/
+
+
+
+/*    ----------------------  BLOCK Widget title --------------------------*/
+ 
+	 
+			 
+	 
 	
 
+/*----------------------  change avatar display - makes sure username displays correctly for profiles tabs settings --------------------------*/
+
+#bbpress-forums div.bbp-reply-author img.avatar {
+    clear: left;
+    display: block;
+}
+
+
+/*----------------------  button fixes to work with default bbPress buttons and override theme values that make buttons look wrong --------------------------*/
+
+/* override bbpress floating subscription link to the right */
+#bbpress-forums div.bsp-center #subscription-toggle {
+    float: none;
+}
+
+/* override any theme margins for generic input css so the mark as read button alignment matches */
+input.bsp_button1 {
+    margin: 0px;
+}
+
+
+/*----------------------  block widget titles--------------------------*/
+.bsp-widget-heading {
+	color: #222;
+	font-weight: bold;
+}
+
+ul.bsp-widget-settings{
+	font-size : 12px !important;
+}
+
+/*----------------------  forums list widget styling--------------------------*/
+.bsp-forum-topic-count {
+	text-align: right ;
+}
+
+ul.bsp-forums-widget{
+	list-style : none !important ;
+	
+}
+
+.bsp-widget-display-forums {
+	list-style: none;
+}
+
+.bsp-forum-info {
+	background: #eaeaea;
+}
+
+/*----------------------  Column display--------------------------*/
+
+
+
+/*----------------------  Additional Topics Fields display--------------------------*/
+
+	 
+	 
+			
+	 
+	 
+	 
+			
+	
 /*----------------------  custom css--------------------------*/
 	
-
-
-
-
- 

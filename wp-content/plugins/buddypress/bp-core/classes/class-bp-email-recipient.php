@@ -1,16 +1,18 @@
 <?php
 /**
- * Core component classes.
+ * BuddyPress Email Recipient class.
+ *
+ * Represents a recipient that an email will be sent to.
  *
  * @package BuddyPress
  * @subpackage Core
  */
 
-// Exit if accessed directly
+// Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Represents a recipient that an email will be sent to.
+ * BP_Email_Recipient class.
  *
  * @since 2.5.0
  */
@@ -21,7 +23,7 @@ class BP_Email_Recipient extends BP_Email_Participant {
 	 *
 	 * @since 2.5.0
 	 *
-	 * @var WP_User
+	 * @var WP_User|null
 	 */
 	protected $user_object = null;
 
@@ -32,7 +34,8 @@ class BP_Email_Recipient extends BP_Email_Participant {
 	 *
 	 * @param string|array|int|WP_User $email_or_user Either a email address, user ID, WP_User object,
 	 *                                                or an array containing any combination of the above.
-	 * @param string $name Optional. If $email_or_user is a string, this is the recipient's name.
+	 * @param string                   $name          Optional. If $email_or_user is a string, this is the
+	 *                                                recipient's name.
 	 */
 	public function __construct( $email_or_user, $name = '' ) {
 		$name = sanitize_text_field( $name );
@@ -43,7 +46,7 @@ class BP_Email_Recipient extends BP_Email_Participant {
 			if ( is_object( $email_or_user ) ) {
 				$this->user_object = $email_or_user;
 
-			// Query for WP user by user ID.
+				// Query for WP user by user ID.
 			} elseif ( is_int( $email_or_user ) ) {
 				$this->user_object = get_user_by( 'id', $email_or_user );
 			}
@@ -53,7 +56,7 @@ class BP_Email_Recipient extends BP_Email_Participant {
 				$address = $email_or_user;
 			}
 
-		// Array or miscellaneous string.
+			// Array or miscellaneous string.
 		} else {
 			if ( ! is_array( $email_or_user ) ) {
 				$email_or_user = array( $email_or_user => $name );
@@ -80,7 +83,7 @@ class BP_Email_Recipient extends BP_Email_Participant {
 
 		// We have a user object; so set address and name from DB.
 		if ( $this->user_object ) {
-			// This is escaped with esc_html in bp_core_get_user_displayname()
+			// This is escaped with esc_html in bp_core_get_user_displayname().
 			$wp_name = wp_specialchars_decode( bp_core_get_user_displayname( $this->user_object->ID ), ENT_QUOTES );
 
 			$this->set_address( $this->user_object->user_email );
@@ -100,8 +103,8 @@ class BP_Email_Recipient extends BP_Email_Participant {
 		 *
 		 * @param string|array|int|WP_User $email_or_user Either a email address, user ID, WP_User object,
 		 *                                                or an array containing any combination of the above.
-		 * @param string $name If $email_or_user is a string, this is the recipient's name.
-		 * @param BP_Email_Recipient $this Current instance of the email type class.
+		 * @param string                   $name          If $email_or_user is a string, this is the recipient's name.
+		 * @param BP_Email_Recipient       $recipient     Current instance of the email type class.
 		 */
 		do_action( 'bp_email_recipient', $email_or_user, $name, $this );
 	}
@@ -169,10 +172,10 @@ class BP_Email_Recipient extends BP_Email_Participant {
 		 *
 		 * @since 2.5.0
 		 *
-		 * @param WP_User $name WP_User object for this recipient, or null if not set.
-		 * @param string $transform Optional. How the return value was transformed.
-		 *                          Accepts 'raw' (default) or 'search-email'.
-		 * @param BP_Email $recipient $this Current instance of the email recipient class.
+		 * @param WP_User            $user_object WP_User object for this recipient, or null if not set.
+		 * @param string             $transform   Optional. How the return value was transformed.
+		 *                                        Accepts 'raw' (default) or 'search-email'.
+		 * @param BP_Email_Recipient $recipient   Current instance of the email recipient class.
 		 */
 		return apply_filters( 'bp_email_recipient_get_user', $this->user_object, $transform, $this );
 	}

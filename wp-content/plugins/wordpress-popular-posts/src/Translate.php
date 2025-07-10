@@ -47,8 +47,9 @@ class Translate {
      */
     public function get_default_language()
     {
-        if ( ! $this->default_language )
-            $this->default_language = ( function_exists('pll_default_language') ) ? pll_default_language() : apply_filters('wpml_default_language', NULL);
+        if ( ! $this->default_language ) {
+            $this->default_language = ( function_exists('pll_default_language') ) ? pll_default_language() : apply_filters('wpml_default_language', null);
+        }
         return $this->default_language;
     }
 
@@ -60,8 +61,9 @@ class Translate {
      */
     public function get_current_language()
     {
-        if ( ! $this->current_language )
-            $this->current_language = ( function_exists('pll_current_language') ) ? pll_current_language() : apply_filters('wpml_current_language', NULL);
+        if ( ! $this->current_language ) {
+            $this->current_language = ( function_exists('pll_current_language') ) ? pll_current_language() : apply_filters('wpml_current_language', null);
+        }
         return $this->current_language;
     }
 
@@ -69,9 +71,9 @@ class Translate {
      * Sets the code of the currently active language.
      *
      * @since    4.0.0
-     * @return   string|null
+     * @return   string
      */
-    public function set_current_language($code = null)
+    public function set_current_language(string $code)
     {
         $this->current_language = $code;
     }
@@ -83,13 +85,14 @@ class Translate {
      * @param   string      $lang   Language code (eg. 'es')
      * @return  string|bool
      */
-    public function get_locale($lang = null)
+    public function get_locale(string $lang)
     {
         // Polylang support
         if ( function_exists('PLL') ) {
             $lang_object = PLL()->model->get_language($lang);
-            if ( $lang_object && isset($lang_object->locale) )
+            if ( $lang_object && isset($lang_object->locale) ) {
                 return $lang_object->locale;
+            }
         } else {
             // WPML support
             global $sitepress;
@@ -111,7 +114,7 @@ class Translate {
      * @param    string     $lang_code
      * @return   integer
      */
-    public function get_object_id($object_id = null, $object_type = 'post', $return_original_if_missing = true, $lang_code = null)
+    public function get_object_id(int $object_id, string $object_type = 'post', bool $return_original_if_missing = true, ?string $lang_code = '')
     {
         return apply_filters(
             'wpml_object_id',
@@ -130,7 +133,7 @@ class Translate {
      * @param   string      $lang
      * @return  string
      */
-    public function url($original_permalink, $lang)
+    public function url(string $original_permalink, ?string $lang)
     {
         return apply_filters('wpml_permalink', $original_permalink, $lang);
     }
@@ -143,7 +146,7 @@ class Translate {
      * @param    string     $object_type
      * @return   string|null
      */
-    public function get_object_lang_code($object_id = null, $object_type = 'post')
+    public function get_object_lang_code(int $object_id, string $object_type = 'post')
     {
         return apply_filters(
             'wpml_element_language_code',

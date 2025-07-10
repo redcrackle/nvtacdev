@@ -107,14 +107,15 @@ class BP_Akismet {
 			foreach ( $actions as $k => $item ) {
 				$b[ $k ] = $item;
 				if ( $k == 'edit' )
-					$b['history'] = '<a href="' . esc_url( bp_get_admin_url( 'admin.php?page=bp-activity&amp;action=edit&aid=' . $activity['id'] ) ) . '#bp_activity_history"> '. __( 'History', 'buddypress' ) . '</a>';
+					$b['history'] = '<a href="' . esc_url( bp_get_admin_url( 'admin.php?page=bp-activity&amp;action=edit&aid=' . $activity['id'] ) ) . '#bp_activity_history"> '. esc_html__( 'History', 'buddypress' ) . '</a>';
 			}
 
 			$actions = $b;
 		}
 
-		if ( $desc )
-			echo '<span class="akismet-status"><a href="' . esc_url( bp_get_admin_url( 'admin.php?page=bp-activity&amp;action=edit&aid=' . $activity['id'] ) ) . '#bp_activity_history">' . htmlspecialchars( $desc ) . '</a></span>';
+		if ( $desc ) {
+			echo '<span class="akismet-status"><a href="' . esc_url( bp_get_admin_url( 'admin.php?page=bp-activity&amp;action=edit&aid=' . $activity['id'] ) ) . '#bp_activity_history">' . esc_html( $desc ) . '</a></span>';
+		}
 
 		/**
 		 * Filters the list of actions for the current activity's row.
@@ -191,12 +192,22 @@ class BP_Akismet {
 	 * @since 1.6.0
 	 */
 	public function add_activity_spam_button() {
-		if ( !bp_activity_user_can_mark_spam() )
+		if ( ! bp_activity_user_can_mark_spam() ) {
 			return;
+		}
 
 		// By default, only handle activity updates and activity comments.
-		if ( !in_array( bp_get_activity_type(), BP_Akismet::get_activity_types() ) )
+		if ( ! in_array( bp_get_activity_type(), BP_Akismet::get_activity_types(), true ) ) {
 			return;
+		}
+
+		$spam_link = bp_rewrites_get_url(
+			array(
+				'component_id'                 => 'activity',
+				'single_item_action'           => 'spam',
+				'single_item_action_variables' => array( bp_get_activity_id() ),
+			)
+		);
 
 		bp_button(
 			array(
@@ -204,7 +215,7 @@ class BP_Akismet {
 				'component'  => 'activity',
 				'id'         => 'activity_make_spam_' . bp_get_activity_id(),
 				'link_class' => 'bp-secondary-action spam-activity confirm button item-button',
-				'link_href'  => wp_nonce_url( bp_get_root_domain() . '/' . bp_get_activity_slug() . '/spam/' . bp_get_activity_id() . '/', 'bp_activity_akismet_spam_' . bp_get_activity_id() ),
+				'link_href'  => wp_nonce_url( $spam_link, 'bp_activity_akismet_spam_' . bp_get_activity_id() ),
 				'link_text'  => __( 'Spam', 'buddypress' ),
 				'wrapper'    => false,
 			)
@@ -219,13 +230,27 @@ class BP_Akismet {
 	 * @since 1.6.0
 	 */
 	public function add_activity_comment_spam_button() {
-		if ( !bp_activity_user_can_mark_spam() )
+		if ( ! bp_activity_user_can_mark_spam() ) {
 			return;
+		}
 
 		// By default, only handle activity updates and activity comments.
 		$current_comment = bp_activity_current_comment();
-		if ( empty( $current_comment ) || !in_array( $current_comment->type, BP_Akismet::get_activity_types() ) )
+		if ( empty( $current_comment ) || ! in_array( $current_comment->type, BP_Akismet::get_activity_types(), true ) ) {
 			return;
+		}
+
+		$spam_link = add_query_arg(
+			'cid',
+			bp_get_activity_comment_id(),
+			bp_rewrites_get_url(
+				array(
+					'component_id'                 => 'activity',
+					'single_item_action'           => 'spam',
+					'single_item_action_variables' => array( bp_get_activity_comment_id() ),
+				)
+			)
+		);
 
 		bp_button(
 			array(
@@ -233,7 +258,7 @@ class BP_Akismet {
 				'component'  => 'activity',
 				'id'         => 'activity_make_spam_' . bp_get_activity_comment_id(),
 				'link_class' => 'bp-secondary-action spam-activity-comment confirm',
-				'link_href'  => wp_nonce_url( bp_get_root_domain() . '/' . bp_get_activity_slug() . '/spam/' . bp_get_activity_comment_id() . '/?cid=' . bp_get_activity_comment_id(), 'bp_activity_akismet_spam_' . bp_get_activity_comment_id() ),
+				'link_href'  => wp_nonce_url( $spam_link, 'bp_activity_akismet_spam_' . bp_get_activity_comment_id() ),
 				'link_text'  => __( 'Spam', 'buddypress' ),
 				'wrapper'    => false,
 			)
@@ -643,13 +668,14 @@ class BP_Akismet {
 	function history_metabox( $item ) {
 		$history = BP_Akismet::get_activity_history( $item->id );
 
-		if ( empty( $history ) )
-			return;
+		if ( empty( $history ) ) {
+			$message = '&mdash;';
+		} else {
+			/* translators: 1: the human diff time. 2: the akismet history data. */
+			$message = sprintf( _x( '%1$s &mdash; %2$s', 'x hours ago - akismet cleared this item', 'buddypress' ), '<span>' . bp_core_time_since( $history['time'] ) . '</span>', esc_html( $history['message'] ) );
+		}
 
-		echo '<div class="akismet-history"><div>';
-		/* translators: 1: the human diff time. 2: the akismet history data. */
-		printf( _x( '%1$s &mdash; %2$s', 'x hours ago - akismet cleared this item', 'buddypress' ), '<span>' . bp_core_time_since( $history[2] ) . '</span>', esc_html( $history[1] ) );
-		echo '</div></div>';
+		printf( '<div class="akismet-history"><div>%s</div></div>', wp_kses( $message, array( 'span' => true ) ) );
 	}
 
 	/**
@@ -683,11 +709,11 @@ class BP_Akismet {
 	 */
 	public function get_activity_history( $activity_id = 0 ) {
 		$history = bp_activity_get_meta( $activity_id, '_bp_akismet_history' );
-		if ( $history === false )
+		if ( $history && is_array( $history ) && isset( $history['time'] ) ) {
+			$history['time'] = (int) $history['time'];
+		} else {
 			$history = array();
-
-		// Sort it by the time recorded.
-		usort( $history, 'akismet_cmp_time' );
+		}
 
 		return $history;
 	}

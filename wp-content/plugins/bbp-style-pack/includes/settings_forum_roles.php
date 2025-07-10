@@ -1,5 +1,9 @@
 <?php
 
+// Exit if accessed directly
+defined( 'ABSPATH' ) || exit;
+
+
 //forum roles settings page
 
 function bsp_roles() {
@@ -10,37 +14,38 @@ function bsp_roles() {
 		<tr valign="top">
 			<th colspan="2">
 					<h3>
-						<?php _e ('Forum Roles' , 'bbp-style-pack' ) ; ?>
+						<?php esc_html_e ('Forum Roles' , 'bbp-style-pack' ) ; ?>
 					</h3>
 					<p>
-						<?php _e ('By default bbpress displays the forum role eg Participant, Moderator, Keymaster etc. against the username on topics and replies.' , 'bbp-style-pack' ) ; ?>
+						<?php esc_html_e ('By default bbpress displays the forum role eg Participant, Moderator, Keymaster etc. against the username on topics and replies.' , 'bbp-style-pack' ) ; ?>
 					</p>					
 					<p>
-						<?php _e ('This tab lets you decide what roles will be displayed, where they are displayed, what names they are called, and how they are styled', 'bbp-style-pack' ) ; ?>
+						<?php esc_html_e ('This tab lets you decide what roles will be displayed, where they are displayed, what names they are called, and how they are styled', 'bbp-style-pack' ) ; ?>
 					</p>
 					<p>
-						<?php _e ('For instance you may not want to display roles at all, or only display moderator.  You might also want to change "keymaster" to say "Admin"' , 'bbp-style-pack' ) ; ?>
+						<?php esc_html_e ('For instance you may not want to display roles at all, or only display moderator.  You might also want to change "keymaster" to say "Admin"' , 'bbp-style-pack' ) ; ?>
 					</p>
 			</th>
 		</tr>
 	</table>
 					
 	<?php global $bsp_roles ;?>
-	<Form method="post" action="options.php">
+	<form method="post" action="options.php">
 	<?php wp_nonce_field( 'roles', 'roles-nonce' ) ?>
 	<?php settings_fields( 'bsp_roles' );
 	//create a style.css on entry and on saving
-	generate_style_css() ;
+	generate_style_css();
+        bsp_clear_cache();
 	?>	
 	<hr>
 	<!-- save the options -->
 		<p class="submit">
-			<input type="submit" class="button-primary" value="<?php _e( 'Save changes', 'bbp-style-pack' ); ?>" />
+			<input type="submit" class="button-primary" value="<?php esc_html_e( 'Save changes', 'bbp-style-pack' ); ?>" />
 		</p>
 	<table>
 		<tr> 
 			<th style="text-align:left ; vertical-align:top ; width : 200px">
-				<?php _e('Where to show roles','bbp-style-pack'); ?>
+				<?php esc_html_e('Where to show roles','bbp-style-pack'); ?>
 			</th>
 		</tr>
 				
@@ -54,18 +59,18 @@ function bsp_roles() {
 		<tr>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="1" class="code"  ' . checked( 1,$value0, false ) . ' />' ;
-				_e ('Click to hide roles' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input name="'.esc_html($item0).'" id="'.$value0.'" type="radio" value="1" class="code"  ' . checked( 1,$value0, false ) . ' />' ;
+				esc_html_e ('Click to hide roles' , 'bbp-style-pack' ) ;?>
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="2" class="code"  ' . checked( 2,$value0, false ) . ' />' ;
-				_e ('Click to display before user display name' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input name="'.esc_html($item0).'" id="'.$value0.'" type="radio" value="2" class="code"  ' . checked( 2,$value0, false ) . ' />' ;
+				esc_html_e ('Click to display before user display name' , 'bbp-style-pack' ) ;?>
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="0" class="code"  ' . checked( 0,$value0, false ) . ' />' ;
-				_e ('Click to display after user display name' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input name="'.esc_html($item0).'" id="'.$value0.'" type="radio" value="0" class="code"  ' . checked( 0,$value0, false ) . ' />' ;
+				esc_html_e ('Click to display after user display name' , 'bbp-style-pack' ) ;?>
 			</td>
 			
 		</tr>
@@ -76,10 +81,10 @@ function bsp_roles() {
 			</td>
 			
 			<td style="width : 200px">
-				<?php echo '<img src="' . plugins_url( 'images/all_roles1.JPG',dirname(__FILE__)  ) . '" height=200px > '; ?>
+				<?php echo '<img src="' . esc_url(plugins_url( 'images/all_roles1.JPG',dirname(__FILE__) ) ) . '" height=200px > '; ?>
 			</td>
 			<td style="width : 200px">
-				<?php echo '<img src="' . plugins_url( 'images/all_roles2.JPG',dirname(__FILE__)  ) . '" height=200px > '; ?>
+				<?php echo '<img src="' . esc_url(plugins_url( 'images/all_roles2.JPG',dirname(__FILE__) ) ) . '" height=200px > '; ?>
 			</td>
 			
 			
@@ -93,7 +98,7 @@ function bsp_roles() {
 		
 		<tr>
 		<th style="text-align:left ; vertical-align:top" colspan = 2>
-				<?php _e('If you have selected before user display name','bbp-style-pack'); ?>
+				<?php esc_html_e('If you have selected before user display name','bbp-style-pack'); ?>
 			</th>
 		</tr>
 		
@@ -109,13 +114,13 @@ function bsp_roles() {
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="0" class="code"  ' . checked( 0,$value0, false ) . ' />' ;
-				_e ('Click to display centered' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input name="'.esc_html($item0).'" id="'.$value0.'" type="radio" value="0" class="code"  ' . checked( 0,$value0, false ) . ' />' ;
+				esc_html_e ('Click to display centered' , 'bbp-style-pack' ) ;?>
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="1" class="code"  ' . checked( 1,$value0, false ) . ' />' ;
-				_e ('Click to display left' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input name="'.esc_html($item0).'" id="'.$value0.'" type="radio" value="1" class="code"  ' . checked( 1,$value0, false ) . ' />' ;
+				esc_html_e ('Click to display left' , 'bbp-style-pack' ) ;?>
 			</td>
 			
 			
@@ -126,10 +131,10 @@ function bsp_roles() {
 			<td>
 			</td>
 			<td style="width : 200px">
-				<?php echo '<img src="' . plugins_url( 'images/all_roles1.JPG',dirname(__FILE__)  ) . '" height=200px > '; ?>
+				<?php echo '<img src="' . esc_url(plugins_url( 'images/all_roles1.JPG',dirname(__FILE__))  ) . '" height=200px > '; ?>
 			</td>
 			<td style="width : 200px">
-				<?php echo '<img src="' . plugins_url( 'images/all_roles3.JPG',dirname(__FILE__)  ) . '" height=200px > '; ?>
+				<?php echo '<img src="' . esc_url(plugins_url( 'images/all_roles3.JPG',dirname(__FILE__))  ) . '" height=200px > '; ?>
 			</td>
 			
 			
@@ -143,7 +148,7 @@ function bsp_roles() {
 		
 		<tr>
 		<th style="text-align:left ; vertical-align:top" colspan = 2>
-				<?php _e('If you have selected after user display name','bbp-style-pack'); ?>
+				<?php esc_html_e('If you have selected after user display name','bbp-style-pack'); ?>
 			</th>
 		</tr>
 		<tr>
@@ -155,16 +160,16 @@ function bsp_roles() {
 			?>
 			<td style="width : 200px">
 				<?php echo '<input name="'.$item.'" id="'.$item.'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ; ?>
-				<?php _e('Remove Line','bbp-style-pack'); ?>
+				<?php esc_html_e('Remove Line','bbp-style-pack'); ?>
 				<p>
-				<?php _e ('By default bbpress puts a line between the display name and the role. You can opt to remove this selecting', 'bbp-style-pack' ) ; ?>
+				<?php esc_html_e ('By default bbpress puts a line between the display name and the role. You can opt to remove this selecting', 'bbp-style-pack' ) ; ?>
 				</p>
 			</td> 
 			<td style="width : 200px">
-				<?php echo '<img src="' . plugins_url( 'images/roles5.JPG',dirname(__FILE__)  ) . '" height=200px > '; ?>
+				<?php echo '<img src="' . esc_url(plugins_url( 'images/roles5.JPG',dirname(__FILE__))  ) . '" height=200px > '; ?>
 			</td>
 			<td style="width : 200px">
-				<?php echo '<img src="' . plugins_url( 'images/roles6.JPG',dirname(__FILE__)  ) . '" height=200px > '; ?>
+				<?php echo '<img src="' . esc_url(plugins_url( 'images/roles6.JPG',dirname(__FILE__) ) ) . '" height=200px > '; ?>
 			</td>
 			
 			
@@ -174,7 +179,7 @@ function bsp_roles() {
 		
 	<hr>	
 	<p><strong>
-	<?php _e ('Roles', 'bbp-style-pack' ) ; ?>
+	<?php esc_html_e ('Roles', 'bbp-style-pack' ) ; ?>
 	</p>
 	</strong>
 	
@@ -184,16 +189,16 @@ function bsp_roles() {
 			<td style="width : 250px">
 			</td>
 			<td style="width : 250px">
-				<?php echo '<img src="' . plugins_url( 'images/roles1.JPG',dirname(__FILE__)  ) . '" height=200px > '; ?>
+				<?php echo '<img src="' . esc_url(plugins_url( 'images/roles1.JPG',dirname(__FILE__) ) ) . '" height=200px > '; ?>
 			</td>
 			<td style="width : 250px">
-				<?php echo '<img src="' . plugins_url( 'images/roles2.JPG',dirname(__FILE__)  ) . '" height=200px > '; ?>
+				<?php echo '<img src="' . esc_url(plugins_url( 'images/roles2.JPG',dirname(__FILE__) ) ) . '" height=200px > '; ?>
 			</td>
 			<td style="width : 250px">
-				<?php echo '<img src="' . plugins_url( 'images/roles3.JPG',dirname(__FILE__)  ) . '" height=200px> '; ?>
+				<?php echo '<img src="' . esc_url(plugins_url( 'images/roles3.JPG',dirname(__FILE__) ) ) . '" height=200px> '; ?>
 			</td>
 			<td style="width : 250px">
-				<?php echo '<img src="' . plugins_url( 'images/roles4.JPG',dirname(__FILE__)  ) . '" height=200px> '; ?>
+				<?php echo '<img src="' . esc_url(plugins_url( 'images/roles4.JPG',dirname(__FILE__))  ) . '" height=200px> '; ?>
 			</td>
 		</tr>
 		
@@ -231,7 +236,6 @@ function bsp_roles() {
 		<?php
 			$name = $key ;
 			$display = bbp_translate_user_role( $role['name']) ;
-			//$display = $role['name'] ;
 			?>	
 		<tr>
 			<th style="text-align:left ; vertical-align:top">
@@ -264,12 +268,14 @@ function bsp_roles() {
 		?>
 	
 			<td style="vertical-align:top">
-				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"/>' ; 
-				_e ('Role Name' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"/>' ; 
+				esc_html_e ('Role Name' , 'bbp-style-pack' ) ;?>
 				<?php if ($name == 'bbp_keymaster') { ?>
 				<td colspan = 2>
 				<label class="description">
-					<?php _e( '<i>If you want to change the name - enter it here</i>' , 'bbp-style-pack' ); ?>
+					<i>
+					<?php esc_html_e( 'If you want to change the name - enter it here' , 'bbp-style-pack' ); ?>
+					</i>
 				</label>
 				</td>
 			<?php } ?>
@@ -284,56 +290,66 @@ function bsp_roles() {
 		
 		<tr>
 			<td style="vertical-align:top">
-				<?php echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="5" class="code"  ' . checked( 5,$value0, false ) . ' />' ;
-				_e ('Click to hide role' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input name="'.esc_html($item0).'" id="'.$value0.'" type="radio" value="5" class="code"  ' . checked( 5,$value0, false ) . ' />' ;
+				esc_html_e ('Click to hide role' , 'bbp-style-pack' ) ;?>
 				<?php if ($name == 'bbp_keymaster') { ?>
 				<br/>
 				<label class="description">
-					<?php _e( '<i>(Do not display this role)</i>' , 'bbp-style-pack' ); ?>
+					<i>
+					<?php esc_html_e( '(Do not display this role)' , 'bbp-style-pack' ); ?>
+					</i>
 				</label>
 			<?php } ?>
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="1" class="code"  ' . checked( 1,$value0, false ) . ' />' ;
-				_e ('Click to display image' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input name="'.esc_html($item0).'" id="'.$value0.'" type="radio" value="1" class="code"  ' . checked( 1,$value0, false ) . ' />' ;
+				esc_html_e ('Click to display image' , 'bbp-style-pack' ) ;?>
 				<?php if ($name == 'bbp_keymaster') { ?>
 				<br/>
 				<label class="description">
-					<?php _e( '<i>(Use just an image that you have uploaded)</i>' , 'bbp-style-pack' ); ?>
+					<i>
+					<?php esc_html_e( '(Use just an image that you have uploaded)' , 'bbp-style-pack' ); ?>
+					</i>
 				</label>
 			<?php } ?>
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="2" class="code"  ' . checked( 2,$value0, false ) . ' />' ;
-				_e ('Click to display name' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input name="'.esc_html($item0).'" id="'.$value0.'" type="radio" value="2" class="code"  ' . checked( 2,$value0, false ) . ' />' ;
+				esc_html_e ('Click to display name' , 'bbp-style-pack' ) ;?>
 				<?php if ($name == 'bbp_keymaster') { ?>
 				<br/>
 				<label class="description">
-					<?php _e( '<i>(Use just the role name - with a background color if desired )</i>' , 'bbp-style-pack' ); ?>
+					<i>
+					<?php esc_html_e( '(Use just the role name - with a background color if desired )' , 'bbp-style-pack' ); ?>
+					</i>
 				</label>
 			<?php } ?>
 			</td>
 	
 			<td style="vertical-align:top">
-				<?php echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="3" class="code"  ' . checked( 3,$value0, false ) . ' />' ;
-				_e ('Click to display name on top of image' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input name="'.esc_html($item0).'" id="'.$value0.'" type="radio" value="3" class="code"  ' . checked( 3,$value0, false ) . ' />' ;
+				esc_html_e ('Click to display name on top of image' , 'bbp-style-pack' ) ;?>
 				<?php if ($name == 'bbp_keymaster') { ?>
 				<br/>
 				<label class="description">
-					<?php _e( '<i>(Use the role name superimposed on an image)</i>' , 'bbp-style-pack' ); ?>
+					<i>
+					<?php esc_html_e( '(Use the role name superimposed on an image)' , 'bbp-style-pack' ); ?>
+					</i>
 				</label>
 			<?php } ?>
 			</td>
 	
 			<td style="vertical-align:top">
-				<?php echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="4" class="code"  ' . checked( 4,$value0, false ) . ' />' ;
-				_e ('Click to display name below image' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input name="'.esc_html($item0).'" id="'.$value0.'" type="radio" value="4" class="code"  ' . checked( 4,$value0, false ) . ' />' ;
+				esc_html_e ('Click to display name below image' , 'bbp-style-pack' ) ;?>
 				<?php if ($name == 'bbp_keymaster') { ?>
 				<br/>
 				<label class="description">
-					<?php _e( '<i>(Use the role name below an image)</i>' , 'bbp-style-pack' ); ?>
+					<i>
+					<?php esc_html_e( '(Use the role name below an image)' , 'bbp-style-pack' ); ?>
+					</i>
 				</label>
 			<?php } ?>
 			</td>
@@ -350,42 +366,41 @@ function bsp_roles() {
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input id="'.$item2.'" class="large-text" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"' ; ?>
-				<?php if ($name == 'bbp_keymaster') { ?>
+				<?php echo '<input id="'.$item2.'" class="large-text" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'">' ; ?>
 				<br/>
-				<label class="description"><?php _e( 'Enter the FULL url of the image to use', 'bbp-style-pack' ); ?>
+				<?php if ($name == 'bbp_keymaster') { ?>
+				<label class="description"><?php esc_html_e( 'Enter the FULL url of the image to use', 'bbp-style-pack' ); ?>
 				</label>
 			<?php }
 				else { ?>
-				<br/><label class="description"><?php _e( 'url', 'bbp-style-pack' ); ?></label></br>	
+				<label class="description"><?php esc_html_e( 'url', 'bbp-style-pack' ); ?></label></br>	
 				<?php } ?>
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3 ).'"' ; ?> 
-				<?php if ($name == 'bbp_keymaster') { ?>
+				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3 ).'">' ; ?> 
 				<br/>
+				<?php if ($name == 'bbp_keymaster') { ?>
 				<label class="description">
-					<?php _e( 'Image height if required eg 50px etc. ', 'bbp-style-pack' ); ?>
+					<?php esc_html_e( 'Image height if required eg 50px etc. ', 'bbp-style-pack' ); ?>
 				</label>
 			<?php }
 			else { ?>
-				<br/>
-				<label class="description">
-					<?php _e( 'Height', 'bbp-style-pack' ); ?>
+					<label class="description">
+					<?php esc_html_e( 'Height', 'bbp-style-pack' ); ?>
 				</label>
 				<?php } ?>
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input id="'.$item4.'" class="large-text" name="'.$item4.'" type="text" value="'.esc_html( $value4 ).'"' ; ?> 
+				<?php echo '<input id="'.$item4.'" class="large-text" name="'.$item4.'" type="text" value="'.esc_html( $value4 ).'">' ; ?>
+				<br/>
 				<?php if ($name == 'bbp_keymaster') { ?>
-				<label class="description"><?php _e( 'Image width if required eg 50px etc.', 'bbp-style-pack' ); ?></label>
+				<label class="description"><?php esc_html_e( 'Image width if required eg 50px etc.', 'bbp-style-pack' ); ?></label>
 			<?php }
 			else { ?>
-			<br/>
 			<label class="description">
-				<?php _e( 'Width', 'bbp-style-pack' ); ?>
+				<?php esc_html_e( 'Width', 'bbp-style-pack' ); ?>
 			</label>
 			<?php } ?>
 			</td>
@@ -402,47 +417,47 @@ function bsp_roles() {
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input id="'.$item5.'" class="bsp-color-picker" name="'.$item5.'" type="text" value="'.esc_html( $value5 ).'"' ; ?>
+				<?php echo '<input id="'.$item5.'" class="bsp-color-picker" name="'.$item5.'" type="text" value="'.esc_html( $value5 ).'">' ; ?>
+				<br/>
 				<?php if ($name == 'bbp_keymaster') { ?>
-					<br/>
+					
 					<label class="description">
-						<?php _e( '<br/>Click to select the font color if required', 'bbp-style-pack' ); ?>
+						<?php esc_html_e( 'Click to select the font color if required', 'bbp-style-pack' ); ?>
 					</label>
 				<?php }
 				else { ?>
-					<br/>
 					<label class="description">
-					<?php _e( '<br/>Font color', 'bbp-style-pack' ); ?>
+					<?php esc_html_e( 'Font color', 'bbp-style-pack' ); ?>
 					</label>
 				<?php } ?>
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input id="'.$item6.'" class="large-text" name="'.$item6.'" type="text" value="'.esc_html( $value6 ).'"' ; ?> 
+				<?php echo '<input id="'.$item6.'" class="large-text" name="'.$item6.'" type="text" value="'.esc_html( $value6 ).'">' ; ?> 
+				<br/>
 				<?php if ($name == 'bbp_keymaster') { ?>
-					<br/>
 					<label class="description">
-						<?php _e( 'Enter the font to use - default theme font', 'bbp-style-pack' ); ?>
+						<?php esc_html_e( 'Enter the font to use - default theme font', 'bbp-style-pack' ); ?>
 					</label>
 				<?php }
 				else { ?>
-					<br/>
 					<label class="description">
-						<?php _e( 'Font', 'bbp-style-pack' ); ?>
+						<?php esc_html_e( 'Font', 'bbp-style-pack' ); ?>
 					</label>
 				<?php } ?>
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input id="'.$item7.'" class="large-text" name="'.$item7.'" type="text" value="'.esc_html( $value7 ).'"' ; ?> 
+				<?php echo '<input id="'.$item7.'" class="large-text" name="'.$item7.'" type="text" value="'.esc_html( $value7 ).'">' ; ?> 
+				<br/>
 				<?php if ($name == 'bbp_keymaster') { ?>
-					<label class="description"><?php _e( 'Enter the font size - Default 12px', 'bbp-style-pack' ); ?>
+					<label class="description">
+						<?php esc_html_e( 'Enter the font size - Default 12px', 'bbp-style-pack' ); ?>
 					</label>
 				<?php }
 				else { ?>
-					<br/>
 					<label class="description">
-						<?php _e( 'Font size', 'bbp-style-pack' ); ?>
+						<?php esc_html_e( 'Font size', 'bbp-style-pack' ); ?>
 					</label>
 				<?php } ?>
 			</td>
@@ -455,27 +470,30 @@ function bsp_roles() {
 					<option value="Bold and Italic">Bold and Italic</option>
 				</select>
 			<br/>
-			<?php _e ('Font style' , 'bbp-style-pack' ) ;?>	
+			<?php esc_html_e ('Font style' , 'bbp-style-pack' ) ;?>	
 			</td>
 		</tr>
-		
+		<tr>
+			<td>
+				<br/>
+			</td>
+		</tr>
 		<tr>
 		
 			<td>
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input id="'.$item8.'" class="bsp-color-picker" name="'.$item8.'" type="text" value="'.esc_html( $value8 ).'"' ; ?>
+				<?php echo '<input id="'.$item8.'" class="bsp-color-picker" name="'.$item8.'" type="text" value="'.esc_html( $value8 ).'">' ; ?>
+				<br/>
 				<?php if ($name == 'bbp_keymaster') { ?>
-					<br/>
 					<label class="description">
-						<?php _e( '<br/>Click to select the background color if required', 'bbp-style-pack' ); ?>
+						<?php esc_html_e( 'Click to select the background color if required', 'bbp-style-pack' ); ?>
 					</label>
 				<?php }
 				else { ?>
-					<br/>
 					<label class="description">
-						<?php _e( '<br/>Background color', 'bbp-style-pack' ); ?>
+						<?php esc_html_e( 'Background color', 'bbp-style-pack' ); ?>
 					</label>
 				<?php } ?>
 			</td>
@@ -505,7 +523,7 @@ function bsp_roles() {
 				<?php echo $display ; ?>
 			</th>
 			<td colspan = 3>
-				<?php _e ('Displays this label if the reply is from the original topic author' , 'bbp-style-pack' ) ;?>	
+				<?php esc_html_e ('Displays this label if the reply is from the original topic author' , 'bbp-style-pack' ) ;?>	
 			</td>
 		</tr>
 		
@@ -540,8 +558,8 @@ function bsp_roles() {
 			?>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"/>' ; 
-				_e ('Topic Author' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"/>' ; 
+				esc_html_e ('Topic Author' , 'bbp-style-pack' ) ;?>
 			</td>
 		</tr>
 		
@@ -553,31 +571,31 @@ function bsp_roles() {
 		
 		<tr>
 			<td style="vertical-align:top">
-				<?php echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="0" class="code"  ' . checked( 0,$value0, false ) . ' />' ;
-				_e ('Click to hide role' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input name="'.esc_html($item0).'" id="'.$value0.'" type="radio" value="0" class="code"  ' . checked( 0,$value0, false ) . ' />' ;
+				esc_html_e ('Click to hide role' , 'bbp-style-pack' ) ;?>
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="1" class="code"  ' . checked( 1,$value0, false ) . ' />' ;
-				_e ('Click to display image' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input name="'.esc_html($item0).'" id="'.$value0.'" type="radio" value="1" class="code"  ' . checked( 1,$value0, false ) . ' />' ;
+				esc_html_e ('Click to display image' , 'bbp-style-pack' ) ;?>
 				
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="2" class="code"  ' . checked( 2,$value0, false ) . ' />' ;
-				_e ('Click to display name' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input name="'.esc_html($item0).'" id="'.$value0.'" type="radio" value="2" class="code"  ' . checked( 2,$value0, false ) . ' />' ;
+				esc_html_e ('Click to display name' , 'bbp-style-pack' ) ;?>
 				
 			</td>
 	
 			<td style="vertical-align:top">
-				<?php echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="3" class="code"  ' . checked( 3,$value0, false ) . ' />' ;
-				_e ('Click to display name on top of image' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input name="'.esc_html($item0).'" id="'.$value0.'" type="radio" value="3" class="code"  ' . checked( 3,$value0, false ) . ' />' ;
+				esc_html_e ('Click to display name on top of image' , 'bbp-style-pack' ) ;?>
 				
 			</td>
 	
 			<td style="vertical-align:top">
-				<?php echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="4" class="code"  ' . checked( 4,$value0, false ) . ' />' ;
-				_e ('Click to display name below image' , 'bbp-style-pack' ) ;?>
+				<?php echo '<input name="'.esc_html($item0).'" id="'.$value0.'" type="radio" value="4" class="code"  ' . checked( 4,$value0, false ) . ' />' ;
+				esc_html_e ('Click to display name below image' , 'bbp-style-pack' ) ;?>
 				
 			</td>
 		</tr>
@@ -590,31 +608,31 @@ function bsp_roles() {
 		
 		<tr>
 			<td>
+			
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input id="'.$item2.'" class="large-text" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"' ; ?>
+				<?php echo '<input id="'.esc_html($item2).'" class="large-text" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'">' ; ?>
 				<br/>
 					<label class="description">
-						<?php _e( 'url', 'bbp-style-pack' ); ?>
+						<?php esc_html_e( 'url', 'bbp-style-pack' ); ?>
 					</label>
-				</br>	
 				</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3 ).'"' ; ?> 
+				<?php echo '<input id="'.esc_html($item3).'" class="large-text" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3 ).'">' ; ?> 
 				<br/>
 				<label class="description">
-					<?php _e( 'Height', 'bbp-style-pack' ); ?>
+					<?php esc_html_e( 'Height', 'bbp-style-pack' ); ?>
 				</label>
 				
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input id="'.$item4.'" class="large-text" name="'.$item4.'" type="text" value="'.esc_html( $value4 ).'"' ; ?> 
+				<?php echo '<input id="'.esc_html($item4).'" class="large-text" name="'.esc_html($item4).'" type="text" value="'.esc_html( $value4 ).'">' ; ?> 
 				<br/>
 					<label class="description">
-						<?php _e( 'Width', 'bbp-style-pack' ); ?>
+						<?php esc_html_e( 'Width', 'bbp-style-pack' ); ?>
 					</label>
 
 			</td>
@@ -622,29 +640,37 @@ function bsp_roles() {
 		
 		<tr>
 			<td>
+				<br/>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+			
 			</td>
 			
 			<td style="vertical-align:top">
-				<?php echo '<input id="'.$item5.'" class="bsp-color-picker" name="'.$item5.'" type="text" value="'.esc_html( $value5 ).'"' ; ?>
-				<br>
-				<label class="description">
-					<?php _e( '<br/>Font color', 'bbp-style-pack' ); ?>
-				</label></br>	
-			</td>
-			<td style="vertical-align:top">
-				<?php echo '<input id="'.$item6.'" class="large-text" name="'.$item6.'" type="text" value="'.esc_html( $value6 ).'"' ; ?> 
+				<?php echo '<input id="'.esc_html($item5).'" class="bsp-color-picker" name="'.esc_html($item5).'" type="text" value="'.esc_html( $value5 ).'">' ; ?>
 				<br/>
 				<label class="description">
-					<?php _e( 'Font', 'bbp-style-pack' ); ?>
-				</label></br>	
+					<?php esc_html_e( 'Font color', 'bbp-style-pack' ); ?>
+				</label>	
+			</td>
+			
+			<td style="vertical-align:top">
+				<?php echo '<input id="'.esc_html($item6).'" class="large-text" name="'.esc_html($item6).'" type="text" value="'.esc_html( $value6 ).'">' ; ?> 
+				<br/>
+				<label class="description">
+					<?php esc_html_e( 'Font', 'bbp-style-pack' ); ?>
+				</label>	
 				
 			</td>
+			<br/>
 			<td style="vertical-align:top">
-				<?php echo '<input id="'.$item7.'" class="large-text" name="'.$item7.'" type="text" value="'.esc_html( $value7 ).'"' ; ?> 
-
+				<?php echo '<input id="'.esc_html($item7).'" class="large-text" name="'.esc_html($item7).'" type="text" value="'.esc_html( $value7 ).'">' ; ?> 
 				<br/>
 				<label class="description">
-					<?php _e( 'Font size', 'bbp-style-pack' ); ?>
+					<?php esc_html_e( 'Font size', 'bbp-style-pack' ); ?>
 				</label>	
 				
 			</td>
@@ -657,19 +683,23 @@ function bsp_roles() {
 				<option value="Bold and Italic">Bold and Italic</option>
 				</select>
 				<br/>
-				<?php _e ('Font style' , 'bbp-style-pack' ) ;?>	
+				<?php esc_html_e ('Font style' , 'bbp-style-pack' ) ;?>	
 			</td>
 			
 		</tr>
-		
+		<tr>
+			<td>
+				<br/>
+			</td>
+		</tr>
 		<tr>
 			<td>
 			</td>
 			<td style="vertical-align:top">
-				<?php echo '<input id="'.$item8.'" class="bsp-color-picker" name="'.$item8.'" type="text" value="'.esc_html( $value8 ).'"' ; ?>
+			<?php echo '<input id="'.esc_html($item8).'" class="bsp-color-picker" name="'.esc_html($item8).'" type="text" value="'.esc_html( $value8 ).'">' ; ?>
 				<br/>
 				<label class="description">
-					<?php _e( '<br/>Background color', 'bbp-style-pack' ); ?>
+					<?php esc_html_e( 'Background color', 'bbp-style-pack' ); ?>
 				</label>
 				
 			</td>
@@ -679,11 +709,9 @@ function bsp_roles() {
 			
 <!-- save the options -->
 		<p class="submit">
-			<input type="submit" class="button-primary" value="<?php _e( 'Save changes', 'bbp-style-pack' ); ?>" />
+			<input type="submit" class="button-primary" value="<?php esc_html_e( 'Save changes', 'bbp-style-pack' ); ?>" />
 		</p>
 	</form>
-</div><!--end sf-wrap-->
-</div><!--end wrap-->
 	
 <?php
 }

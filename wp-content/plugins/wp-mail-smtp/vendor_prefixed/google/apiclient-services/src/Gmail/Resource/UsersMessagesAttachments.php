@@ -23,7 +23,7 @@ use WPMailSMTP\Vendor\Google\Service\Gmail\MessagePartBody;
  * Typical usage is:
  *  <code>
  *   $gmailService = new Google\Service\Gmail(...);
- *   $attachments = $gmailService->attachments;
+ *   $attachments = $gmailService->users_messages_attachments;
  *  </code>
  */
 class UsersMessagesAttachments extends \WPMailSMTP\Vendor\Google\Service\Resource
@@ -36,7 +36,10 @@ class UsersMessagesAttachments extends \WPMailSMTP\Vendor\Google\Service\Resourc
      * @param string $messageId The ID of the message containing the attachment.
      * @param string $id The ID of the attachment.
      * @param array $optParams Optional parameters.
+     *
+     * @opt_param bool temporaryEeccBypass
      * @return MessagePartBody
+     * @throws \Google\Service\Exception
      */
     public function get($userId, $messageId, $id, $optParams = [])
     {

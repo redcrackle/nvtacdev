@@ -1,7 +1,25 @@
 <?php
 namespace WordPressPopularPosts\Rest;
 
+use WordPressPopularPosts\Translate;
+use WordPressPopularPosts\Traits\QueriesPosts;
+
 class PostsEndpoint extends Endpoint {
+
+    use QueriesPosts;
+
+    /**
+     * Initializes class.
+     *
+     * @param   array
+     * @param   \WordPressPopularPosts\Translate
+     * @param   \WordPressPopularPosts\Output
+     */
+    public function __construct(array $config, Translate $translate)
+    {
+        $this->config = $config;
+        $this->translate = $translate;
+    }
 
     /**
      * Registers the endpoint(s).
@@ -161,6 +179,14 @@ class PostsEndpoint extends Endpoint {
                 'type'              => 'string',
                 'sanitize_callback' => function($pid) {
                     return rtrim(preg_replace('|[^0-9,]|', '', $pid), ',');
+                },
+                'validate_callback' => 'rest_validate_request_arg',
+            ],
+            'exclude' => [
+                'description'       => __('Post IDs to exclude from the listing.'),
+                'type'              => 'string',
+                'sanitize_callback' => function($exclude) {
+                    return rtrim(preg_replace('|[^0-9,]|', '', $exclude), ',');
                 },
                 'validate_callback' => 'rest_validate_request_arg',
             ],

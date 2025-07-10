@@ -50,8 +50,15 @@ function bp_members_membership_requests_cancel_activation_email( $send, $user_id
 	 */
 	$send = apply_filters( 'bp_members_membership_requests_bypass_manual_approval', false, $details );
 
-	// If the registration process has been interrupted, this is a new membership request.
-	if ( ! $send ) {
+	$invites = bp_members_invitations_get_invites(
+		array(
+			'invitee_email' => $user_email,
+			'invite_sent'   => 'sent'
+		)
+	);
+
+	// If the registration process has been interrupted, this is a new membership request or the user was accepting an invitation and we need not send an activation email.
+	if ( ! $send && ! $invites ) {
 		$signup = bp_members_get_signup_by( 'activation_key', $activation_key );
 
 		/**
@@ -177,7 +184,7 @@ function bp_members_membership_requests_notify_site_admins( $signup ) {
 
 		// Bail if member opted out of receiving this email.
 		if ( 'no' === bp_get_user_meta( $admin_id, 'notification_members_membership_request', true ) ) {
-			return;
+			continue;
 		}
 
 		$unsubscribe_args = array(
@@ -245,13 +252,19 @@ add_action( 'bp_core_signup_before_delete', 'bp_members_membership_requests_send
  * @param array $signup_ids Array of changing signup IDs.
  */
 function bp_members_membership_requests_delete_notifications_on_change( $signup_ids ) {
-	foreach ( $signup_ids as $signup_id ) {
-		BP_Notifications_Notification::delete(
-			array(
-				'item_id'          => $signup_id,
-				'component_action' => 'membership_request_submitted',
-			)
-		);
+	if ( bp_is_active( 'notifications' ) ) {
+		foreach ( $signup_ids as $signup_id ) {
+			/**
+			 * We use this method instead of one of the notification functions
+			 * because we want to delete all notifications for all admins.
+			 */
+			BP_Notifications_Notification::delete(
+				array(
+					'item_id'          => $signup_id,
+					'component_action' => 'membership_request_submitted',
+				)
+			);
+		}
 	}
 }
 add_action( 'bp_core_signup_after_resend',   'bp_members_membership_requests_delete_notifications_on_change' );
@@ -370,14 +383,14 @@ add_filter( 'bp_members_ms_signup_date_sent_unsent_message', 'bp_members_members
 
 /**
  * Filter/add "Request Membership" links in the following locations:
- * - BP login widget,
+ * - BP login block widget,
  * - Sidebar register link,
  * - WP Toolbar,
  * - WP login form.
  *********************************************************************/
 
 /**
- * Add "Request Membership" link to Widget login form.
+ * Add "Request Membership" link to Block Widget login form.
  *
  * @since 10.0.0
  *
@@ -415,7 +428,7 @@ add_filter( 'register', 'bp_members_membership_requests_filter_sidebar_register_
  *
  * @since 10.0.0
  *
- * @param WP_Admin_Bar $wp_admin_bar WP_Admin_Bar instance, passed by reference
+ * @param WP_Admin_Bar $wp_admin_bar WordPress object implementing a Toolbar API.
  */
 function bp_members_membership_requests_add_toolbar_link( $wp_admin_bar ) {
 	if ( is_user_logged_in() ) {

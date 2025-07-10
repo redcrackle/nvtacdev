@@ -3,7 +3,7 @@
  * Members template tags
  *
  * @since 3.0.0
- * @version 9.0.0
+ * @version 12.0.0
  */
 
 // Exit if accessed directly.
@@ -247,20 +247,10 @@ function bp_nouveau_members_loop_buttons( $args = array() ) {
 			$parent_element = $args['parent_element'];
 		}
 
-		/*
-		 * If we have a arg value for $button_element passed through
-		 * use it to default all the $buttons['button_element'] values
-		 * otherwise default to 'a' (anchor)
-		 * Or override & hardcode the 'element' string on $buttons array.
-		 *
-		 * Icons sets a class for icon display if not using the button element
-		 */
-		$icons = '';
 		if ( ! empty( $args['button_element'] ) ) {
 			$button_element = $args['button_element'] ;
 		} else {
 			$button_element = 'button';
-			$icons = ' icons';
 		}
 
 		// If we pass through parent classes add them to $button array
@@ -319,22 +309,9 @@ function bp_nouveau_members_loop_buttons( $args = array() ) {
 
 			// It's any other members screen
 			} else {
-				/*
-				 * This filter workaround is waiting for a core adaptation
-				 * so that we can directly get the friends button arguments
-				 * instead of the button.
-				 *
-				 * See https://buddypress.trac.wordpress.org/ticket/7126
-				 */
-				add_filter( 'bp_get_add_friend_button', 'bp_nouveau_members_catch_button_args', 100, 1 );
+				$button_args = bp_get_add_friend_button_args( $user_id );
 
-				bp_get_add_friend_button( $user_id );
-
-				remove_filter( 'bp_get_add_friend_button', 'bp_nouveau_members_catch_button_args', 100, 1 );
-
-				if ( isset( bp_nouveau()->members->button_args ) && bp_nouveau()->members->button_args ) {
-					$button_args = bp_nouveau()->members->button_args;
-
+				if ( array_filter( $button_args ) ) {
 					$buttons['member_friendship'] = array(
 						'id'                => 'member_friendship',
 						'position'          => 5,
@@ -343,6 +320,7 @@ function bp_nouveau_members_loop_buttons( $args = array() ) {
 						'block_self'        => $button_args['block_self'],
 						'parent_element'    => $parent_element,
 						'link_text'         => $button_args['link_text'],
+						'link_title'        => $button_args['link_title'],
 						'parent_attr'       => array(
 							'id'    => $button_args['wrapper_id'],
 							'class' => $parent_class . ' ' . $button_args['wrapper_class'],
@@ -363,8 +341,6 @@ function bp_nouveau_members_loop_buttons( $args = array() ) {
 						$buttons['member_friendship']['button_element'] = 'a';
 						$buttons['member_friendship']['button_attr']['href'] = $button_args['link_href'];
 					}
-
-					unset( bp_nouveau()->members->button_args );
 				}
 			}
 		}
@@ -372,26 +348,13 @@ function bp_nouveau_members_loop_buttons( $args = array() ) {
 		// Only add The public and private messages when not in a loop
 		if ( 'profile' === $type ) {
 			if ( bp_is_active( 'activity' ) && bp_activity_do_mentions() ) {
-				/*
-				 * This filter workaround is waiting for a core adaptation
-				 * so that we can directly get the public message button arguments
-				 * instead of the button.
-				 *
-				 * See https://buddypress.trac.wordpress.org/ticket/7126
-				 */
-				add_filter( 'bp_get_send_public_message_button', 'bp_nouveau_members_catch_button_args', 100, 1 );
+				$button_args = bp_activity_get_public_message_button_args();
 
-				bp_get_send_public_message_button();
-
-				remove_filter( 'bp_get_send_public_message_button', 'bp_nouveau_members_catch_button_args', 100, 1 );
-
-				if ( isset( bp_nouveau()->members->button_args ) && bp_nouveau()->members->button_args ) {
-					$button_args = bp_nouveau()->members->button_args;
-
+				if ( array_filter( $button_args ) ) {
 					/*
-					 * This button should remain as an anchor link.
-					 * Hardcode the use of anchor elements if button arg passed in for other elements.
-					 */
+					* This button should remain as an anchor link.
+					* Hardcode the use of anchor elements if button arg passed in for other elements.
+					*/
 					$buttons['public_message'] = array(
 						'id'                => $button_args['id'],
 						'position'          => 15,
@@ -401,6 +364,7 @@ function bp_nouveau_members_loop_buttons( $args = array() ) {
 						'parent_element'    => $parent_element,
 						'button_element'    => 'a',
 						'link_text'         => $button_args['link_text'],
+						'link_title'        => $button_args['link_title'],
 						'parent_attr'       => array(
 							'id'    => $button_args['wrapper_id'],
 							'class' => $parent_class,
@@ -411,30 +375,17 @@ function bp_nouveau_members_loop_buttons( $args = array() ) {
 							'class'            => $button_args['link_class'],
 						),
 					);
-					unset( bp_nouveau()->members->button_args );
 				}
 			}
 
 			if ( bp_is_active( 'messages' ) ) {
-				/**
-				 * This filter workaround is waiting for a core adaptation
-				 * so that we can directly get the private messages button arguments
-				 * instead of the button.
-				 * @see https://buddypress.trac.wordpress.org/ticket/7126
-				 */
-				add_filter( 'bp_get_send_message_button_args', 'bp_nouveau_members_catch_button_args', 100, 1 );
+				$button_args = bp_get_send_message_button_args();
 
-				bp_get_send_message_button();
-
-				remove_filter( 'bp_get_send_message_button_args', 'bp_nouveau_members_catch_button_args', 100, 1 );
-
-				if ( isset( bp_nouveau()->members->button_args ) && bp_nouveau()->members->button_args ) {
-					$button_args = bp_nouveau()->members->button_args;
-
+				if ( array_filter( $button_args ) ) {
 					/*
-					 * This button should remain as an anchor link.
-					 * Hardcode the use of anchor elements if button arg passed in for other elements.
-					 */
+					* This button should remain as an anchor link.
+					* Hardcode the use of anchor elements if button arg passed in for other elements.
+					*/
 					$buttons['private_message'] = array(
 						'id'                => $button_args['id'],
 						'position'          => 25,
@@ -444,20 +395,19 @@ function bp_nouveau_members_loop_buttons( $args = array() ) {
 						'parent_element'    => $parent_element,
 						'button_element'    => 'a',
 						'link_text'         => $button_args['link_text'],
+						'link_title'        => $button_args['link_title'],
 						'parent_attr'       => array(
 							'id'    => $button_args['wrapper_id'],
 							'class' => $parent_class,
 						),
 						'button_attr'       => array(
-							'href'  => trailingslashit( bp_loggedin_user_domain() . bp_nouveau_get_component_slug( 'messages' ) ) . 'compose?r=' . bp_core_get_username( $user_id ),
+							'href'  => bp_get_send_private_message_link(),
 							'id'    => false,
 							'class' => $button_args['link_class'],
 							'rel'   => '',
 							'title' => '',
 						),
 					);
-
-					unset( bp_nouveau()->members->button_args );
 				}
 			}
 		}
@@ -475,7 +425,7 @@ function bp_nouveau_members_loop_buttons( $args = array() ) {
 		 */
 		$buttons_group = apply_filters( 'bp_nouveau_get_members_buttons', $buttons, $user_id, $type, $args );
 		if ( ! $buttons_group ) {
-			return $buttons;
+			return array();
 		}
 
 		// It's the first entry of the loop, so build the Group and sort it
@@ -528,6 +478,8 @@ function bp_nouveau_member_has_meta() {
  * @return string HTML Output.
  */
 function bp_nouveau_member_meta() {
+	// Escaping is made in `bp_nouveau_get_member_meta()`.
+	// phpcs:ignore WordPress.Security.EscapeOutput
 	echo join( "\n", bp_nouveau_get_member_meta() );
 }
 
@@ -564,7 +516,7 @@ function bp_nouveau_member_meta() {
 			// We're in the members loop
 			} else {
 				$meta = array(
-					'last_activity' => sprintf( '%s', bp_get_member_last_active() ),
+					'last_activity' => sprintf( '%s', esc_html( bp_get_member_last_active() ) ),
 				);
 			}
 
@@ -795,6 +747,8 @@ function bp_nouveau_member_description( $user_id = 0 ) {
  * @return string HTML Output
  */
 function bp_nouveau_member_description_edit_link() {
+	// Escaping is made in `bp_nouveau_member_get_description_edit_link()`.
+	// phpcs:ignore WordPress.Security.EscapeOutput
 	echo bp_nouveau_member_get_description_edit_link();
 }
 
@@ -1070,3 +1024,31 @@ function bp_nouveau_invitations_bulk_management_dropdown() {
 	<input type="submit" id="invitation-bulk-manage" class="button action" value="<?php echo esc_attr_x( 'Apply', 'button', 'buddypress' ); ?>">
 	<?php
 }
+
+/**
+ * Customize the way to output the Members' loop member latest activities.
+ *
+ * @since 12.0.0
+ *
+ * @param string $activity_content Formatted latest update for current member.
+ * @param array  $args             Array of parsed arguments.
+ * @param array  $latest_update    Array of the latest activity data.
+ * @return string The formatted latest update for current member.
+ */
+function bp_nouveau_get_member_latest_update( $activity_content = '', $args = array(), $latest_update = array() ) {
+	if ( ! isset( $latest_update['content'], $latest_update['excerpt'], $latest_update['permalink'] ) ) {
+		return $activity_content;
+	}
+
+	if ( strlen( $latest_update['excerpt'] ) < strlen( $latest_update['content'] ) ) {
+		return sprintf(
+			'%1$s<span class="activity-read-more"><a href="%2$s" rel="nofollow">%3$s</a></span>',
+			esc_html( $latest_update['excerpt'] ) . "\n",
+			esc_url( $latest_update['permalink'] ),
+			esc_html__( 'View full conversation', 'buddypress' )
+		);
+	}
+
+	return esc_html( $latest_update['excerpt'] );
+}
+add_filter( 'bp_get_member_latest_update', 'bp_nouveau_get_member_latest_update', 10, 3 );

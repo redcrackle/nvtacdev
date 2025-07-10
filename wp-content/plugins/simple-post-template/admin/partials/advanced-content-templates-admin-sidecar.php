@@ -19,9 +19,12 @@ if ( empty( $templates ) ) {
 	<input class="button-primary" style="margin-top: 10px;" name="act_load_template" id="act_load_template" type="button" value="Load Template" />
 </div>
 
-<h4 style="margin-bottom: 4px;">Advanced Content Templates</h4>
-<p>Want more powerful features like custom fields, featured images, and taxonomies? Go premium!</p>
-<a class="button-secondary" target="_blank" href="https://www.advancedcontenttemplates.com?utm_medium=Sidecar&utm_content=<?php echo urlencode( 'Get Advanced Content Templates' ); ?>">Get Advanced Content Templates</a>
+<div class="" style="padding: 12px; border-radius: 4px; background-color:#ffe01a; margin-top: 12px;">
+    <h4 style="margin-bottom: 4px; margin-top: 0px;">Advanced Content Templates</h4>
+    <p>Want more powerful features like custom fields, featured images, and taxonomies? Upgrade today!</p>
+    <p style="font-style: italic;">P.S. You can save 25% on your pro upgrade with code <b>LITE25</b></p>
+    <a class="button-secondary" target="_blank" href="https://www.advancedcontenttemplates.com/?utm_campaign=free&utm_source=wprepo">Check Out ACT</a>
+</div>
 
 <script>
 jQuery(document).ready(function() {

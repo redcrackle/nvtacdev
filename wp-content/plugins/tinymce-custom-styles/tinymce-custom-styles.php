@@ -3,8 +3,8 @@
  * Plugin Name: TinyMCE Custom Styles
  * Plugin URI: https://timreeves.de/
  * Description: Add custom editor stylesheets to TinyMCE and Theme, and configure the TinyMCE styles dropdown to match.
- * Version: 1.1.2
- * Author: Tim Reeves (original author David Stöckl)
+ * Version: 1.1.5
+ * Author: Tim Reeves
  * Author URI: https://timreeves.de/
  * License: GPLv3
  * Text Domain: tinymce-custom-styles
@@ -60,7 +60,7 @@ function tcs_get_style_url($style_name) {
 	} elseif ($keyword == 'themes_child_directory') {
 		$http_path = get_stylesheet_directory_uri() . '/' . $style_name;
 	} elseif ($keyword == 'custom_directory') {
-		$http_path= content_url() . '/' . get_option('tcs_cuslink') . $style_name;
+		$http_path= content_url() . '/' . esc_attr(get_option('tcs_cuslink')) . $style_name;
 	}
 
 	return $http_path;
@@ -78,7 +78,7 @@ function tcs_get_style_server_path($style_name) {
 	} elseif ($keyword == 'themes_child_directory') {
 		$server_side_path = get_stylesheet_directory() . '/' . $style_name;
 	} elseif ($keyword == 'custom_directory') {
-		$server_side_path = WP_CONTENT_DIR . '/' . get_option('tcs_cuslink') . $style_name;
+		$server_side_path = WP_CONTENT_DIR . '/' . esc_attr(get_option('tcs_cuslink')) . $style_name;
 	}
 
 	return $server_side_path;
@@ -357,8 +357,8 @@ function tcs_backend_page() {
 		// 1. Save any changes to location specification and create stub css files if missing
 
 		// 1a. Note new option values if themes folder location, custom theme directory or submenu option changed
-		if ($_POST["tcs_locstyle"] != get_option('tcs_locstyle')) update_option("tcs_locstyle", $_POST['tcs_locstyle']);
-		if ($_POST["tcs_cuslink"]  != get_option('tcs_cuslink'))  update_option("tcs_cuslink",  $_POST['tcs_cuslink']);
+		if ($_POST["tcs_locstyle"] != get_option('tcs_locstyle')) update_option("tcs_locstyle", sanitize_text_field($_POST['tcs_locstyle']));
+		if ($_POST["tcs_cuslink"]  != get_option('tcs_cuslink'))  update_option("tcs_cuslink",  sanitize_text_field($_POST['tcs_cuslink']));
 		$valUseSubMenu = isset($_POST["tcs_submenu"]) ? "1" : "0";
 		if ($valUseSubMenu != get_option('tcs_submenu'))  update_option("tcs_submenu",  $valUseSubMenu);
 		$valNoMerge = isset($_POST["tcs_nomerge"]) ? "1" : "0";
@@ -368,7 +368,7 @@ function tcs_backend_page() {
 		if (!file_exists(tcs_get_style_server_path('editor-style.css')) OR
 			!file_exists(tcs_get_style_server_path("editor-style-shared.css")))
 		{
-		    tcs_createCssStubFiles($_POST['tcs_locstyle'], $_POST['tcs_cuslink']);
+		    tcs_createCssStubFiles($_POST['tcs_locstyle'], sanitize_text_field($_POST['tcs_cuslink']));
 		}
 
 		// 1c. Get the option value for adding the custom styles as a submenu
@@ -384,15 +384,15 @@ function tcs_backend_page() {
 
         	$allowed = TRUE;
 
-			$field0 = $_POST["addstyledrop_0_" . $i];	// Title
+			$field0 = sanitize_text_field($_POST["addstyledrop_0_" . $i]);	// Title
 
         	// Type (radios)
         	$field1 = 'unset';
 			if (isset($_POST["addstyledrop_1_" . $i])) $field1 = $_POST["addstyledrop_1_" . $i];
 
-			$field3 = $_POST["addstyledrop_3_" . $i];	// Type value
+			$field3 = sanitize_text_field($_POST["addstyledrop_3_" . $i]);	// Type value
 
-			$field4 = $_POST["addstyledrop_4_" . $i];	// CSS Class(es)
+			$field4 = sanitize_text_field($_POST["addstyledrop_4_" . $i]);	// CSS Class(es)
 
 			// Exact checkbox
 			$field7 = 0;
@@ -431,7 +431,8 @@ function tcs_backend_page() {
 						$k = "addstyledrop_5_{$i}_{$a}_key";
 						$v = "addstyledrop_5_{$i}_{$a}_val";
 						if ($_POST[$k] != "" && $_POST[$v] != "") {
-							$ready_styles[$_POST[$k]] = $_POST[$v];
+							$_POST[$k] = sanitize_text_field($_POST[$k]);
+							$ready_styles[$_POST[$k]] = sanitize_text_field($_POST[$v]);
 						}
 					}
 					$checked_row["styles"] = $ready_styles;
@@ -444,7 +445,8 @@ function tcs_backend_page() {
 						$k = "addstyledrop_6_{$i}_{$a}_key";
 						$v = "addstyledrop_6_{$i}_{$a}_val";
 						if ($_POST[$k] != "" && $_POST[$v] != "") {
-							$ready_attribs[$_POST[$k]] = $_POST[$v];
+							$_POST[$k] = sanitize_text_field($_POST[$k]);
+							$ready_attribs[$_POST[$k]] = sanitize_text_field($_POST[$v]);
 						}
 					}
 					$checked_row["attributes"] = $ready_attribs;
@@ -478,7 +480,7 @@ function tcs_backend_page() {
 				<p><?php _e('Please choose a location for your stylesheet files:', TCS_TEXTDOMAIN); ?></p>
 				<p><input type="radio" name="tcs_locstyle" value="themes_directory" <?php if (get_option('tcs_locstyle') == 'themes_directory') {?>checked="checked" <?php } ?> /> <?php printf(__("Directory of current Theme (do %snot%s choose in case of automatically updated theme, or a theme which itself provides an 'editor-style.css' file)", TCS_TEXTDOMAIN), '<strong>', '</strong>'); ?></p>
 				<p><input type="radio" name="tcs_locstyle" value="themes_child_directory" <?php if (get_option('tcs_locstyle') == "themes_child_directory") {?>checked="checked" <?php } ?> /> <?php printf(__('Directory of current Child Theme (do %snot%s choose in case of automatically updated child theme)', TCS_TEXTDOMAIN), '<strong>', '</strong>'); ?></p>
-				<p><input type="radio" name="tcs_locstyle" value="custom_directory" <?php if (get_option('tcs_locstyle') == "custom_directory") {?>checked="checked" <?php } ?> /> <?php printf(__('Use a custom directory (recommended) at %s/', TCS_TEXTDOMAIN), WP_CONTENT_DIR); ?><input size="30" type="text" name="tcs_cuslink" value="<?php echo get_option('tcs_cuslink'); ?>" />editor-style[-shared].css
+				<p><input type="radio" name="tcs_locstyle" value="custom_directory" <?php if (get_option('tcs_locstyle') == "custom_directory") {?>checked="checked" <?php } ?> /> <?php printf(__('Use a custom directory (recommended) at %s/', TCS_TEXTDOMAIN), WP_CONTENT_DIR); ?><input size="30" type="text" name="tcs_cuslink" value="<?php echo esc_attr(get_option('tcs_cuslink')); ?>" />editor-style[-shared].css
 				<?php printf(__('%sYour custom directory must pre-exist and your input above must begin without a slash, and include one at the end of each directory.%sAny characters after the last slash will be prepended to the file names.', TCS_TEXTDOMAIN), $breakIndentAfterRadio, $breakIndentAfterRadio); ?></p>
 <?php
 				// Output error or usage messages for the css files
@@ -621,14 +623,14 @@ function tcs_backend_page() {
 							$strTypeIdRoot = "addstyledrop_1_{$op_ct}";
 						?>
 						<tr id="addstyledrop_row_<?php echo "$op_ct"; if ($op_ct % 2 == 0) echo '" style="background-color:#f3f3f3;';?>" valign="top">
-							<td><input type="text" name="addstyledrop_0_<?php echo $op_ct; ?>" id="addstyledrop_0_<?php echo $op_ct; ?>" value="<?php echo $item['title']; ?>" /></td>
+							<td><input type="text" name="addstyledrop_0_<?php echo $op_ct; ?>" id="addstyledrop_0_<?php echo $op_ct; ?>" value="<?php echo esc_attr($item['title']); ?>" /></td>
 							<td>
 								<label style="white-space:nowrap;"><input type="radio" value="inline" name="<?php echo "{$strTypeIdRoot}"; if ($type == "inline") echo '" checked="checked'; ?>" /> Inline</label><br>
 								<label style="white-space:nowrap;"><input type="radio" value="block" name="<?php echo "{$strTypeIdRoot}"; if ($type == "block") echo '" checked="checked'; ?>" /> Block</label><br>
 								<label style="white-space:nowrap;"><input type="radio" value="selector" name="<?php echo "{$strTypeIdRoot}"; if ($type == "selector") echo '" checked="checked'; ?>" /> Selector</label>
 							</td>
-							<td><input type="text" size="14" name="addstyledrop_3_<?php echo $op_ct; ?>" id="addstyledrop_3_<?php echo $op_ct; ?>" value="<?php echo $typeval; ?>" /></td>
-							<td style="border-right: 1px solid #e1e1e1;"><input type="text" size="14" name="addstyledrop_4_<?php echo $op_ct; ?>" id="addstyledrop_4_<?php echo $op_ct; ?>" value="<?php echo $item['classes']; ?>" /></td>
+							<td><input type="text" size="14" name="addstyledrop_3_<?php echo $op_ct; ?>" id="addstyledrop_3_<?php echo $op_ct; ?>" value="<?php echo esc_attr($typeval); ?>" /></td>
+							<td style="border-right: 1px solid #e1e1e1;"><input type="text" size="14" name="addstyledrop_4_<?php echo $op_ct; ?>" id="addstyledrop_4_<?php echo $op_ct; ?>" value="<?php echo esc_attr($item['classes']); ?>" /></td>
 							<td style="border-right: 1px solid #e1e1e1;">
 								<table id="addstyledrop_5_<?php echo $op_ct; ?>">
 									<tr>
@@ -644,10 +646,10 @@ function tcs_backend_page() {
 								?>
 									<tr id="tprow_5_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>">
 										<td>
-											<input type="text" size="14" id="addstyledrop_5_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>_key" name="addstyledrop_5_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>_key" value="<?php echo $key; ?>" />
+											<input type="text" size="14" id="addstyledrop_5_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>_key" name="addstyledrop_5_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>_key" value="<?php echo esc_attr($key); ?>" />
 										</td>
 										<td>
-											<input type="text" size="14" id="addstyledrop_5_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>_val" name="addstyledrop_5_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>_val" value="<?php echo $tp_item; ?>" />
+											<input type="text" size="14" id="addstyledrop_5_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>_val" name="addstyledrop_5_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>_val" value="<?php echo esc_attr($tp_item); ?>" />
 										</td>
 										<td><a style="cursor:pointer;" onclick="delete_tp_row(5, <?php echo $op_ct; ?>, <?php echo $tp_ct; ?>)">X</a></td>
 									</tr>
@@ -675,10 +677,10 @@ function tcs_backend_page() {
 								?>
 									<tr id="tprow_6_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>">
 										<td>
-											<input type="text" size="14" id="addstyledrop_6_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>_key" name="addstyledrop_6_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>_key" value="<?php echo $key; ?>" />
+											<input type="text" size="14" id="addstyledrop_6_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>_key" name="addstyledrop_6_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>_key" value="<?php echo esc_attr($key); ?>" />
 										</td>
 										<td>
-											<input type="text" size="14" id="addstyledrop_6_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>_val" name="addstyledrop_6_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>_val" value="<?php echo $tp_item; ?>" />
+											<input type="text" size="14" id="addstyledrop_6_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>_val" name="addstyledrop_6_<?php echo $op_ct; ?>_<?php echo $tp_ct; ?>_val" value="<?php echo esc_attr($tp_item); ?>" />
 										</td>
 										<td><a style="cursor:pointer;" onclick="delete_tp_row(6, <?php echo $op_ct; ?>, <?php echo $tp_ct; ?>)">X</a></td>
 									</tr>

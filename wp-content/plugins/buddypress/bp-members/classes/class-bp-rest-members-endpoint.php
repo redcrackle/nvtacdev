@@ -11,6 +11,9 @@ defined( 'ABSPATH' ) || exit;
 /**
  * BuddyPress Members endpoints.
  *
+ * /members/
+ * /members/{id}
+ *
  * @since 5.0.0
  */
 class BP_REST_Members_Endpoint extends WP_REST_Users_Controller {
@@ -195,19 +198,30 @@ class BP_REST_Members_Endpoint extends WP_REST_Users_Controller {
 	 * @since 5.0.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
-	 * @return true
+	 * @return true|WP_Error
 	 */
 	public function get_items_permissions_check( $request ) {
+		$retval = new WP_Error(
+			'bp_rest_authorization_required',
+			__( 'Sorry, you are not allowed to perform this action.', 'buddypress' ),
+			array(
+				'status' => rest_authorization_required_code(),
+			)
+		);
+
+		if ( bp_current_user_can( 'bp_view', array( 'bp_component' => 'members' ) ) ) {
+			$retval = true;
+		}
 
 		/**
 		 * Filter the members `get_items` permissions check.
 		 *
 		 * @since 5.0.0
 		 *
-		 * @param true            $retval  Returned value.
+		 * @param true|WP_Error   $retval  Whether the user has access to members component items.
 		 * @param WP_REST_Request $request The request sent to the API.
 		 */
-		return apply_filters( 'bp_rest_members_get_items_permissions_check', true, $request );
+		return apply_filters( 'bp_rest_members_get_items_permissions_check', $retval, $request );
 	}
 
 	/**
@@ -255,30 +269,32 @@ class BP_REST_Members_Endpoint extends WP_REST_Users_Controller {
 			)
 		);
 
-		$user = bp_rest_get_user( $request->get_param( 'id' ) );
+		if ( bp_current_user_can( 'bp_view', array( 'bp_component' => 'members' ) ) ) {
+			$user = bp_rest_get_user( $request->get_param( 'id' ) );
 
-		if ( ! $user instanceof WP_User ) {
-			$retval = new WP_Error(
-				'bp_rest_member_invalid_id',
-				__( 'Invalid member ID.', 'buddypress' ),
-				array(
-					'status' => 404,
-				)
-			);
-		} elseif ( 'edit' === $request->get_param( 'context' ) ) {
-			if ( get_current_user_id() === $user->ID || bp_current_user_can( 'list_users' ) ) {
-				$retval = true;
-			} else {
+			if ( ! $user instanceof WP_User ) {
 				$retval = new WP_Error(
-					'bp_rest_authorization_required',
-					__( 'Sorry, you are not allowed to view members with the edit context.', 'buddypress' ),
+					'bp_rest_member_invalid_id',
+					__( 'Invalid member ID.', 'buddypress' ),
 					array(
-						'status' => rest_authorization_required_code(),
+						'status' => 404,
 					)
 				);
+			} elseif ( 'edit' === $request->get_param( 'context' ) ) {
+				if ( get_current_user_id() === $user->ID || bp_current_user_can( 'list_users' ) ) {
+					$retval = true;
+				} else {
+					$retval = new WP_Error(
+						'bp_rest_authorization_required',
+						__( 'Sorry, you are not allowed to view members with the edit context.', 'buddypress' ),
+						array(
+							'status' => rest_authorization_required_code(),
+						)
+					);
+				}
+			} else {
+				$retval = true;
 			}
-		} else {
-			$retval = true;
 		}
 
 		/**
@@ -403,45 +419,85 @@ class BP_REST_Members_Endpoint extends WP_REST_Users_Controller {
 	}
 
 	/**
-	 * Deleting the current user is not implemented into this endpoint.
-	 *
-	 * This action is specific to the User Settings endpoint.
+	 * Checks if a given request has access to delete the current user.
 	 *
 	 * @since 5.0.0
+	 * @since 0.7.0 Do implement this method.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_Error                WP_Error object to inform it's not implemented.
+	 * @return true|WP_Error True if the request has access to delete the item, WP_Error object otherwise.
 	 */
 	public function delete_current_item_permissions_check( $request ) {
-		return new WP_Error(
-			'bp_rest_invalid_method',
-			/* translators: %s: transport method name */
-			sprintf( __( '\'%s\' Transport Method not implemented.', 'buddypress' ), $request->get_method() ),
+		$retval = new WP_Error(
+			'bp_rest_authorization_required',
+			__( 'Sorry, you are not allowed delete your account.', 'buddypress' ),
 			array(
-				'status' => 405,
+				'status' => rest_authorization_required_code(),
 			)
 		);
+
+		if ( ! bp_disable_account_deletion() ) {
+			$retval = true;
+		}
+
+		/**
+		 * Filter the members `delete_current_item` permissions check.
+		 *
+		 * @since 0.7.0
+		 *
+		 * @param true|WP_Error   $retval  Returned value.
+		 * @param WP_REST_Request $request The request sent to the API.
+		 */
+		return apply_filters( 'bp_rest_members_delete_current_item_permissions_check', $retval, $request );
 	}
 
 	/**
-	 * Deleting the current user is not implemented into this endpoint.
-	 *
-	 * This action is specific to the User Settings endpoint.
+	 * Deletes the current user.
 	 *
 	 * @since 5.0.0
+	 * @since 0.7.0 Do implement this method.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_Error                WP_Error to inform it's not implemented.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function delete_current_item( $request ) {
-		return new WP_Error(
-			'bp_rest_invalid_method',
-			/* translators: %s: transport method name */
-			sprintf( __( '\'%s\' Transport method not implemented.', 'buddypress' ), $request->get_method() ),
+		$request->set_param( 'context', 'edit' );
+
+		$user = bp_rest_get_user( get_current_user_id() );
+
+		if ( ! $user instanceof WP_User ) {
+			return new WP_Error(
+				'bp_rest_member_invalid_id',
+				__( 'Invalid member ID.', 'buddypress' ),
+				array(
+					'status' => 404,
+				)
+			);
+		}
+
+		$previous = $this->prepare_item_for_response( $user, $request );
+		$result   = bp_core_delete_account();
+
+		if ( ! $result ) {
+			return new WP_Error(
+				'bp_rest_members_cannot_delete',
+				__( 'Your account cannot be deleted.', 'buddypress' ),
+				array( 'status' => 500 )
+			);
+		}
+
+		$response = new WP_REST_Response();
+		$response->set_data(
 			array(
-				'status' => 405,
+				'deleted'  => true,
+				'previous' => $previous->get_data(),
 			)
 		);
+
+		/* this action is documented in wp-includes/rest-api/endpoints/class-wp-rest-users-controller.php */
+		do_action( 'rest_delete_user', $user, $response, $request );
+
+		return $response;
 	}
 
 	/**
@@ -460,7 +516,7 @@ class BP_REST_Members_Endpoint extends WP_REST_Users_Controller {
 		$data     = $this->filter_response_by_context( $data, $context );
 		$response = rest_ensure_response( $data );
 
-		$response->add_links( $this->prepare_links( $user ) );
+		$response->add_links( $this->prepare_links( $user, $data ) );
 
 		// Update current user's last activity.
 		if ( strpos( $request->get_route(), 'members/me' ) !== false && get_current_user_id() === $user->ID ) {
@@ -480,12 +536,88 @@ class BP_REST_Members_Endpoint extends WP_REST_Users_Controller {
 	}
 
 	/**
+	 * Prepares links for the user request.
+	 *
+	 * @since 11.0.0
+	 *
+	 * @param WP_User $user      User object.
+	 * @param array   $user_data User data.
+	 * @return array
+	 */
+	protected function prepare_links( $user, $user_data = array() ) {
+		$base  = sprintf( '/%1$s/%2$s/', $this->namespace, $this->rest_base );
+		$links = array(
+			'self'       => array(
+				'href' => rest_url( $base . $user->ID ),
+			),
+			'collection' => array(
+				'href' => rest_url( $base ),
+			),
+		);
+
+		// Actions.
+
+		if ( is_user_logged_in() ) {
+			if ( bp_is_active( 'friends' ) ) {
+				$friends_component = buddypress()->friends->id;
+				$friends_action    = array( 'href' => bp_rest_get_object_url( $user->ID, $friends_component ) );
+
+				switch ( $user_data['friendship_status_slug'] ) {
+					case 'not_friends':
+						$links['bp-action-add-friendship'] = array(
+							'href'         => rest_url( sprintf( '/%1$s/%2$s/', $this->namespace, $friends_component ) ),
+							'initiator_id' => bp_loggedin_user_id(),
+							'friend_id'    => $user->ID,
+						);
+						break;
+
+					case 'is_friend':
+						$links['bp-action-delete-friendship'] = $friends_action;
+						break;
+
+					case 'pending':
+						$links['bp-action-cancel-friendship-request'] = $friends_action;
+						break;
+
+					case 'awaiting_response':
+						$links['bp-action-accept-friendship-request'] = $friends_action;
+						$links['bp-action-reject-friendship-request'] = $friends_action;
+						break;
+				}
+			}
+
+			if (
+				bp_is_active( 'messages' )
+				&& (
+					true === wp_validate_boolean( $user_data['friendship_status'] )
+					|| buddypress()->messages->autocomplete_all === true
+				)
+			) {
+				$links['bp-action-create-thread'] = array(
+					'href'    => rest_url( sprintf( '/%1$s/%2$s/', $this->namespace, buddypress()->messages->id ) ),
+					'user_id' => $user->ID,
+				);
+			}
+		}
+
+		/**
+		 * Filter links prepared for the REST response.
+		 *
+		 * @since 11.0.0
+		 *
+		 * @param array   $links The prepared links of the REST response.
+		 * @param WP_User $user  The User object.
+		 */
+		return apply_filters( 'bp_rest_member_prepare_links', $links, $user );
+	}
+
+	/**
 	 * Method to facilitate fetching of user data.
 	 *
 	 * This was abstracted to be used in other BuddyPress endpoints.
 	 *
 	 * @since 5.0.0
-	 * @since 7.0.0 Add the $request parameter.
+	 * @since 7.0.0 Add the `$request` parameter.
 	 *
 	 * @param WP_User         $user    User object.
 	 * @param string          $context The context of the request. Defaults to 'view'.
@@ -522,7 +654,7 @@ class BP_REST_Members_Endpoint extends WP_REST_Users_Controller {
 
 		// Link.
 		if ( empty( $fields ) || ! empty( $fields['link'] ) ) {
-			$data['link'] = bp_core_get_user_domain( $user->ID, $user->user_nicename, $user->user_login );
+			$data['link'] = bp_members_get_user_url( $user->ID );
 		}
 
 		// Member types.
@@ -592,11 +724,14 @@ class BP_REST_Members_Endpoint extends WP_REST_Users_Controller {
 		}
 
 		if ( 'edit' === $context && current_user_can( 'list_users' ) ) {
-			$data['registered_date']     = bp_rest_prepare_date_response( $user->data->user_registered, get_date_from_gmt( $user->data->user_registered ) );
-			$data['registered_date_gmt'] = bp_rest_prepare_date_response( $user->data->user_registered );
-			$data['roles']               = (array) array_values( $user->roles );
-			$data['capabilities']        = (array) array_keys( $user->allcaps );
-			$data['extra_capabilities']  = (array) array_keys( $user->caps );
+			if ( isset( $user->data ) ) {
+				$data['registered_date']     = bp_rest_prepare_date_response( $user->data->user_registered, get_date_from_gmt( $user->data->user_registered ) );
+				$data['registered_date_gmt'] = bp_rest_prepare_date_response( $user->data->user_registered );
+			}
+
+			$data['roles']              = isset( $user->roles ) ? array_values( (array) $user->roles ) : array();
+			$data['capabilities']       = isset( $user->allcaps ) ? array_keys( (array) $user->allcaps ) : array();
+			$data['extra_capabilities'] = isset( $user->caps ) ? array_keys( (array) $user->caps ) : array();
 		}
 
 		// The name used for that user in @-mentions.
@@ -758,19 +893,19 @@ class BP_REST_Members_Endpoint extends WP_REST_Users_Controller {
 	 *
 	 * @since 5.0.0
 	 *
-	 * @param WP_User         $object  The WordPress user object.
+	 * @param WP_User         $user    The WordPress user object.
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return bool|WP_Error True on success, WP_Error object if a field cannot be updated.
 	 */
-	protected function update_additional_fields_for_object( $object, $request ) {
-		if ( ! isset( $object->data ) ) {
+	protected function update_additional_fields_for_object( $user, $request ) {
+		if ( ! isset( $user->data ) ) {
 			return new WP_Error(
 				'invalid_user',
 				__( 'The data for the user was not found.', 'buddypress' )
 			);
 		}
 
-		$member     = $object->data;
+		$member     = $user->data;
 		$member->id = $member->ID;
 
 		return parent::update_additional_fields_for_object( $member, $request );
@@ -864,7 +999,7 @@ class BP_REST_Members_Endpoint extends WP_REST_Users_Controller {
 					'name'                   => array(
 						'description' => __( 'Display name for the member.', 'buddypress' ),
 						'type'        => 'string',
-						'context'     => array( 'view', 'edit' ),
+						'context'     => array( 'view', 'edit', 'embed' ),
 						'arg_options' => array(
 							'sanitize_callback' => 'sanitize_text_field',
 						),

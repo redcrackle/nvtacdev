@@ -84,9 +84,10 @@ function um_upgrade_update_users_per_page20beta1() {
 		}
 
 		$from = ( absint( $_POST['page'] ) * $users_per_page ) - $users_per_page + 1;
-		$to = absint( $_POST['page'] ) * $users_per_page;
+		$to   = absint( $_POST['page'] ) * $users_per_page;
 
-		wp_send_json_success( array( 'message' => sprintf( __( 'Users from %s to %s was upgraded successfully...', 'ultimate-member' ), $from, $to ) ) );
+		// translators: %1$s is a from; %2$s is a to.
+		wp_send_json_success( array( 'message' => sprintf( __( 'Users from %1$s to %2$s was upgraded successfully...', 'ultimate-member' ), $from, $to ) ) );
 	} else {
 		wp_send_json_error();
 	}
@@ -149,7 +150,7 @@ function um_upgrade_cpt20beta1() {
 
 	um_maybe_unset_time_limit();
 
-	include 'um_cpt.php';
+	include 'um-cpt.php';
 	wp_send_json_success( array( 'message' => __( 'UM Custom Posts was upgraded successfully', 'ultimate-member' ) ) );
 }
 
@@ -213,9 +214,10 @@ function um_upgrade_update_forum_per_page20beta1() {
 		}
 
 		$from = ( absint( $_POST['page'] ) * $posts_per_page ) - $posts_per_page + 1;
-		$to = absint( $_POST['page'] ) * $posts_per_page;
+		$to   = absint( $_POST['page'] ) * $posts_per_page;
 
-		wp_send_json_success( array( 'message' => sprintf( __( 'Forums from %s to %s was upgraded successfully...', 'ultimate-member' ), $from, $to ) ) );
+		// translators: %1$s is a from; %2$s is a to.
+		wp_send_json_success( array( 'message' => sprintf( __( 'Forums from %1$s to %2$s was upgraded successfully...', 'ultimate-member' ), $from, $to ) ) );
 	} else {
 		wp_send_json_error();
 	}
@@ -300,9 +302,10 @@ function um_upgrade_update_products_per_page20beta1() {
 		}
 
 		$from = ( absint( $_POST['page'] ) * $posts_per_page ) - $posts_per_page + 1;
-		$to = absint( $_POST['page'] ) * $posts_per_page;
+		$to   = absint( $_POST['page'] ) * $posts_per_page;
 
-		wp_send_json_success( array( 'message' =>  sprintf( __( 'Woocommerce Products from %s to %s was upgraded successfully...', 'ultimate-member' ), $from, $to ) ) );
+		// translators: %1$s is a from; %2$s is a to.
+		wp_send_json_success( array( 'message' => sprintf( __( 'Woocommerce Products from %1$s to %2$s was upgraded successfully...', 'ultimate-member' ), $from, $to ) ) );
 	} else {
 		wp_send_json_error();
 	}
@@ -315,7 +318,7 @@ function um_upgrade_email_templates20beta1() {
 
 	um_maybe_unset_time_limit();
 
-	include 'email_templates.php';
+	include 'email-templates.php';
 
 	update_option( 'um_last_version_upgrade', '2.0-beta1' );
 	delete_option( 'um_roles_associations' );

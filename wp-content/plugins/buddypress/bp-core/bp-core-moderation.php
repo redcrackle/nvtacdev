@@ -25,8 +25,10 @@ defined( 'ABSPATH' ) || exit;
  */
 function bp_core_check_for_flood( $user_id = 0 ) {
 
+	$throttle_time = bp_get_option( '_bp_throttle_time' );
+
 	// Option disabled. No flood checks.
-	if ( !$throttle_time = bp_get_option( '_bp_throttle_time' ) ) {
+	if ( ! $throttle_time ) {
 		return true;
 	}
 
@@ -36,7 +38,7 @@ function bp_core_check_for_flood( $user_id = 0 ) {
 	}
 
 	$last_posted = get_user_meta( $user_id, '_bp_last_posted', true );
-	if ( isset( $last_posted ) && ( time() < ( $last_posted + $throttle_time ) ) && !current_user_can( 'throttle' ) ) {
+	if ( isset( $last_posted ) && ( time() < ( $last_posted + $throttle_time ) ) && ! current_user_can( 'throttle' ) ) {
 		return false;
 	}
 
@@ -77,8 +79,8 @@ function bp_core_check_for_moderation( $user_id = 0, $title = '', $content = '',
 	}
 
 	// Define local variable(s).
-	$_post     = array();
-	$match_out = '';
+	$_post   = array();
+	$matches = array();
 
 	/** User Data ************************************************************
 	 */
@@ -90,9 +92,10 @@ function bp_core_check_for_moderation( $user_id = 0, $title = '', $content = '',
 
 		// If data exists, map it.
 		if ( ! empty( $user ) ) {
-			$_post['author'] = $user->display_name;
-			$_post['email']  = $user->user_email;
-			$_post['url']    = $user->user_url;
+			$_post['user_id'] = $user->ID;
+			$_post['author']  = $user->display_name;
+			$_post['email']   = $user->user_email;
+			$_post['url']     = $user->user_url;
 		}
 	}
 
@@ -111,20 +114,32 @@ function bp_core_check_for_moderation( $user_id = 0, $title = '', $content = '',
 	if ( ! empty( $max_links ) ) {
 
 		// How many links?
-		$num_links = preg_match_all( '/(http|ftp|https):\/\//i', $content, $match_out );
+		$num_links = preg_match_all( '/(http|ftp|https):\/\/(.+?)([\s\'"])/i', $content, $matches );
 
-		// Allow for bumping the max to include the user's URL.
+		// Neutralize the current site's URL.
+		if ( isset( $matches[0] ) && is_array( $matches[0] ) ) {
+			foreach ( $matches[0] as $found_url ) {
+				if ( 0 === strpos( $found_url, home_url() ) ) {
+					--$num_links;
+				}
+			}
+		}
+
+		// Allow for bumping the max according to the user's URL or content data.
 		if ( ! empty( $_post['url'] ) ) {
+			$user_url = $_post['url'];
 
 			/**
 			 * Filters the maximum amount of links allowed to include the user's URL.
 			 *
 			 * @since 1.6.0
+			 * @since 11.0.0 Introduced the $content parameter as WordPress did the same in 4.7.0.
 			 *
-			 * @param string $num_links How many links found.
-			 * @param string $value     User's url.
+			 * @param string $num_links    How many links found.
+			 * @param string $user_url     User's url.
+			 * @param array  $content      The content being moderated.
 			 */
-			$num_links = apply_filters( 'comment_max_links_url', $num_links, $_post['url'] );
+			$num_links = apply_filters( 'comment_max_links_url', $num_links, $user_url, $content );
 		}
 
 		// Das ist zu viele links!
@@ -239,12 +254,6 @@ function bp_core_check_for_disallowed_keys( $user_id = 0, $title = '', $content 
 
 	// Get the moderation keys.
 	$disallowed = get_option( 'disallowed_keys' );
-
-	// Support for WP < 5.5.
-	if ( false === $disallowed ) {
-		$disallowed = get_option( 'blacklist_keys' );
-	}
-
 	$disallowed = trim( $disallowed );
 
 	// Bail if disallowed list is empty.
@@ -290,7 +299,9 @@ function bp_core_check_for_disallowed_keys( $user_id = 0, $title = '', $content 
 		$word = trim( $word );
 
 		// Skip empty lines.
-		if ( empty( $word ) ) { continue; }
+		if ( empty( $word ) ) {
+			continue;
+		}
 
 		// Do some escaping magic so that '#' chars in the
 		// spam words don't break things.
@@ -298,7 +309,7 @@ function bp_core_check_for_disallowed_keys( $user_id = 0, $title = '', $content 
 		$pattern = "#$word#i";
 
 		// Loop through post data.
-		foreach( $_post as $post_data ) {
+		foreach ( $_post as $post_data ) {
 
 			// Check each user data for current word.
 			if ( preg_match( $pattern, $post_data ) ) {
@@ -323,7 +334,11 @@ function bp_core_check_for_disallowed_keys( $user_id = 0, $title = '', $content 
  * @return string IP address.
  */
 function bp_core_current_user_ip() {
-	$retval = preg_replace( '/[^0-9a-fA-F:., ]/', '', $_SERVER['REMOTE_ADDR'] );
+	$retval = '';
+
+	if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+		$retval = preg_replace( '/[^0-9a-fA-F:., ]/', '', wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
+	}
 
 	/**
 	 * Filters the current user's IP address.
@@ -343,12 +358,11 @@ function bp_core_current_user_ip() {
  * @return string User agent string.
  */
 function bp_core_current_user_ua() {
+	$retval = '';
 
 	// Sanity check the user agent.
 	if ( ! empty( $_SERVER['HTTP_USER_AGENT'] ) ) {
 		$retval = substr( $_SERVER['HTTP_USER_AGENT'], 0, 254 );
-	} else {
-		$retval = '';
 	}
 
 	/**

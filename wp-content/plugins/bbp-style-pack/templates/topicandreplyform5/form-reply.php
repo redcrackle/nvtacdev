@@ -7,6 +7,10 @@
  * @subpackage Theme
  */
 
+// Exit if accessed directly
+defined( 'ABSPATH' ) || exit;
+
+
 ?>
 
 <?php if ( bbp_is_reply_edit() ) : ?>
@@ -26,7 +30,13 @@
 			<?php do_action( 'bbp_theme_before_reply_form' ); ?>
 
 			<fieldset class="bbp-form">
-				<legend><?php printf( __( 'Reply To: %s', 'bbpress' ), bbp_get_topic_title() ); ?></legend>
+				<legend>
+                                        <?php printf( 
+										 /* translators: %s is topic title */
+                                                __( 'Reply To: %s', 'bbpress' ), 
+                                                bbp_get_topic_title() 
+                                        ); ?>
+                                </legend>
 
 				<?php do_action( 'bbp_theme_before_reply_form_notices' ); ?>
 
@@ -64,7 +74,15 @@
 					<?php if ( ! ( bbp_use_wp_editor() || current_user_can( 'unfiltered_html' ) ) ) : ?>
 
 						<p class="form-allowed-tags">
-							<label><?php _e( 'You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes:','bbpress' ); ?></label><br />
+							<label>
+                                                                <?php
+                                                                        printf( 
+                                                                                /* translators: %s is abbreviation HTML Tag */
+                                                                                esc_html__( 'You may use these %s tags and attributes:', 'bbpress' ), 
+                                                                                '<abbr title="HyperText Markup Language">HTML</abbr>' 
+                                                                        ); 
+                                                                ?>
+                                                        </label><br />
 							<code><?php bbp_allowed_tags(); ?></code>
 						</p>
 
@@ -182,7 +200,13 @@
 
 	<div id="no-reply-<?php bbp_topic_id(); ?>" class="bbp-no-reply">
 		<div class="bbp-template-notice">
-			<p><?php printf( __( 'The topic &#8216;%s&#8217; is closed to new replies.', 'bbpress' ), bbp_get_topic_title() ); ?></p>
+			<p><?php 
+                                printf( 
+                                        /* translators: &#8216; and &#8217; are encoded apostrophes and %s is string for the topic title */
+                                        __( 'The topic &#8216;%s&#8217; is closed to new replies.', 'bbpress' ), 
+                                        bbp_get_topic_title() 
+                                ); 
+                        ?></p>
 		</div>
 	</div>
 
@@ -190,7 +214,13 @@
 
 	<div id="no-reply-<?php bbp_topic_id(); ?>" class="bbp-no-reply">
 		<div class="bbp-template-notice">
-			<p><?php printf( __( 'The forum &#8216;%s&#8217; is closed to new topics and replies.', 'bbpress' ), bbp_get_forum_title( bbp_get_topic_forum_id() ) ); ?></p>
+			<p><?php 
+                                printf( 
+                                        /* translators: &#8216; and &#8217; are encoded apostrophes and %s is string for the forum title */
+                                        __( 'The forum &#8216;%s&#8217; is closed to new topics and replies.', 'bbpress' ), 
+                                        bbp_get_forum_title( bbp_get_topic_forum_id() ) 
+                                ); 
+                        ?></p>
 		</div>
 	</div>
 
@@ -198,7 +228,12 @@
 
 	<div id="no-reply-<?php bbp_topic_id(); ?>" class="bbp-no-reply">
 		<div class="bbp-template-notice">
-			<p><?php is_user_logged_in() ? _e( 'You cannot reply to this topic.', 'bbpress' ) : _e( 'You must be logged in to reply to this topic.', 'bbpress' ); ?></p>
+			<p>
+                                <?php is_user_logged_in() ? 
+                                        _e( 'You cannot reply to this topic.', 'bbpress' ) 
+                                        : _e( 'You must be logged in to reply to this topic.', 'bbpress' ); 
+                                ?>
+                        </p>
 		</div>
 	</div>
 
