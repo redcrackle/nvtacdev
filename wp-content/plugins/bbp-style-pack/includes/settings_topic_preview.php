@@ -1,42 +1,37 @@
 <?php
 
-// Exit if accessed directly
-defined( 'ABSPATH' ) || exit;
-
-
 //topic preview style settings page
 
 function bsp_style_settings_topic_preview () {
 	global $bsp_style_settings_topic_preview ;
 	?> 
-	<form method="post" action="options.php">
+	<Form method="post" action="options.php">
 		<?php wp_nonce_field( 'style-settings_topic_preview', 'style-settings-nonce' ) ?>
 		<?php settings_fields( 'bsp_style_settings_topic_preview' );
 		//create a style.css on entry and on saving
-		generate_style_css();
-                bsp_clear_cache();
+		generate_style_css() ;
 		?>
 		<table class="form-table">
 		<tr valign="top">
 			<th colspan="2">
 				<h3>
-					<?php esc_html_e ('Topic Preview' , 'bbp-style-pack' ) ; ?>
+					<?php _e ('Topic Preview' , 'bbp-style-pack' ) ; ?>
 				</h3>
 		</tr>
 	</table>
 	<!-- save the options -->
 	<p class="submit">
-		<input type="submit" class="button-primary" value="<?php esc_html_e( 'Save changes', 'bbp-style-pack' ); ?>" />
+		<input type="submit" class="button-primary" value="<?php _e( 'Save changes', 'bbp-style-pack' ); ?>" />
 	</p>
 	
 	<table>
 		<tr>
 			<td>
 				<p>
-					<?php esc_html_e('This section allows you to create a topic preview - when you hover on a topic in a forum list, the first x words of the topic are displayed.', 'bbp-style-pack'); ?> 
+					<?php _e('This section allows you to create a topic preview - when you hover on a topic in a forum list, the first x words of the topic are displayed.', 'bbp-style-pack'); ?> 
 				</p>
 				<p>
-					<?php esc_html_e('This saves your community needing to open each topic to see what it is about.', 'bbp-style-pack'); ?> 
+					<?php _e('This saves your community needing to open each topic to see what it is about.', 'bbp-style-pack'); ?> 
 				</p>
 			</td>
 			
@@ -54,7 +49,7 @@ function bsp_style_settings_topic_preview () {
 	<!-- checkbox to activate  -->
 		<tr valign="top">  
 			<th>
-				1. <?php esc_html_e('Activate Topic Previews', 'bbp-style-pack'); ?>
+				1. <?php _e('Activate Topic Previews', 'bbp-style-pack'); ?>
 			</th>
 			
 			<td>
@@ -70,13 +65,13 @@ function bsp_style_settings_topic_preview () {
 	<!-- TOPIC PREVIEW STYLING -->					
 		<tr>	
 			<th>
-				<?php esc_html_e('Style', 'bbp-style-pack'); ?>
+				<?php _e('Style', 'bbp-style-pack'); ?>
 			</th>
 		</tr>
 		
 		<tr>
 			<td colspan=2>
-				<?php esc_html_e('You can style the preview below' , 'bbp-style-pack'); ?>
+				<?php _e('You can style the preview below' , 'bbp-style-pack'); ?>
 			</td>
 			<?php
 			$item =  'bsp_style_settings_topic_preview[button_type]' ;
@@ -148,13 +143,13 @@ function bsp_style_settings_topic_preview () {
 			
 		<tr>
 			<td>
-				<?php echo esc_html($name1) ; ?>
+				<?php echo $name1 ; ?>
 			</td>
 			
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="small-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="small-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Default 10px - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Default 10px - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -162,13 +157,13 @@ function bsp_style_settings_topic_preview () {
 		
 		<tr>
 			<td>
-				<?php echo esc_html($name2) ; ?>
+				<?php echo $name2 ; ?>
 			</td>
 			
 			<td>
-				<?php echo '<input id="'.esc_html($item2).'" class="bsp-color-picker" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item2.'" class="bsp-color-picker" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
 				</label>
 				<br/>
 			</td>
@@ -176,13 +171,13 @@ function bsp_style_settings_topic_preview () {
 		
 		<tr>
 			<td>
-				<?php echo esc_html($name3) ; ?>
+				<?php echo $name3 ; ?>
 			</td>
 			
 			<td>
-				<?php echo '<input id="'.esc_html($item3).'" class="medium-text" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item3.'" class="medium-text" name="'.$item3.'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -190,11 +185,11 @@ function bsp_style_settings_topic_preview () {
 			
 		<tr>
 			<td> 
-				<?php echo esc_html($name4) ; ?>
+				<?php echo $name4 ; ?>
 			</td>
 			
 			<td>
-				<select name="<?php echo esc_html($item4) ; ?>">
+				<select name="<?php echo $item4 ; ?>">
 					<?php echo '<option value="'.esc_html( $value4).'">'.esc_html( $value4) ; ?> 
 					<option value="Normal">Normal</option>
 					<option value="Italic">Italic</option>
@@ -206,13 +201,13 @@ function bsp_style_settings_topic_preview () {
 			
 		<tr>
 			<td>
-				<?php echo esc_html($name5) ; ?>
+				<?php echo $name5 ; ?>
 			</td>
 			
 			<td>
-				<?php echo '<input id="'.esc_html($item5).'" class="bsp-color-picker" name="'.esc_html($item5).'" type="text" value="'.esc_html( $value5 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item5.'" class="bsp-color-picker" name="'.$item5.'" type="text" value="'.esc_html( $value5 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
 				</label>
 				<br/>
 			</td>
@@ -221,10 +216,10 @@ function bsp_style_settings_topic_preview () {
 		<tr>
 			<td colspan=2>
 				<b><p>
-					<?php esc_html_e('By default, the preview will show the content of the topic, but without images or links.', 'bbp-style-pack'); ?> 
+					<?php _e('By default, the preview will show the content of the topic, but without images or links.', 'bbp-style-pack'); ?> 
 				</p>
 				<p>
-					<?php esc_html_e('The defaults below work for many sites, <i>so you may not need to set anything below </i>, but you may want to adjust them for your site - to say limit what is shown.', 'bbp-style-pack'); ?> 
+					<?php _e('The defaults below work for many sites, <i>so you may not need to set anything below </i>, but you may want to adjust them for your site - to say limit what is shown.', 'bbp-style-pack'); ?> 
 				</p>
 				</b>
 			</td>
@@ -233,7 +228,7 @@ function bsp_style_settings_topic_preview () {
 		<tr>
 			<td colspan=2>
 				<p><b>
-					<?php esc_html_e('Standard display', 'bbp-style-pack'); ?> 
+					<?php _e('Standard display', 'bbp-style-pack'); ?> 
 				</b></p>
 				
 			</td>
@@ -241,13 +236,13 @@ function bsp_style_settings_topic_preview () {
 		
 		<tr>
 			<td> 
-				<?php echo esc_html($name6) ; ?> 
+				<?php echo $name6 ; ?> 
 			</td>
 			
 			<td>
-				<?php echo '<input id="'.esc_html($item6).'" class="medium-text" name="'.esc_html($item6).'" type="text" value="'.esc_html( $value6 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item6.'" class="medium-text" name="'.$item6.'" type="text" value="'.esc_html( $value6 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Width of preview - default 400px', 'bbp-style-pack' ); ?>
+					<?php _e( 'Width of preview - default 400px', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -255,13 +250,13 @@ function bsp_style_settings_topic_preview () {
 		
 		<tr>
 			<td> 
-				<?php echo esc_html($name7) ; ?> 
+				<?php echo $name7 ; ?> 
 			</td>
 			
 			<td>
-				<?php echo '<input id="'.esc_html($item7).'" class="medium-text" name="'.esc_html($item7).'" type="text" value="'.esc_html( $value7 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item7.'" class="medium-text" name="'.$item7.'" type="text" value="'.esc_html( $value7 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Height of preview - by default this will adjust for the amount of content, but you can set a fixed size instead', 'bbp-style-pack' ); ?>
+					<?php _e( 'Height of preview - by default this will adjust for the amount of content, but you can set a fixed size instead', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -269,13 +264,13 @@ function bsp_style_settings_topic_preview () {
 		
 		<tr>
 			<td> 
-				<?php echo esc_html($name8) ; ?> 
+				<?php echo $name8 ; ?> 
 			</td>
 			
 			<td>
-				<?php echo '<input id="'.esc_html($item8).'" class="medium-text" name="'.esc_html($item8).'" type="text" value="'.esc_html( $value8 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item8.'" class="medium-text" name="'.$item8.'" type="text" value="'.esc_html( $value8 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Number of characters to show in Preview - default will show all the content', 'bbp-style-pack' ); ?>
+					<?php _e( 'Number of characters to show in Preview - default will show all the content', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -285,7 +280,7 @@ function bsp_style_settings_topic_preview () {
 			<td colspan=2>
 				<p>
 					<b>
-						<?php esc_html_e('Smaller display', 'bbp-style-pack'); ?> 
+						<?php _e('Smaller display', 'bbp-style-pack'); ?> 
 					</b>
 				</p>
 				
@@ -295,13 +290,13 @@ function bsp_style_settings_topic_preview () {
 		<tr>
 			<td colspan=2>
 				<p>
-					<?php esc_html_e('You may want to alter the parameters for smaller screens - eg mobiles etc. <i>You do not need to set these unless you want a different display. </i> ', 'bbp-style-pack'); ?>
+					<?php _e('You may want to alter the parameters for smaller screens - eg mobiles etc. <i>You do not need to set these unless you want a different display. </i> ', 'bbp-style-pack'); ?>
 				</p>
 				<p>
-					<?php esc_html_e('Typical widths are 320px — 480px for mobile devices, and 481px — 768px for iPads, Tablets etc.', 'bbp-style-pack'); ?>
+					<?php _e('Typical widths are 320px — 480px for mobile devices, and 481px — 768px for iPads, Tablets etc.', 'bbp-style-pack'); ?>
 				</p>	
 					<p>
-					<?php esc_html_e('Set the maximum width and screens below this width will use the settings below.', 'bbp-style-pack'); ?>
+					<?php _e('Set the maximum width and screens below this width will use the settings below.', 'bbp-style-pack'); ?>
 				</p>	
 					
 					
@@ -310,13 +305,13 @@ function bsp_style_settings_topic_preview () {
 		
 		<tr>
 			<td> 
-				<?php echo esc_html($name9) ; ?> 
+				<?php echo $name9 ; ?> 
 			</td>
 			
 			<td>
-				<?php echo '<input id="'.esc_html($item9).'" class="medium-text" name="'.esc_html($item9).'" type="text" value="'.esc_html( $value9 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item9.'" class="medium-text" name="'.$item9.'" type="text" value="'.esc_html( $value9 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Screen width - below which these settings take effect', 'bbp-style-pack' ); ?>
+					<?php _e( 'Screen width - below which these settings take effect', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -324,13 +319,13 @@ function bsp_style_settings_topic_preview () {
 		
 		<tr>
 			<td> 
-				<?php echo esc_html($name10) ; ?> 
+				<?php echo $name10 ; ?> 
 			</td>
 			
 			<td>
-				<?php echo '<input id="'.esc_html($item10).'" class="medium-text" name="'.esc_html($item10).'" type="text" value="'.esc_html( $value10 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item10.'" class="medium-text" name="'.$item10.'" type="text" value="'.esc_html( $value10 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Width of preview - default 400px', 'bbp-style-pack' ); ?>
+					<?php _e( 'Width of preview - default 400px', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -338,13 +333,13 @@ function bsp_style_settings_topic_preview () {
 		
 		<tr>
 			<td> 
-				<?php echo esc_html($name11) ; ?> 
+				<?php echo $name11 ; ?> 
 			</td>
 			
 			<td>
-				<?php echo '<input id="'.esc_html($item11).'" class="medium-text" name="'.esc_html($item11).'" type="text" value="'.esc_html( $value11 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item11.'" class="medium-text" name="'.$item11.'" type="text" value="'.esc_html( $value11 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Height of preview - by default this will adjust for the amount of content, but you can set a fixed size instead', 'bbp-style-pack' ); ?>
+					<?php _e( 'Height of preview - by default this will adjust for the amount of content, but you can set a fixed size instead', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -353,13 +348,13 @@ function bsp_style_settings_topic_preview () {
 		
 		<tr>
 			<td> 
-				<?php echo esc_html($name12) ; ?> 
+				<?php echo $name12 ; ?> 
 			</td>
 			
 			<td>
-				<?php echo '<input id="'.esc_html($item12).'" class="medium-text" name="'.esc_html($item12).'" type="text" value="'.esc_html( $value12 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item12.'" class="medium-text" name="'.$item12.'" type="text" value="'.esc_html( $value12 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Number of characters to show in Preview - default will show all the content', 'bbp-style-pack' ); ?>
+					<?php _e( 'Number of characters to show in Preview - default will show all the content', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -370,9 +365,11 @@ function bsp_style_settings_topic_preview () {
 	</table>
 	<!-- save the options -->
 	<p class="submit">
-		<input type="submit" class="button-primary" value="<?php esc_html_e( 'Save changes', 'bbp-style-pack' ); ?>" />
+		<input type="submit" class="button-primary" value="<?php _e( 'Save changes', 'bbp-style-pack' ); ?>" />
 	</p>
 	</form>
-
+	</div><!--end sf-wrap-->
+	</div><!--end wrap-->
 <?php
 }
+?>

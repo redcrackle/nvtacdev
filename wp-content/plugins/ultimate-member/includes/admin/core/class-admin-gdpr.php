@@ -24,7 +24,7 @@ if ( ! class_exists( 'um\admin\core\Admin_GDPR' ) ) {
 		 * Admin_GDPR constructor.
 		 */
 		function __construct() {
-			add_action( 'init', array( &$this, 'init_fields' ) );
+			add_action( 'init', array( &$this, 'init_fields' ), 10 );
 			add_action( 'admin_init', array( &$this, 'plugin_add_suggested_privacy_content' ), 20 );
 			add_filter( 'wp_privacy_personal_data_exporters', array( &$this, 'plugin_register_exporters' ) );
 			add_filter( 'wp_privacy_personal_data_erasers', array( &$this, 'plugin_register_erasers' ) );
@@ -67,7 +67,7 @@ if ( ! class_exists( 'um\admin\core\Admin_GDPR' ) ) {
 				'um_user_profile_url_slug_name_dash'    => __( 'Profile Slug "First and Last Name with \'-\'"', 'ultimate-member' ),
 				'um_user_profile_url_slug_name_plus'    => __( 'Profile Slug "First and Last Name with \'+\'"', 'ultimate-member' ),
 				'um_user_profile_url_slug_user_id'      => __( 'Profile Slug "User ID"', 'ultimate-member' ),
-				'_um_last_login'                        => __( 'Last Login date', 'ultimate-member' ),
+				'_um_last_login'                        => __( 'Last Login Timestamp', 'ultimate-member' ),
 
 				//Private content extension
 				'_um_private_content_post_id'           => __( 'Private Content Post ID', 'ultimate-member' ),
@@ -137,7 +137,7 @@ if ( ! class_exists( 'um\admin\core\Admin_GDPR' ) ) {
 		 */
 		function plugin_add_suggested_privacy_content() {
 			$content = $this->plugin_get_default_privacy_content();
-			wp_add_privacy_policy_content( UM_PLUGIN_NAME, $content );
+			wp_add_privacy_policy_content( ultimatemember_plugin_name, $content );
 		}
 
 
@@ -152,7 +152,7 @@ if ( ! class_exists( 'um\admin\core\Admin_GDPR' ) ) {
 		 */
 		function plugin_register_exporters( $exporters ) {
 			$exporters[] = array(
-				'exporter_friendly_name' => UM_PLUGIN_NAME,
+				'exporter_friendly_name' => ultimatemember_plugin_name,
 				'callback'               => array( &$this, 'data_exporter' )
 			);
 			return $exporters;
@@ -170,16 +170,12 @@ if ( ! class_exists( 'um\admin\core\Admin_GDPR' ) ) {
 		function get_metadata( $user_id ) {
 			global $wpdb;
 
-			$metadata = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT meta_key,
-						meta_value
-					FROM {$wpdb->usermeta}
-					WHERE user_id = %d",
-					$user_id
-				),
-				ARRAY_A
-			);
+			$metadata = $wpdb->get_results( $wpdb->prepare(
+				"SELECT meta_key, meta_value 
+				FROM {$wpdb->usermeta} 
+				WHERE user_id = %d",
+				$user_id
+			), ARRAY_A );
 
 			$filtered = array();
 			foreach ( $metadata as $data ) {
@@ -226,7 +222,7 @@ if ( ! class_exists( 'um\admin\core\Admin_GDPR' ) ) {
 				// If you define your own group, the first exporter to
 				// include a label will be used as the group label in the
 				// final exported report
-				$group_label = UM_PLUGIN_NAME;
+				$group_label = ultimatemember_plugin_name;
 
 				// Plugins can add as many items in the item data array as they want
 				//$data = array();
@@ -261,7 +257,7 @@ if ( ! class_exists( 'um\admin\core\Admin_GDPR' ) ) {
 		 */
 		function plugin_register_erasers( $erasers = array() ) {
 			$erasers[] = array(
-				'eraser_friendly_name'  => UM_PLUGIN_NAME,
+				'eraser_friendly_name'  => ultimatemember_plugin_name,
 				'callback'              => array( &$this, 'data_eraser' )
 			);
 			return $erasers;
@@ -299,8 +295,7 @@ if ( ! class_exists( 'um\admin\core\Admin_GDPR' ) ) {
 					if ( $deleted ) {
 						$items_removed = true;
 					} else {
-						// translators: %s: metadata name.
-						$messages[]     = sprintf( __( 'Your %s was unable to be removed at this time.', 'ultimate-member' ), $metadata['name'] );
+						$messages[] = sprintf( __( 'Your %s was unable to be removed at this time.', 'ultimate-member' ), $metadata['name'] );
 						$items_retained = true;
 					}
 				}

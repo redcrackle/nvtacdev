@@ -13,7 +13,7 @@ defined( 'ABSPATH' ) || exit;
 // Get the statistics
 $stats = bbp_get_statistics(); ?>
 
-<dl role="main" class="bbp-stats">
+<dl role="main">
 
 	<?php do_action( 'bbp_before_statistics' ); ?>
 

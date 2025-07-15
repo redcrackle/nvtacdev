@@ -62,11 +62,11 @@ function um_dynamic_user_profile_title( $title, $id = '' ) {
 		}
 	}
 
-	if ( ! function_exists( 'mb_convert_encoding' ) ) {
+	if ( ! function_exists( 'utf8_decode' ) ) {
 		return $title;
 	}
 
-	return ( strlen( $title ) !== mb_strlen( $title ) ) ? $title : mb_convert_encoding( $title, 'UTF-8' );
+	return ( strlen( $title ) !== mb_strlen( $title ) ) ? $title : utf8_encode( $title );
 }
 add_filter( 'the_title', 'um_dynamic_user_profile_title', 100000, 2 );
 
@@ -127,7 +127,7 @@ add_filter( 'get_canonical_url', 'um_get_canonical_url', 20, 2 );
  * @return array
  */
 function um_change_profile_cover_photo_label( $fields ) {
-	$max_size = UM()->common()->filesystem()::format_bytes( $fields['cover_photo']['max_size'] );
+	$max_size = UM()->files()->format_bytes( $fields['cover_photo']['max_size'] );
 	if ( ! empty( $max_size ) ) {
 		list( $file_size, $unit ) = explode( ' ', $max_size );
 
@@ -148,7 +148,7 @@ add_filter( 'um_predefined_fields_hook', 'um_change_profile_cover_photo_label', 
  * @return array
  */
 function um_change_profile_photo_label( $fields ) {
-	$max_size = UM()->common()->filesystem()::format_bytes( $fields['profile_photo']['max_size'] );
+	$max_size = UM()->files()->format_bytes( $fields['profile_photo']['max_size'] );
 	if ( ! empty( $max_size ) ) {
 		list( $file_size, $unit ) = explode( ' ', $max_size );
 

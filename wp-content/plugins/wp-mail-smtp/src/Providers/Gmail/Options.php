@@ -2,10 +2,8 @@
 
 namespace WPMailSMTP\Providers\Gmail;
 
-use WPMailSMTP\Admin\ConnectionSettings;
-use WPMailSMTP\ConnectionInterface;
-use WPMailSMTP\Helpers\UI;
 use WPMailSMTP\Providers\OptionsAbstract;
+use WPMailSMTP\Options as PluginOptions;
 
 /**
  * Class Option.
@@ -26,10 +24,8 @@ class Options extends OptionsAbstract {
 	 *
 	 * @since 1.0.0
 	 * @since 2.3.0 Added supports parameter.
-	 *
-	 * @param ConnectionInterface $connection The Connection object.
 	 */
-	public function __construct( $connection = null ) {
+	public function __construct() {
 
 		parent::__construct(
 			[
@@ -38,9 +34,10 @@ class Options extends OptionsAbstract {
 				'title'       => esc_html__( 'Google / Gmail', 'wp-mail-smtp' ),
 				'description' => sprintf(
 					wp_kses( /* translators: %s - URL to our Gmail doc. */
-						__( 'Our Gmail mailer works with any Gmail or Google Workspace account via the Google API. You can send WordPress emails from your main email address or a Gmail alias, and it\'s more secure than connecting to Gmail using SMTP credentials. We now have a One-Click Setup, which simply asks you to authorize your Google account to use our app and takes care of everything for you. Alternatively, you can connect manually, which involves several steps that are more technical than other mailer options, so we created a detailed guide to walk you through the process.<br><br>To get started, read our <a href="%s" target="_blank" rel="noopener noreferrer">Gmail documentation</a>.', 'wp-mail-smtp' ),
+						__( 'Our Gmail mailer works with any Gmail or Google Workspace account via the Google API. You can send WordPress emails from your main email address or a Gmail alias, and it\'s more secure than connecting to Gmail using SMTP credentials. The set-up steps are more technical than other options, so we created a detailed guide to walk you through the process.<br><br>To get started, read our <a href="%s" target="_blank" rel="noopener noreferrer">Gmail documentation</a>.', 'wp-mail-smtp' ),
 						[
 							'br' => [],
+							'b'  => [],
 							'a'  => [
 								'href'   => [],
 								'rel'    => [],
@@ -48,7 +45,7 @@ class Options extends OptionsAbstract {
 							],
 						]
 					),
-					esc_url( wp_mail_smtp()->get_utm_url( 'https://wpmailsmtp.com/docs/how-to-set-up-the-gmail-mailer-in-wp-mail-smtp/', 'Gmail documentation' ) )
+					'https://wpmailsmtp.com/docs/how-to-set-up-the-gmail-mailer-in-wp-mail-smtp/'
 				),
 				'notices'     => [
 					'educational' => wp_kses(
@@ -66,8 +63,7 @@ class Options extends OptionsAbstract {
 					'from_email_force' => true,
 					'from_name_force'  => true,
 				],
-			],
-			$connection
+			]
 		);
 	}
 
@@ -84,28 +80,6 @@ class Options extends OptionsAbstract {
 		}
 		?>
 
-		<?php if ( ! wp_mail_smtp()->is_pro() ) : ?>
-			<div id="wp-mail-smtp-setting-row-<?php echo esc_attr( $this->get_slug() ); ?>-one_click_setup_enabled-lite" class="wp-mail-smtp-setting-row">
-				<div class="wp-mail-smtp-setting-label">
-					<label for="wp-mail-smtp-setting-<?php echo esc_attr( $this->get_slug() ); ?>-one_click_setup_enabled-lite">
-						<?php esc_html_e( 'One-Click Setup', 'wp-mail-smtp' ); ?>
-					</label>
-				</div>
-				<div class="wp-mail-smtp-setting-field">
-					<?php
-					UI::toggle(
-						[
-							'id' => 'wp-mail-smtp-setting-' . esc_attr( $this->get_slug() ) . '-one_click_setup_enabled-lite',
-						]
-					);
-					?>
-					<p class="desc">
-						<?php esc_html_e( 'Provides a quick and easy way to connect to Google that doesn\'t require creating your own app.', 'wp-mail-smtp' ); ?>
-					</p>
-				</div>
-			</div>
-		<?php endif; ?>
-
 		<!-- Client ID -->
 		<div id="wp-mail-smtp-setting-row-<?php echo esc_attr( $this->get_slug() ); ?>-client_id"
 			class="wp-mail-smtp-setting-row wp-mail-smtp-setting-row-text wp-mail-smtp-clear">
@@ -114,8 +88,8 @@ class Options extends OptionsAbstract {
 			</div>
 			<div class="wp-mail-smtp-setting-field">
 				<input name="wp-mail-smtp[<?php echo esc_attr( $this->get_slug() ); ?>][client_id]" type="text"
-					value="<?php echo esc_attr( $this->connection_options->get( $this->get_slug(), 'client_id' ) ); ?>"
-					<?php echo $this->connection_options->is_const_defined( $this->get_slug(), 'client_id' ) ? 'disabled' : ''; ?>
+					value="<?php echo esc_attr( $this->options->get( $this->get_slug(), 'client_id' ) ); ?>"
+					<?php echo $this->options->is_const_defined( $this->get_slug(), 'client_id' ) ? 'disabled' : ''; ?>
 					id="wp-mail-smtp-setting-<?php echo esc_attr( $this->get_slug() ); ?>-client_id" spellcheck="false"
 				/>
 			</div>
@@ -128,25 +102,17 @@ class Options extends OptionsAbstract {
 				<label for="wp-mail-smtp-setting-<?php echo esc_attr( $this->get_slug() ); ?>-client_secret"><?php esc_html_e( 'Client Secret', 'wp-mail-smtp' ); ?></label>
 			</div>
 			<div class="wp-mail-smtp-setting-field">
-				<?php if ( $this->connection_options->is_const_defined( $this->get_slug(), 'client_secret' ) ) : ?>
+				<?php if ( $this->options->is_const_defined( $this->get_slug(), 'client_secret' ) ) : ?>
 					<input type="text" disabled value="****************************************"
 						id="wp-mail-smtp-setting-<?php echo esc_attr( $this->get_slug() ); ?>-client_secret"
 					/>
 					<?php $this->display_const_set_message( 'WPMS_GMAIL_CLIENT_SECRET' ); ?>
 				<?php else : ?>
-					<?php
-					$slug  = $this->get_slug();
-					$value = $this->connection_options->get( $this->get_slug(), 'client_secret' );
-
-					UI::hidden_password_field(
-						[
-							'name'       => "wp-mail-smtp[{$slug}][client_secret]",
-							'id'         => "wp-mail-smtp-setting-{$slug}-client_secret",
-							'value'      => $value,
-							'clear_text' => esc_html__( 'Remove Client Secret', 'wp-mail-smtp' ),
-						]
-					);
-					?>
+					<input type="password" spellcheck="false"
+						name="wp-mail-smtp[<?php echo esc_attr( $this->get_slug() ); ?>][client_secret]"
+						value="<?php echo esc_attr( $this->options->get( $this->get_slug(), 'client_secret' ) ); ?>"
+						id="wp-mail-smtp-setting-<?php echo esc_attr( $this->get_slug() ); ?>-client_secret"
+					/>
 				<?php endif; ?>
 			</div>
 		</div>
@@ -162,7 +128,7 @@ class Options extends OptionsAbstract {
 					value="<?php echo esc_attr( Auth::get_oauth_redirect_url() ); ?>"
 					id="wp-mail-smtp-setting-<?php echo esc_attr( $this->get_slug() ); ?>-client_redirect"
 				/>
-				<button type="button" class="wp-mail-smtp-btn wp-mail-smtp-btn-md wp-mail-smtp-btn-grey wp-mail-smtp-setting-copy"
+				<button type="button" class="wp-mail-smtp-btn wp-mail-smtp-btn-md wp-mail-smtp-btn-light-grey wp-mail-smtp-setting-copy"
 					title="<?php esc_attr_e( 'Copy URL to clipboard', 'wp-mail-smtp' ); ?>"
 					data-source_id="wp-mail-smtp-setting-<?php echo esc_attr( $this->get_slug() ); ?>-client_redirect">
 					<span class="dashicons dashicons-admin-page"></span>
@@ -197,7 +163,7 @@ class Options extends OptionsAbstract {
 		// Do the processing on the fly, as having ajax here is too complicated.
 		$this->process_provider_remove();
 
-		$auth = new Auth( $this->connection );
+		$auth = new Auth();
 		?>
 
 		<?php if ( $auth->is_clients_saved() ) : ?>
@@ -213,8 +179,8 @@ class Options extends OptionsAbstract {
 
 			<?php else : ?>
 
-				<a href="<?php echo esc_url( wp_nonce_url( ( new ConnectionSettings( $this->connection ) )->get_admin_page_url(), 'gmail_remove', 'gmail_remove_nonce' ) ); ?>#wp-mail-smtp-setting-row-<?php echo esc_attr( $this->get_slug() ); ?>-authorize" class="wp-mail-smtp-btn wp-mail-smtp-btn-md wp-mail-smtp-btn-red js-wp-mail-smtp-provider-remove">
-					<?php esc_html_e( 'Remove OAuth Connection', 'wp-mail-smtp' ); ?>
+				<a href="<?php echo esc_url( wp_nonce_url( wp_mail_smtp()->get_admin()->get_admin_page_url(), 'gmail_remove', 'gmail_remove_nonce' ) ); ?>#wp-mail-smtp-setting-row-<?php echo esc_attr( $this->get_slug() ); ?>-authorize" class="wp-mail-smtp-btn wp-mail-smtp-btn-md wp-mail-smtp-btn-red js-wp-mail-smtp-provider-remove">
+					<?php esc_html_e( 'Remove Connection', 'wp-mail-smtp' ); ?>
 				</a>
 				<span class="connected-as">
 					<?php
@@ -233,7 +199,7 @@ class Options extends OptionsAbstract {
 					<?php
 					printf(
 						wp_kses( /* translators: %s - URL to Google Gmail alias documentation page. */
-							__( 'If you want to use a different From Email address you can set up a Google email alias. <a href="%s" target="_blank" rel="noopener noreferrer">Follow these instructions</a> and then select the From Email at the top of this page.', 'wp-mail-smtp' ),
+							__( 'If you want to use a different From Email address you can set-up a Google email alias. <a href="%s" target="_blank" rel="noopener noreferrer">Follow these instructions</a> and then select the From Email at the top of this page.', 'wp-mail-smtp' ),
 							[
 								'a' => [
 									'href'   => [],
@@ -242,7 +208,7 @@ class Options extends OptionsAbstract {
 								],
 							]
 						),
-						esc_url( wp_mail_smtp()->get_utm_url( 'https://wpmailsmtp.com/gmail-send-from-alias-wp-mail-smtp/', 'Gmail aliases description - Follow these instructions' ) )
+						'https://wpmailsmtp.com/gmail-send-from-alias-wp-mail-smtp/'
 					);
 					?>
 				</p>
@@ -250,7 +216,7 @@ class Options extends OptionsAbstract {
 					<?php esc_html_e( 'You can also send emails with different From Email addresses, by disabling the Force From Email setting and using registered aliases throughout your WordPress site as the From Email addresses.', 'wp-mail-smtp' ); ?>
 				</p>
 				<p class="desc">
-					<?php esc_html_e( 'Removing the OAuth connection will give you an ability to redo the OAuth connection or link to another Google account.', 'wp-mail-smtp' ); ?>
+					<?php esc_html_e( 'Removing the connection will give you an ability to redo the connection or link to another Google account.', 'wp-mail-smtp' ); ?>
 				</p>
 
 			<?php endif; ?>
@@ -266,13 +232,13 @@ class Options extends OptionsAbstract {
 	}
 
 	/**
-	 * Remove Provider OAuth connection.
+	 * Remove Provider connection.
 	 *
 	 * @since 1.3.0
 	 */
 	public function process_provider_remove() {
 
-		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_options() ) ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
@@ -283,17 +249,21 @@ class Options extends OptionsAbstract {
 			return;
 		}
 
-		if ( $this->connection->get_mailer_slug() !== $this->get_slug() ) {
+		$options = PluginOptions::init();
+
+		if ( $options->get( 'mail', 'mailer' ) !== $this->get_slug() ) {
 			return;
 		}
 
-		$old_opt = $this->connection_options->get_all_raw();
+		$old_opt = $options->get_all_raw();
 
-		unset( $old_opt[ $this->get_slug() ]['access_token'] );
-		unset( $old_opt[ $this->get_slug() ]['refresh_token'] );
-		unset( $old_opt[ $this->get_slug() ]['user_details'] );
-		unset( $old_opt[ $this->get_slug() ]['auth_code'] );
+		foreach ( $old_opt[ $this->get_slug() ] as $key => $value ) {
+			// Unset everything except Client ID and Secret.
+			if ( ! in_array( $key, array( 'client_id', 'client_secret' ), true ) ) {
+				unset( $old_opt[ $this->get_slug() ][ $key ] );
+			}
+		}
 
-		$this->connection_options->set( $old_opt );
+		$options->set( $old_opt );
 	}
 }

@@ -2,10 +2,9 @@
 
 namespace WPMailSMTP;
 
-use Plugin_Upgrader;
 use WP_Error;
 use WPMailSMTP\Admin\PluginsInstallSkin;
-use WPMailSMTP\Helpers\Helpers;
+use WPMailSMTP\Admin\PluginsInstallUpgrader;
 
 /**
  * WP Mail SMTP Connect.
@@ -67,20 +66,17 @@ class Connect {
 	 *
 	 * @since 2.6.0
 	 *
-	 * @param string $key        The license key.
-	 * @param string $oth        The One-time hash.
-	 * @param string $redirect   The redirect URL.
+	 * @param string $key      The license key.
+	 * @param string $oth      The One-time hash.
+	 * @param string $redirect The redirect URL.
 	 *
 	 * @return bool|string
 	 */
-	public static function generate_url( $key, $oth = '', $redirect = '' ) {
+	public static function generate_url( $key, $oth, $redirect = '' ) {
 
 		if ( empty( $key ) || wp_mail_smtp()->is_pro() ) {
 			return false;
 		}
-
-		$oth        = ! empty( $oth ) ? $oth : hash( 'sha512', wp_rand() );
-		$hashed_oth = hash_hmac( 'sha512', $oth, wp_salt() );
 
 		$redirect = ! empty( $redirect ) ? $redirect : wp_mail_smtp()->get_admin()->get_admin_page_url();
 
@@ -90,11 +86,11 @@ class Connect {
 		return add_query_arg(
 			[
 				'key'      => $key,
-				'oth'      => $hashed_oth,
+				'oth'      => $oth,
 				'endpoint' => admin_url( 'admin-ajax.php' ),
 				'version'  => WPMS_PLUGIN_VER,
 				'siteurl'  => admin_url(),
-				'homeurl'  => site_url(),
+				'homeurl'  => home_url(),
 				'redirect' => rawurldecode( base64_encode( $redirect ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 				'v'        => 2,
 			],
@@ -155,7 +151,8 @@ class Connect {
 			);
 		}
 
-		$url = self::generate_url( $key );
+		$oth = hash( 'sha512', wp_rand() );
+		$url = self::generate_url( $key, $oth );
 
 		if ( empty( $url ) ) {
 			wp_send_json_error(
@@ -165,7 +162,18 @@ class Connect {
 			);
 		}
 
-		wp_send_json_success( [ 'url' => $url ] );
+		wp_send_json_success(
+			[
+				'url'      => $url,
+				'back_url' => add_query_arg(
+					[
+						'action' => 'wp_mail_smtp_connect',
+						'oth'    => $oth,
+					],
+					admin_url( 'admin-ajax.php' )
+				),
+			]
+		);
 	}
 
 	/**
@@ -188,11 +196,7 @@ class Connect {
 		// Verify oth.
 		$oth = get_option( 'wp_mail_smtp_connect_token' );
 
-		if ( empty( $oth ) ) {
-			wp_send_json_error( $error );
-		}
-
-		if ( hash_hmac( 'sha512', $oth, wp_salt() ) !== $post_oth ) {
+		if ( empty( $oth ) || ! hash_equals( $oth, $post_oth ) ) {
 			wp_send_json_error( $error );
 		}
 
@@ -218,14 +222,7 @@ class Connect {
 			wp_send_json_success( esc_html__( 'Plugin installed & activated.', 'wp-mail-smtp' ) );
 		}
 
-		/*
-		 * The `request_filesystem_credentials` function will output a credentials form in case of failure.
-		 * We don't want that, since it will break AJAX response. So just hide output with a buffer.
-		 */
-		ob_start();
-		// phpcs:ignore WPForms.Formatting.EmptyLineAfterAssigmentVariables.AddEmptyLine
 		$creds = request_filesystem_credentials( $url, '', false, false, null );
-		ob_end_clean();
 
 		// Check for file system permissions.
 		$perm_error = esc_html__( 'There was an error while installing an upgrade. Please check file system permissions and try again. Also, you can download the plugin from wpmailsmtp.com and install it manually.', 'wp-mail-smtp' );
@@ -241,11 +238,8 @@ class Connect {
 		// Do not allow WordPress to search/download translations, as this will break JS output.
 		remove_action( 'upgrader_process_complete', array( 'Language_Pack_Upgrader', 'async_upgrade' ), 20 );
 
-		// Import the plugin upgrader.
-		Helpers::include_plugin_upgrader();
-
 		// Create the plugin upgrader with our custom skin.
-		$installer = new Plugin_Upgrader( new PluginsInstallSkin() );
+		$installer = new PluginsInstallUpgrader( new PluginsInstallSkin() );
 
 		// Error check.
 		if ( ! method_exists( $installer, 'install' ) ) {
@@ -286,12 +280,11 @@ class Connect {
 				$options = Options::init();
 				$all_opt = $options->get_all_raw();
 
-				$all_opt['license']['key']              = $key;
-				$all_opt['license']['type']             = 'pro';
-				$all_opt['license']['is_expired']       = false;
-				$all_opt['license']['is_disabled']      = false;
-				$all_opt['license']['is_invalid']       = false;
-				$all_opt['license']['is_limit_reached'] = false;
+				$all_opt['license']['key']         = $key;
+				$all_opt['license']['type']        = 'pro';
+				$all_opt['license']['is_expired']  = false;
+				$all_opt['license']['is_disabled'] = false;
+				$all_opt['license']['is_invalid']  = false;
 
 				$options->set( $all_opt, false, true );
 

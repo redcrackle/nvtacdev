@@ -3,7 +3,7 @@
  * BuddyPress - Members Single Group Invites
  *
  * @since 3.0.0
- * @version 12.0.0
+ * @version 3.1.0
  */
 ?>
 
@@ -11,7 +11,7 @@
 
 <?php bp_nouveau_group_hook( 'before', 'invites_content' ); ?>
 
-<?php if ( bp_has_groups( 'type=invites&user_id=' . bp_displayed_user_id() ) ) : ?>
+<?php if ( bp_has_groups( 'type=invites&user_id=' . bp_loggedin_user_id() ) ) : ?>
 
 	<ul id="group-list" class="invites item-list bp-list" data-bp-list="groups_invites">
 
@@ -26,7 +26,7 @@
 
 				<?php if ( ! bp_disable_group_avatar_uploads() ) : ?>
 					<div class="item-avatar">
-						<a href="<?php bp_group_url(); ?>"><?php bp_group_avatar(); ?></a>
+						<a href="<?php bp_group_permalink(); ?>"><?php bp_group_avatar(); ?></a>
 					</div>
 				<?php endif; ?>
 
@@ -35,17 +35,15 @@
 						<p class="meta group-details">
 							<span class="small">
 							<?php
-							echo esc_html(
-								sprintf(
-									/* translators: %s is the number of Group members */
-									_n(
-										'%s member',
-										'%s members',
-										bp_get_group_total_members( false ),
-										'buddypress'
-									),
-									number_format_i18n( bp_get_group_total_members( false ) )
-								)
+							printf(
+								/* translators: %s is the number of Group members */
+								_n(
+									'%s member',
+									'%s members',
+									bp_get_group_total_members( false ),
+									'buddypress'
+								),
+								number_format_i18n( bp_get_group_total_members( false ) )
 							);
 							?>
 							</span>

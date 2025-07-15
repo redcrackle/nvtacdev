@@ -1,11 +1,8 @@
 .wp-block-latest-comments {
 	padding-left: 0;
 
-	&:where(:not([class*="-font-size"]):not([style*="font-size"])) .wp-block-latest-comments__comment {
-		font-size: var(--global--font-size-sm);
-	}
-
 	.wp-block-latest-comments__comment {
+		font-size: var(--global--font-size-sm);
 		line-height: var(--global--line-height-body);
 
 		/* Vertical margins logic */
@@ -26,12 +23,12 @@
 	}
 
 	.wp-block-latest-comments__comment-date {
-		color: inherit;
-		font-size: inherit;
+		color: var(--global--color-primary);
+		font-size: var(--global--font-size-sm);
 	}
 
 	.wp-block-latest-comments__comment-excerpt p {
-		font-size: inherit;
+		font-size: var(--global--font-size-sm);
 		line-height: var(--global--line-height-body);
 		margin: 0;
 	}

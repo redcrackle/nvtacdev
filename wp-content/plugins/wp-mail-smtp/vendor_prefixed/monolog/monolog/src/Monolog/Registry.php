@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -27,8 +26,8 @@ use InvalidArgumentException;
  *
  * function testLogger()
  * {
- *     Monolog\Registry::api()->error('Sent to $api Logger instance');
- *     Monolog\Registry::application()->error('Sent to $application Logger instance');
+ *     Monolog\Registry::api()->addError('Sent to $api Logger instance');
+ *     Monolog\Registry::application()->addError('Sent to $application Logger instance');
  * }
  * </code>
  *
@@ -41,7 +40,7 @@ class Registry
      *
      * @var Logger[]
      */
-    private static $loggers = [];
+    private static $loggers = array();
     /**
      * Adds new logging channel to the registry
      *
@@ -49,9 +48,8 @@ class Registry
      * @param  string|null               $name      Name of the logging channel ($logger->getName() by default)
      * @param  bool                      $overwrite Overwrite instance in the registry if the given name already exists?
      * @throws \InvalidArgumentException If $overwrite set to false and named Logger instance already exists
-     * @return void
      */
-    public static function addLogger(\WPMailSMTP\Vendor\Monolog\Logger $logger, ?string $name = null, bool $overwrite = \false)
+    public static function addLogger(\WPMailSMTP\Vendor\Monolog\Logger $logger, $name = null, $overwrite = \false)
     {
         $name = $name ?: $logger->getName();
         if (isset(self::$loggers[$name]) && !$overwrite) {
@@ -64,20 +62,21 @@ class Registry
      *
      * @param string|Logger $logger Name or logger instance
      */
-    public static function hasLogger($logger) : bool
+    public static function hasLogger($logger)
     {
         if ($logger instanceof \WPMailSMTP\Vendor\Monolog\Logger) {
             $index = \array_search($logger, self::$loggers, \true);
             return \false !== $index;
+        } else {
+            return isset(self::$loggers[$logger]);
         }
-        return isset(self::$loggers[$logger]);
     }
     /**
      * Removes instance from registry by name or instance
      *
      * @param string|Logger $logger Name or logger instance
      */
-    public static function removeLogger($logger) : void
+    public static function removeLogger($logger)
     {
         if ($logger instanceof \WPMailSMTP\Vendor\Monolog\Logger) {
             if (\false !== ($idx = \array_search($logger, self::$loggers, \true))) {
@@ -90,17 +89,18 @@ class Registry
     /**
      * Clears the registry
      */
-    public static function clear() : void
+    public static function clear()
     {
-        self::$loggers = [];
+        self::$loggers = array();
     }
     /**
      * Gets Logger instance from the registry
      *
      * @param  string                    $name Name of the requested Logger instance
      * @throws \InvalidArgumentException If named Logger instance is not in the registry
+     * @return Logger                    Requested instance of Logger
      */
-    public static function getInstance($name) : \WPMailSMTP\Vendor\Monolog\Logger
+    public static function getInstance($name)
     {
         if (!isset(self::$loggers[$name])) {
             throw new \InvalidArgumentException(\sprintf('Requested "%s" logger instance is not in the registry', $name));
@@ -111,7 +111,7 @@ class Registry
      * Gets Logger instance from the registry via static method call
      *
      * @param  string                    $name      Name of the requested Logger instance
-     * @param  mixed[]                   $arguments Arguments passed to static method call
+     * @param  array                     $arguments Arguments passed to static method call
      * @throws \InvalidArgumentException If named Logger instance is not in the registry
      * @return Logger                    Requested instance of Logger
      */

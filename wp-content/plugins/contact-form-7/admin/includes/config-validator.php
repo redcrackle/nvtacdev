@@ -47,32 +47,27 @@ function wpcf7_admin_warnings_bulk_cv( $page, $action, $object ) {
 
 	$message = __( "Misconfiguration leads to mail delivery failure or other troubles. Validate your contact forms now.", 'contact-form-7' );
 
-	wp_admin_notice(
-		sprintf(
-			'%1$s &raquo; %2$s',
-			esc_html( $message ),
-			$link
-		),
-		array( 'type' => 'warning' )
+	echo sprintf(
+		'<div class="notice notice-warning"><p>%1$s &raquo; %2$s</p></div>',
+		esc_html( $message ),
+		$link
 	);
 }
 
 add_action( 'wpcf7_admin_load', 'wpcf7_load_bulk_validate_page', 10, 2 );
 
 function wpcf7_load_bulk_validate_page( $page, $action ) {
-	if (
-		'wpcf7' !== $page or
-		'validate' !== $action or
-		! wpcf7_validate_configuration() or
-		'POST' !== wpcf7_superglobal_server( 'REQUEST_METHOD' )
-	) {
+	if ( 'wpcf7' != $page
+	or 'validate' != $action
+	or ! wpcf7_validate_configuration()
+	or 'POST' != $_SERVER['REQUEST_METHOD'] ) {
 		return;
 	}
 
 	check_admin_referer( 'wpcf7-bulk-validate' );
 
 	if ( ! current_user_can( 'wpcf7_edit_contact_forms' ) ) {
-		wp_die( wp_kses_data( __( 'You are not allowed to validate configuration.', 'contact-form-7' ) ) );
+		wp_die( __( "You are not allowed to validate configuration.", 'contact-form-7' ) );
 	}
 
 	$contact_forms = WPCF7_ContactForm::find();
@@ -114,67 +109,33 @@ function wpcf7_admin_bulk_validate_page() {
 	$count = WPCF7_ContactForm::count();
 
 	$submit_text = sprintf(
-		/* translators: %s: number of contact forms */
 		_n(
-			'Validate %s contact form now',
-			'Validate %s contact forms now',
+			/* translators: %s: number of contact forms */
+			"Validate %s contact form now",
+			"Validate %s contact forms now",
 			$count, 'contact-form-7'
 		),
 		number_format_i18n( $count )
 	);
 
-	$formatter = new WPCF7_HTMLFormatter( array(
-		'allowed_html' => array_merge( wpcf7_kses_allowed_html(), array(
-			'form' => array(
-				'action' => true,
-				'method' => true,
-			),
-		) ),
-	) );
+?>
+<div class="wrap">
 
-	$formatter->append_start_tag( 'div', array(
-		'class' => 'wrap',
-	) );
+<h1><?php echo esc_html( __( 'Validate Configuration', 'contact-form-7' ) ); ?></h1>
 
-	$formatter->append_start_tag( 'h1' );
+<form method="post" action="">
+	<input type="hidden" name="action" value="validate" />
+	<?php wp_nonce_field( 'wpcf7-bulk-validate' ); ?>
+	<p><input type="submit" class="button" value="<?php echo esc_attr( $submit_text ); ?>" /></p>
+</form>
 
-	$formatter->append_preformatted(
-		esc_html( __( 'Validate Configuration', 'contact-form-7' ) )
+<?php
+	echo wpcf7_link(
+		__( 'https://contactform7.com/configuration-validator-faq/', 'contact-form-7' ),
+		__( 'FAQ about Configuration Validator', 'contact-form-7' )
 	);
+?>
 
-	$formatter->end_tag( 'h1' );
-
-	$formatter->append_start_tag( 'form', array(
-		'method' => 'post',
-		'action' => '',
-	) );
-
-	$formatter->append_start_tag( 'p' );
-
-	$formatter->call_user_func( static function () {
-		wp_nonce_field( 'wpcf7-bulk-validate' );
-	} );
-
-	$formatter->append_start_tag( 'input', array(
-		'type' => 'hidden',
-		'name' => 'action',
-		'value' => 'validate',
-	) );
-
-	$formatter->append_start_tag( 'input', array(
-		'type' => 'submit',
-		'class' => 'button',
-		'value' => $submit_text,
-	) );
-
-	$formatter->end_tag( 'form' );
-
-	$formatter->append_preformatted(
-		wpcf7_link(
-			__( 'https://contactform7.com/configuration-validator-faq/', 'contact-form-7' ),
-			__( 'FAQ about Configuration Validator', 'contact-form-7' )
-		)
-	);
-
-	$formatter->print();
+</div>
+<?php
 }

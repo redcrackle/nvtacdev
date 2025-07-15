@@ -35,6 +35,7 @@ class Red_Json_File extends Red_FileIO {
 		}
 
 		// Import groups
+		$groups = array();
 		$group_map = array();
 
 		if ( isset( $json['groups'] ) ) {
@@ -66,11 +67,8 @@ class Red_Json_File extends Red_FileIO {
 				}
 
 				$redirect['group_id'] = $group_map[ $redirect['group_id'] ];
-				$created = Red_Item::create( $redirect );
-
-				if ( $created instanceof Red_Item ) {
-					$count++;
-				}
+				Red_Item::create( $redirect );
+				$count++;
 
 				// Helps reduce memory usage
 				unset( $json['redirects'][ $pos ] );

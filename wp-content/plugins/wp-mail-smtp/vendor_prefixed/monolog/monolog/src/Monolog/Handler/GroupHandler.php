@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -17,21 +16,15 @@ use WPMailSMTP\Vendor\Monolog\ResettableInterface;
  * Forwards records to multiple handlers
  *
  * @author Lenar Lõhmus <lenar@city.ee>
- *
- * @phpstan-import-type Record from \Monolog\Logger
  */
-class GroupHandler extends \WPMailSMTP\Vendor\Monolog\Handler\Handler implements \WPMailSMTP\Vendor\Monolog\Handler\ProcessableHandlerInterface, \WPMailSMTP\Vendor\Monolog\ResettableInterface
+class GroupHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractHandler
 {
-    use ProcessableHandlerTrait;
-    /** @var HandlerInterface[] */
     protected $handlers;
-    /** @var bool */
-    protected $bubble;
     /**
-     * @param HandlerInterface[] $handlers Array of Handlers.
-     * @param bool               $bubble   Whether the messages that are handled can bubble up the stack or not
+     * @param array $handlers Array of Handlers.
+     * @param bool  $bubble   Whether the messages that are handled can bubble up the stack or not
      */
-    public function __construct(array $handlers, bool $bubble = \true)
+    public function __construct(array $handlers, $bubble = \true)
     {
         foreach ($handlers as $handler) {
             if (!$handler instanceof \WPMailSMTP\Vendor\Monolog\Handler\HandlerInterface) {
@@ -42,9 +35,9 @@ class GroupHandler extends \WPMailSMTP\Vendor\Monolog\Handler\Handler implements
         $this->bubble = $bubble;
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function isHandling(array $record) : bool
+    public function isHandling(array $record)
     {
         foreach ($this->handlers as $handler) {
             if ($handler->isHandling($record)) {
@@ -54,13 +47,14 @@ class GroupHandler extends \WPMailSMTP\Vendor\Monolog\Handler\Handler implements
         return \false;
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function handle(array $record) : bool
+    public function handle(array $record)
     {
         if ($this->processors) {
-            /** @var Record $record */
-            $record = $this->processRecord($record);
+            foreach ($this->processors as $processor) {
+                $record = \call_user_func($processor, $record);
+            }
         }
         foreach ($this->handlers as $handler) {
             $handler->handle($record);
@@ -68,16 +62,18 @@ class GroupHandler extends \WPMailSMTP\Vendor\Monolog\Handler\Handler implements
         return \false === $this->bubble;
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function handleBatch(array $records) : void
+    public function handleBatch(array $records)
     {
         if ($this->processors) {
-            $processed = [];
+            $processed = array();
             foreach ($records as $record) {
-                $processed[] = $this->processRecord($record);
+                foreach ($this->processors as $processor) {
+                    $record = \call_user_func($processor, $record);
+                }
+                $processed[] = $record;
             }
-            /** @var Record[] $records */
             $records = $processed;
         }
         foreach ($this->handlers as $handler) {
@@ -86,29 +82,20 @@ class GroupHandler extends \WPMailSMTP\Vendor\Monolog\Handler\Handler implements
     }
     public function reset()
     {
-        $this->resetProcessors();
+        parent::reset();
         foreach ($this->handlers as $handler) {
             if ($handler instanceof \WPMailSMTP\Vendor\Monolog\ResettableInterface) {
                 $handler->reset();
             }
         }
     }
-    public function close() : void
-    {
-        parent::close();
-        foreach ($this->handlers as $handler) {
-            $handler->close();
-        }
-    }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setFormatter(\WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface $formatter) : \WPMailSMTP\Vendor\Monolog\Handler\HandlerInterface
+    public function setFormatter(\WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface $formatter)
     {
         foreach ($this->handlers as $handler) {
-            if ($handler instanceof \WPMailSMTP\Vendor\Monolog\Handler\FormattableHandlerInterface) {
-                $handler->setFormatter($formatter);
-            }
+            $handler->setFormatter($formatter);
         }
         return $this;
     }

@@ -1,16 +1,16 @@
 <?php
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+    exit;
 }
 
 /**
  * MonsterInsights settings export.
  *
- * @return void
  * @since 6.0.0
  * @access public
  *
+ * @return void
  */
 function monsterinsights_process_export_settings() {
 	if ( ! isset( $_POST['monsterinsights_action'] ) || empty( $_POST['monsterinsights_action'] ) ) {
@@ -24,8 +24,8 @@ function monsterinsights_process_export_settings() {
 	if ( 'monsterinsights_export_settings' !== $_POST['monsterinsights_action'] ) {
 		return;
 	}
-	
-	if ( empty( $_POST['monsterinsights_export_settings'] ) || ! wp_verify_nonce( $_POST['monsterinsights_export_settings'], 'mi-admin-nonce' ) ) { // phpcs:ignore
+
+	if ( empty( $_POST['monsterinsights_export_settings'] ) || ! wp_verify_nonce( $_POST['monsterinsights_export_settings'], 'mi-admin-nonce' ) ) {
 		return;
 	}
 
@@ -34,9 +34,10 @@ function monsterinsights_process_export_settings() {
 
 	nocache_headers();
 	header( 'Content-Type: application/json; charset=utf-8' );
-	header( 'Content-Disposition: attachment; filename=monsterinsights-settings-export-' . date( 'm-d-Y' ) . '.json' ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- We need this to depend on the runtime timezone.
+	header( 'Content-Disposition: attachment; filename=monsterinsights-settings-export-' . date( 'm-d-Y' ) . '.json' );
 	header( "Expires: 0" );
-	echo $settings; // phpcs:ignore
+
+	echo $settings;
 	exit;
 }
 

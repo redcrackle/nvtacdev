@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -11,14 +10,14 @@ declare (strict_types=1);
  */
 namespace WPMailSMTP\Vendor\Monolog\Handler;
 
-use WPMailSMTP\Vendor\Rollbar\RollbarLogger;
-use Throwable;
+use WPMailSMTP\Vendor\RollbarNotifier;
+use Exception;
 use WPMailSMTP\Vendor\Monolog\Logger;
 /**
  * Sends errors to Rollbar
  *
  * If the context data contains a `payload` key, that is used as an array
- * of payload options to RollbarLogger's log method.
+ * of payload options to RollbarNotifier's report_message/report_exception methods.
  *
  * Rollbar's context info will contain the context + extra keys from the log record
  * merged, and then on top of that a few keys:
@@ -33,31 +32,33 @@ use WPMailSMTP\Vendor\Monolog\Logger;
 class RollbarHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProcessingHandler
 {
     /**
-     * @var RollbarLogger
+     * Rollbar notifier
+     *
+     * @var RollbarNotifier
      */
-    protected $rollbarLogger;
-    /** @var string[] */
-    protected $levelMap = [\WPMailSMTP\Vendor\Monolog\Logger::DEBUG => 'debug', \WPMailSMTP\Vendor\Monolog\Logger::INFO => 'info', \WPMailSMTP\Vendor\Monolog\Logger::NOTICE => 'info', \WPMailSMTP\Vendor\Monolog\Logger::WARNING => 'warning', \WPMailSMTP\Vendor\Monolog\Logger::ERROR => 'error', \WPMailSMTP\Vendor\Monolog\Logger::CRITICAL => 'critical', \WPMailSMTP\Vendor\Monolog\Logger::ALERT => 'critical', \WPMailSMTP\Vendor\Monolog\Logger::EMERGENCY => 'critical'];
+    protected $rollbarNotifier;
+    protected $levelMap = array(\WPMailSMTP\Vendor\Monolog\Logger::DEBUG => 'debug', \WPMailSMTP\Vendor\Monolog\Logger::INFO => 'info', \WPMailSMTP\Vendor\Monolog\Logger::NOTICE => 'info', \WPMailSMTP\Vendor\Monolog\Logger::WARNING => 'warning', \WPMailSMTP\Vendor\Monolog\Logger::ERROR => 'error', \WPMailSMTP\Vendor\Monolog\Logger::CRITICAL => 'critical', \WPMailSMTP\Vendor\Monolog\Logger::ALERT => 'critical', \WPMailSMTP\Vendor\Monolog\Logger::EMERGENCY => 'critical');
     /**
      * Records whether any log records have been added since the last flush of the rollbar notifier
      *
      * @var bool
      */
     private $hasRecords = \false;
-    /** @var bool */
     protected $initialized = \false;
     /**
-     * @param RollbarLogger $rollbarLogger RollbarLogger object constructed with valid token
+     * @param RollbarNotifier $rollbarNotifier RollbarNotifier object constructed with valid token
+     * @param int             $level           The minimum logging level at which this handler will be triggered
+     * @param bool            $bubble          Whether the messages that are handled can bubble up the stack or not
      */
-    public function __construct(\WPMailSMTP\Vendor\Rollbar\RollbarLogger $rollbarLogger, $level = \WPMailSMTP\Vendor\Monolog\Logger::ERROR, bool $bubble = \true)
+    public function __construct(\WPMailSMTP\Vendor\RollbarNotifier $rollbarNotifier, $level = \WPMailSMTP\Vendor\Monolog\Logger::ERROR, $bubble = \true)
     {
-        $this->rollbarLogger = $rollbarLogger;
+        $this->rollbarNotifier = $rollbarNotifier;
         parent::__construct($level, $bubble);
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    protected function write(array $record) : void
+    protected function write(array $record)
     {
         if (!$this->initialized) {
             // __destructor() doesn't get called on Fatal errors
@@ -65,34 +66,38 @@ class RollbarHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProcessi
             $this->initialized = \true;
         }
         $context = $record['context'];
-        $context = \array_merge($context, $record['extra'], ['level' => $this->levelMap[$record['level']], 'monolog_level' => $record['level_name'], 'channel' => $record['channel'], 'datetime' => $record['datetime']->format('U')]);
-        if (isset($context['exception']) && $context['exception'] instanceof \Throwable) {
+        $payload = array();
+        if (isset($context['payload'])) {
+            $payload = $context['payload'];
+            unset($context['payload']);
+        }
+        $context = \array_merge($context, $record['extra'], array('level' => $this->levelMap[$record['level']], 'monolog_level' => $record['level_name'], 'channel' => $record['channel'], 'datetime' => $record['datetime']->format('U')));
+        if (isset($context['exception']) && $context['exception'] instanceof \Exception) {
+            $payload['level'] = $context['level'];
             $exception = $context['exception'];
             unset($context['exception']);
-            $toLog = $exception;
+            $this->rollbarNotifier->report_exception($exception, $context, $payload);
         } else {
-            $toLog = $record['message'];
+            $this->rollbarNotifier->report_message($record['message'], $context['level'], $context, $payload);
         }
-        // @phpstan-ignore-next-line
-        $this->rollbarLogger->log($context['level'], $toLog, $context);
         $this->hasRecords = \true;
     }
-    public function flush() : void
+    public function flush()
     {
         if ($this->hasRecords) {
-            $this->rollbarLogger->flush();
+            $this->rollbarNotifier->flush();
             $this->hasRecords = \false;
         }
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function close() : void
+    public function close()
     {
         $this->flush();
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function reset()
     {

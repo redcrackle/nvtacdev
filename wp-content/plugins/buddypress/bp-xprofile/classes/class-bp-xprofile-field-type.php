@@ -99,14 +99,6 @@ abstract class BP_XProfile_Field_Type {
 	public $field_obj = null;
 
 	/**
-	 * Field data visibility.
-	 *
-	 * @since 2.0.0
-	 * @var string
-	 */
-	public $visibility;
-
-	/**
 	 * Constructor.
 	 *
 	 * @since 2.0.0
@@ -118,7 +110,8 @@ abstract class BP_XProfile_Field_Type {
 		 *
 		 * @since 2.0.0
 		 *
-		 * @param BP_XProfile_Field_Type $field_type Current instance of the field type class.
+		 * @param BP_XProfile_Field_Type $this Current instance of
+		 *                                     the field type class.
 		 */
 		do_action( 'bp_xprofile_field_type', $this );
 	}
@@ -146,7 +139,7 @@ abstract class BP_XProfile_Field_Type {
 		 * @param string                 $format         Regex string.
 		 * @param string                 $replace_format Optional replace format If "replace", replaces the
 		 *                                               format instead of adding to it. Defaults to "add".
-		 * @param BP_XProfile_Field_Type $field_type     Current instance of the field type class.
+		 * @param BP_XProfile_Field_Type $this           Current instance of the BP_XProfile_Field_Type class.
 		 */
 		$format = apply_filters( 'bp_xprofile_field_type_set_format', $format, $replace_format, $this );
 
@@ -193,9 +186,9 @@ abstract class BP_XProfile_Field_Type {
 			 * @since 2.0.0
 			 * @deprecated 7.0.0 Use 'bp_xprofile_field_type_set_allowed_values' instead.
 			 *
-			 * @param string                 $value      Field value.
-			 * @param array                  $values     Original array of values.
-			 * @param BP_XProfile_Field_Type $field_type Current instance of the field type class.
+			 * @param string                 $value  Field value.
+			 * @param array                  $values Original array of values.
+			 * @param BP_XProfile_Field_Type $this   Current instance of the BP_XProfile_Field_Type class.
 			 */
 			$this->validation_allowed_values[] = apply_filters_deprecated( 'bp_xprofile_field_type_set_whitelist_values', array( $value, $values, $this ), '7.0.0', 'bp_xprofile_field_type_set_allowed_values' );
 
@@ -204,9 +197,9 @@ abstract class BP_XProfile_Field_Type {
 			 *
 			 * @since 7.0.0
 			 *
-			 * @param string                 $value      Field value.
-			 * @param array                  $values     Original array of values.
-			 * @param BP_XProfile_Field_Type $field_type Current instance of the field type class.
+			 * @param string                 $value  Field value.
+			 * @param array                  $values Original array of values.
+			 * @param BP_XProfile_Field_Type $this   Current instance of the BP_XProfile_Field_Type class.
 			 */
 			$this->validation_allowed_values[] = apply_filters( 'bp_xprofile_field_type_set_allowed_values', $value, $values, $this );
 		}
@@ -262,9 +255,9 @@ abstract class BP_XProfile_Field_Type {
 		 *
 		 * @since 2.0.0
 		 *
-		 * @param bool                   $validated  Whether or not the field type is valid.
-		 * @param string|array           $values     Value to check against the registered formats.
-		 * @param BP_XProfile_Field_Type $field_type Current instance of the field type class.
+		 * @param bool                   $validated Whether or not the field type is valid.
+		 * @param string|array           $values    Value to check against the registered formats.
+		 * @param BP_XProfile_Field_Type $this      Current instance of the BP_XProfile_Field_Type class.
 		 */
 		return (bool) apply_filters( 'bp_xprofile_field_type_is_valid', $validated, $values, $this );
 	}
@@ -294,6 +287,7 @@ abstract class BP_XProfile_Field_Type {
 	 * @since 2.0.0
 	 *
 	 * @param array $raw_properties Optional key/value array of permitted attributes that you want to add.
+	 * @return void
 	 */
 	abstract public function edit_field_html( array $raw_properties = array() );
 
@@ -305,6 +299,7 @@ abstract class BP_XProfile_Field_Type {
 	 * @since 2.0.0
 	 *
 	 * @param array $raw_properties Optional key/value array of permitted attributes that you want to add.
+	 * @return void
 	 */
 	abstract public function admin_field_html( array $raw_properties = array() );
 
@@ -375,13 +370,13 @@ abstract class BP_XProfile_Field_Type {
 					$options = array();
 					$i       = 1;
 
-					while ( isset( $_POST[ $type . '_option' ][ $i ] ) ) {
+					while ( isset( $_POST[$type . '_option'][$i] ) ) {
 
 						// Multiselectbox and checkboxes support MULTIPLE default options; all other core types support only ONE.
-						if ( $current_type_obj->supports_options && ! $current_type_obj->supports_multiple_defaults && isset( $_POST[ "isDefault_{$type}_option" ][ $i ] ) && (int) $_POST[ "isDefault_{$type}_option" ] === $i ) {
+						if ( $current_type_obj->supports_options && ! $current_type_obj->supports_multiple_defaults && isset( $_POST["isDefault_{$type}_option"][$i] ) && (int) $_POST["isDefault_{$type}_option"] === $i ) {
 							$is_default_option = true;
-						} elseif ( isset( $_POST[ "isDefault_{$type}_option" ][ $i ] ) ) {
-							$is_default_option = (bool) $_POST[ "isDefault_{$type}_option" ][ $i ];
+						} elseif ( isset( $_POST["isDefault_{$type}_option"][$i] ) ) {
+							$is_default_option = (bool) $_POST["isDefault_{$type}_option"][$i];
 						} else {
 							$is_default_option = false;
 						}
@@ -390,7 +385,7 @@ abstract class BP_XProfile_Field_Type {
 						$options[] = (object) array(
 							'id'                => -1,
 							'is_default_option' => $is_default_option,
-							'name'              => sanitize_text_field( stripslashes( $_POST[ $type . '_option' ][ $i ] ) ),
+							'name'              => sanitize_text_field( stripslashes( $_POST[$type . '_option'][$i] ) ),
 						);
 
 						++$i;
@@ -425,10 +420,10 @@ abstract class BP_XProfile_Field_Type {
 								/* translators: accessibility text */
 								esc_html_e( 'Add an option', 'buddypress' );
 							?></label>
-							<input type="text" name="<?php echo esc_attr( "{$type}_option[{$j}]" ); ?>" id="<?php echo esc_attr( "{$type}_option{$j}" ); ?>" value="<?php echo esc_attr( stripslashes( $options[ $i ]->name ) ); ?>" />
+							<input type="text" name="<?php echo esc_attr( "{$type}_option[{$j}]" ); ?>" id="<?php echo esc_attr( "{$type}_option{$j}" ); ?>" value="<?php echo esc_attr( stripslashes( $options[$i]->name ) ); ?>" />
 							<label for="<?php echo esc_attr( "{$type}_option{$default_name}" ); ?>">
-								<input type="<?php echo esc_attr( $control_type ); ?>" id="<?php echo esc_attr( "{$type}_option{$default_name}" ); ?>" name="<?php echo esc_attr( "isDefault_{$type}_option{$default_name}" ); ?>" <?php checked( $options[ $i ]->is_default_option, true ); ?> value="<?php echo esc_attr( $j ); ?>" />
-								<?php esc_html_e( 'Default Value', 'buddypress' ); ?>
+								<input type="<?php echo esc_attr( $control_type ); ?>" id="<?php echo esc_attr( "{$type}_option{$default_name}" ); ?>" name="<?php echo esc_attr( "isDefault_{$type}_option{$default_name}" ); ?>" <?php checked( $options[$i]->is_default_option, true ); ?> value="<?php echo esc_attr( $j ); ?>" />
+								<?php _e( 'Default Value', 'buddypress' ); ?>
 							</label>
 
 							<?php if ( 1 !== $j ) : ?>
@@ -562,18 +557,5 @@ abstract class BP_XProfile_Field_Type {
 		$r = (array) apply_filters( 'bp_xprofile_field_edit_html_elements', $r, get_class( $this ) );
 
 		return bp_get_form_field_attributes( sanitize_key( bp_get_the_profile_field_name() ), $r );
-	}
-
-	/**
-	 * Output a sanitized and escaped string of the edit field's HTML elements and attributes.
-	 *
-	 * @since 12.4.1
-	 *
-	 * @param array $properties Optional key/value array of attributes for this edit field.
-	 */
-	protected function output_edit_field_html_elements( array $properties = array() ) {
-		// Escaping is done in `bp_get_form_field_attributes()`.
-		// phpcs:ignore WordPress.Security.EscapeOutput
-		echo $this->get_edit_field_html_elements( $properties );
 	}
 }

@@ -72,32 +72,28 @@ class ServiceAccountCredentials extends \WPMailSMTP\Vendor\Google\Auth\Credentia
      * @var string
      */
     protected $quotaProject;
-    /**
+    /*
      * @var string|null
      */
     protected $projectId;
-    /**
-     * @var array<mixed>|null
+    /*
+     * @var array|null
      */
     private $lastReceivedJwtAccessToken;
-    /**
+    /*
      * @var bool
      */
     private $useJwtAccessWithScope = \false;
-    /**
+    /*
      * @var ServiceAccountJwtAccessCredentials|null
      */
     private $jwtAccessCredentials;
     /**
-     * @var string
-     */
-    private string $universeDomain;
-    /**
      * Create a new ServiceAccountCredentials.
      *
-     * @param string|string[]|null $scope the scope of the access request, expressed
+     * @param string|array $scope the scope of the access request, expressed
      *   either as an Array or as a space-delimited String.
-     * @param string|array<mixed> $jsonKey JSON credential file path or JSON credentials
+     * @param string|array $jsonKey JSON credential file path or JSON credentials
      *   as an associative array
      * @param string $sub an email address account to impersonate, in situations when
      *   the service account has been delegated domain wide access.
@@ -110,7 +106,7 @@ class ServiceAccountCredentials extends \WPMailSMTP\Vendor\Google\Auth\Credentia
                 throw new \InvalidArgumentException('file does not exist');
             }
             $jsonKeyStream = \file_get_contents($jsonKey);
-            if (!($jsonKey = \json_decode((string) $jsonKeyStream, \true))) {
+            if (!($jsonKey = \json_decode($jsonKeyStream, \true))) {
                 throw new \LogicException('invalid json for auth config');
             }
         }
@@ -131,8 +127,7 @@ class ServiceAccountCredentials extends \WPMailSMTP\Vendor\Google\Auth\Credentia
             $additionalClaims = ['target_audience' => $targetAudience];
         }
         $this->auth = new \WPMailSMTP\Vendor\Google\Auth\OAuth2(['audience' => self::TOKEN_CREDENTIAL_URI, 'issuer' => $jsonKey['client_email'], 'scope' => $scope, 'signingAlgorithm' => 'RS256', 'signingKey' => $jsonKey['private_key'], 'sub' => $sub, 'tokenCredentialUri' => self::TOKEN_CREDENTIAL_URI, 'additionalClaims' => $additionalClaims]);
-        $this->projectId = $jsonKey['project_id'] ?? null;
-        $this->universeDomain = $jsonKey['universe_domain'] ?? self::DEFAULT_UNIVERSE_DOMAIN;
+        $this->projectId = isset($jsonKey['project_id']) ? $jsonKey['project_id'] : null;
     }
     /**
      * When called, the ServiceAccountCredentials will use an instance of
@@ -140,8 +135,6 @@ class ServiceAccountCredentials extends \WPMailSMTP\Vendor\Google\Auth\Credentia
      * even when only scopes are supplied. Otherwise,
      * ServiceAccountJwtAccessCredentials is only called when no scopes and an
      * authUrl (audience) is suppled.
-     *
-     * @return void
      */
     public function useJwtAccessWithScope()
     {
@@ -150,15 +143,13 @@ class ServiceAccountCredentials extends \WPMailSMTP\Vendor\Google\Auth\Credentia
     /**
      * @param callable $httpHandler
      *
-     * @return array<mixed> {
-     *     A set of auth related metadata, containing the following
-     *
-     *     @type string $access_token
-     *     @type int $expires_in
-     *     @type string $token_type
-     * }
+     * @return array A set of auth related metadata, containing the following
+     * keys:
+     *   - access_token (string)
+     *   - expires_in (int)
+     *   - token_type (string)
      */
-    public function fetchAuthToken(?callable $httpHandler = null)
+    public function fetchAuthToken(callable $httpHandler = null)
     {
         if ($this->useSelfSignedJwt()) {
             $jwtCreds = $this->createJwtAccessCredentials();
@@ -183,7 +174,7 @@ class ServiceAccountCredentials extends \WPMailSMTP\Vendor\Google\Auth\Credentia
         return $key;
     }
     /**
-     * @return array<mixed>
+     * @return array
      */
     public function getLastReceivedToken()
     {
@@ -199,19 +190,19 @@ class ServiceAccountCredentials extends \WPMailSMTP\Vendor\Google\Auth\Credentia
      * @param callable $httpHandler Not used by this credentials type.
      * @return string|null
      */
-    public function getProjectId(?callable $httpHandler = null)
+    public function getProjectId(callable $httpHandler = null)
     {
         return $this->projectId;
     }
     /**
      * Updates metadata with the authorization token.
      *
-     * @param array<mixed> $metadata metadata hashmap
+     * @param array $metadata metadata hashmap
      * @param string $authUri optional auth uri
      * @param callable $httpHandler callback which delivers psr7 request
-     * @return array<mixed> updated metadata hashmap
+     * @return array updated metadata hashmap
      */
-    public function updateMetadata($metadata, $authUri = null, ?callable $httpHandler = null)
+    public function updateMetadata($metadata, $authUri = null, callable $httpHandler = null)
     {
         // scope exists. use oauth implementation
         if (!$this->useSelfSignedJwt()) {
@@ -230,14 +221,11 @@ class ServiceAccountCredentials extends \WPMailSMTP\Vendor\Google\Auth\Credentia
         }
         return $updatedMetadata;
     }
-    /**
-     * @return ServiceAccountJwtAccessCredentials
-     */
     private function createJwtAccessCredentials()
     {
         if (!$this->jwtAccessCredentials) {
             // Create credentials for self-signing a JWT (JwtAccess)
-            $credJson = ['private_key' => $this->auth->getSigningKey(), 'client_email' => $this->auth->getIssuer()];
+            $credJson = array('private_key' => $this->auth->getSigningKey(), 'client_email' => $this->auth->getIssuer());
             $this->jwtAccessCredentials = new \WPMailSMTP\Vendor\Google\Auth\Credentials\ServiceAccountJwtAccessCredentials($credJson, $this->auth->getScope());
         }
         return $this->jwtAccessCredentials;
@@ -245,7 +233,6 @@ class ServiceAccountCredentials extends \WPMailSMTP\Vendor\Google\Auth\Credentia
     /**
      * @param string $sub an email address account to impersonate, in situations when
      *   the service account has been delegated domain wide access.
-     * @return void
      */
     public function setSub($sub)
     {
@@ -259,7 +246,7 @@ class ServiceAccountCredentials extends \WPMailSMTP\Vendor\Google\Auth\Credentia
      * @param callable $httpHandler Not used by this credentials type.
      * @return string
      */
-    public function getClientName(?callable $httpHandler = null)
+    public function getClientName(callable $httpHandler = null)
     {
         return $this->auth->getIssuer();
     }
@@ -272,39 +259,14 @@ class ServiceAccountCredentials extends \WPMailSMTP\Vendor\Google\Auth\Credentia
     {
         return $this->quotaProject;
     }
-    /**
-     * Get the universe domain configured in the JSON credential.
-     *
-     * @return string
-     */
-    public function getUniverseDomain() : string
-    {
-        return $this->universeDomain;
-    }
-    /**
-     * @return bool
-     */
     private function useSelfSignedJwt()
     {
-        // When a sub is supplied, the user is using domain-wide delegation, which not available
-        // with self-signed JWTs
-        if (null !== $this->auth->getSub()) {
-            // If we are outside the GDU, we can't use domain-wide delegation
-            if ($this->getUniverseDomain() !== self::DEFAULT_UNIVERSE_DOMAIN) {
-                throw new \LogicException(\sprintf('Service Account subject is configured for the credential. Domain-wide ' . 'delegation is not supported in universes other than %s.', self::DEFAULT_UNIVERSE_DOMAIN));
-            }
-            return \false;
-        }
         // If claims are set, this call is for "id_tokens"
         if ($this->auth->getAdditionalClaims()) {
             return \false;
         }
         // When true, ServiceAccountCredentials will always use JwtAccess for access tokens
         if ($this->useJwtAccessWithScope) {
-            return \true;
-        }
-        // If the universe domain is outside the GDU, use JwtAccess for access tokens
-        if ($this->getUniverseDomain() !== self::DEFAULT_UNIVERSE_DOMAIN) {
             return \true;
         }
         return \is_null($this->auth->getScope());

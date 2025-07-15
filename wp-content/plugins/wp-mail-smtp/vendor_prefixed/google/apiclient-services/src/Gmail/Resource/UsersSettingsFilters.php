@@ -24,7 +24,7 @@ use WPMailSMTP\Vendor\Google\Service\Gmail\ListFiltersResponse;
  * Typical usage is:
  *  <code>
  *   $gmailService = new Google\Service\Gmail(...);
- *   $filters = $gmailService->users_settings_filters;
+ *   $filters = $gmailService->filters;
  *  </code>
  */
 class UsersSettingsFilters extends \WPMailSMTP\Vendor\Google\Service\Resource
@@ -38,7 +38,6 @@ class UsersSettingsFilters extends \WPMailSMTP\Vendor\Google\Service\Resource
      * @param Filter $postBody
      * @param array $optParams Optional parameters.
      * @return Filter
-     * @throws \Google\Service\Exception
      */
     public function create($userId, \WPMailSMTP\Vendor\Google\Service\Gmail\Filter $postBody, $optParams = [])
     {
@@ -47,13 +46,12 @@ class UsersSettingsFilters extends \WPMailSMTP\Vendor\Google\Service\Resource
         return $this->call('create', [$params], \WPMailSMTP\Vendor\Google\Service\Gmail\Filter::class);
     }
     /**
-     * Immediately and permanently deletes the specified filter. (filters.delete)
+     * Deletes a filter. (filters.delete)
      *
      * @param string $userId User's email address. The special value "me" can be
      * used to indicate the authenticated user.
      * @param string $id The ID of the filter to be deleted.
      * @param array $optParams Optional parameters.
-     * @throws \Google\Service\Exception
      */
     public function delete($userId, $id, $optParams = [])
     {
@@ -69,7 +67,6 @@ class UsersSettingsFilters extends \WPMailSMTP\Vendor\Google\Service\Resource
      * @param string $id The ID of the filter to be fetched.
      * @param array $optParams Optional parameters.
      * @return Filter
-     * @throws \Google\Service\Exception
      */
     public function get($userId, $id, $optParams = [])
     {
@@ -84,7 +81,6 @@ class UsersSettingsFilters extends \WPMailSMTP\Vendor\Google\Service\Resource
      * used to indicate the authenticated user.
      * @param array $optParams Optional parameters.
      * @return ListFiltersResponse
-     * @throws \Google\Service\Exception
      */
     public function listUsersSettingsFilters($userId, $optParams = [])
     {

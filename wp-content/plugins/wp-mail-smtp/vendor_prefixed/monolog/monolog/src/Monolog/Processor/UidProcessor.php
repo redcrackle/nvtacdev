@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -19,24 +18,23 @@ use WPMailSMTP\Vendor\Monolog\ResettableInterface;
  */
 class UidProcessor implements \WPMailSMTP\Vendor\Monolog\Processor\ProcessorInterface, \WPMailSMTP\Vendor\Monolog\ResettableInterface
 {
-    /** @var string */
     private $uid;
-    public function __construct(int $length = 7)
+    public function __construct($length = 7)
     {
-        if ($length > 32 || $length < 1) {
+        if (!\is_int($length) || $length > 32 || $length < 1) {
             throw new \InvalidArgumentException('The uid length must be an integer between 1 and 32');
         }
         $this->uid = $this->generateUid($length);
     }
-    /**
-     * {@inheritDoc}
-     */
-    public function __invoke(array $record) : array
+    public function __invoke(array $record)
     {
         $record['extra']['uid'] = $this->uid;
         return $record;
     }
-    public function getUid() : string
+    /**
+     * @return string
+     */
+    public function getUid()
     {
         return $this->uid;
     }
@@ -44,8 +42,8 @@ class UidProcessor implements \WPMailSMTP\Vendor\Monolog\Processor\ProcessorInte
     {
         $this->uid = $this->generateUid(\strlen($this->uid));
     }
-    private function generateUid(int $length) : string
+    private function generateUid($length)
     {
-        return \substr(\bin2hex(\random_bytes((int) \ceil($length / 2))), 0, $length);
+        return \substr(\hash('md5', \uniqid('', \true)), 0, $length);
     }
 }

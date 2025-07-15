@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -11,7 +10,6 @@ declare (strict_types=1);
  */
 namespace WPMailSMTP\Vendor\Monolog\Handler;
 
-use WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface;
 use WPMailSMTP\Vendor\Monolog\Formatter\LineFormatter;
 use WPMailSMTP\Vendor\Monolog\Logger;
 /**
@@ -21,13 +19,11 @@ use WPMailSMTP\Vendor\Monolog\Logger;
  *
  * @see https://fleep.io/integrations/webhooks/ Fleep Webhooks Documentation
  * @author Ando Roots <ando@sqroot.eu>
- *
- * @phpstan-import-type FormattedRecord from AbstractProcessingHandler
  */
 class FleepHookHandler extends \WPMailSMTP\Vendor\Monolog\Handler\SocketHandler
 {
-    protected const FLEEP_HOST = 'fleep.io';
-    protected const FLEEP_HOOK_URI = '/hook/';
+    const FLEEP_HOST = 'fleep.io';
+    const FLEEP_HOOK_URI = '/hook/';
     /**
      * @var string Webhook token (specifies the conversation where logs are sent)
      */
@@ -39,16 +35,18 @@ class FleepHookHandler extends \WPMailSMTP\Vendor\Monolog\Handler\SocketHandler
      * see https://fleep.io/integrations/webhooks/
      *
      * @param  string                    $token  Webhook token
+     * @param  bool|int                  $level  The minimum logging level at which this handler will be triggered
+     * @param  bool                      $bubble Whether the messages that are handled can bubble up the stack or not
      * @throws MissingExtensionException
      */
-    public function __construct(string $token, $level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG, bool $bubble = \true, bool $persistent = \false, float $timeout = 0.0, float $writingTimeout = 10.0, ?float $connectionTimeout = null, ?int $chunkSize = null)
+    public function __construct($token, $level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG, $bubble = \true)
     {
         if (!\extension_loaded('openssl')) {
             throw new \WPMailSMTP\Vendor\Monolog\Handler\MissingExtensionException('The OpenSSL PHP extension is required to use the FleepHookHandler');
         }
         $this->token = $token;
-        $connectionString = 'ssl://' . static::FLEEP_HOST . ':443';
-        parent::__construct($connectionString, $level, $bubble, $persistent, $timeout, $writingTimeout, $connectionTimeout, $chunkSize);
+        $connectionString = 'ssl://' . self::FLEEP_HOST . ':443';
+        parent::__construct($connectionString, $level, $bubble);
     }
     /**
      * Returns the default formatter to use with this handler
@@ -57,33 +55,41 @@ class FleepHookHandler extends \WPMailSMTP\Vendor\Monolog\Handler\SocketHandler
      *
      * @return LineFormatter
      */
-    protected function getDefaultFormatter() : \WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface
+    protected function getDefaultFormatter()
     {
         return new \WPMailSMTP\Vendor\Monolog\Formatter\LineFormatter(null, null, \true, \true);
     }
     /**
      * Handles a log record
+     *
+     * @param array $record
      */
-    public function write(array $record) : void
+    public function write(array $record)
     {
         parent::write($record);
         $this->closeSocket();
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
+     * @param  array  $record
+     * @return string
      */
-    protected function generateDataStream(array $record) : string
+    protected function generateDataStream($record)
     {
         $content = $this->buildContent($record);
         return $this->buildHeader($content) . $content;
     }
     /**
      * Builds the header of the API Call
+     *
+     * @param  string $content
+     * @return string
      */
-    private function buildHeader(string $content) : string
+    private function buildHeader($content)
     {
-        $header = "POST " . static::FLEEP_HOOK_URI . $this->token . " HTTP/1.1\r\n";
-        $header .= "Host: " . static::FLEEP_HOST . "\r\n";
+        $header = "POST " . self::FLEEP_HOOK_URI . $this->token . " HTTP/1.1\r\n";
+        $header .= "Host: " . self::FLEEP_HOST . "\r\n";
         $header .= "Content-Type: application/x-www-form-urlencoded\r\n";
         $header .= "Content-Length: " . \strlen($content) . "\r\n";
         $header .= "\r\n";
@@ -92,11 +98,12 @@ class FleepHookHandler extends \WPMailSMTP\Vendor\Monolog\Handler\SocketHandler
     /**
      * Builds the body of API call
      *
-     * @phpstan-param FormattedRecord $record
+     * @param  array  $record
+     * @return string
      */
-    private function buildContent(array $record) : string
+    private function buildContent($record)
     {
-        $dataArray = ['message' => $record['formatted']];
+        $dataArray = array('message' => $record['formatted']);
         return \http_build_query($dataArray);
     }
 }

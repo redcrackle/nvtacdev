@@ -2,7 +2,7 @@
 addReply = {
 
 	/**
-	 * Move the reply form when "Reply" is clicked on threaded replies
+	 * Move the reply form when "Reply" is clicked.
 	 *
 	 * @since 2.6.2
 	 * @param {string} replyId

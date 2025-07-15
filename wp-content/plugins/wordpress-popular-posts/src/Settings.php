@@ -36,8 +36,7 @@ class Settings {
             'freshness' => false,
             'order_by' => 'views',
             'post_type' => 'post',
-            'pid' => '', /* Deprecated */
-            'exclude' => '',
+            'pid' => '',
             'author' => '',
             'cat' => '',
             'taxonomy' => 'category',
@@ -45,7 +44,7 @@ class Settings {
             'shorten_title' => [
                 'active' => false,
                 'length' => 25,
-                'words' => false
+                'words'	=> false
             ],
             'post-excerpt' => [
                 'active' => false,
@@ -81,7 +80,7 @@ class Settings {
                 'title-end' => '</h2>',
                 'wpp-start' => '<ul class="wpp-list">',
                 'wpp-end' => '</ul>',
-                'post-html' => '<li class="{current_class}">{thumb} {title} <span class="wpp-meta post-stats">{stats}</span></li>'
+                'post-html' => '<li>{thumb} {title} <span class="wpp-meta post-stats">{stats}</span></li>'
             ],
             'theme' => [
                 'name' => '',
@@ -95,7 +94,7 @@ class Settings {
                 'time_quantity' => 24,
                 'order_by' => 'views',
                 'limit' => 10,
-                'post_type' => 'post',
+                'post_type' => 'post,page',
                 'freshness' => false
             ],
             'tools' => [
@@ -107,7 +106,6 @@ class Settings {
                 ],
                 'thumbnail' => [
                     'source' => 'featured',
-                    'format' => 'original',
                     'field' => '',
                     'resize' => false,
                     'default' => '',
@@ -141,7 +139,7 @@ class Settings {
      * @param    string   $option_set
      * @return   array
      */
-    public static function get(string $option_set = '')
+    public static function get($option_set = null)
     {
         $options = self::$defaults;
 
@@ -149,9 +147,7 @@ class Settings {
             return $options['widget_options'];
         }
 
-        $admin_options = get_option('wpp_settings_config');
-
-        if ( ! $admin_options ) {
+        if ( ! $admin_options = get_option('wpp_settings_config') ) {
             $admin_options = $options['admin_options'];
             add_option('wpp_settings_config', $admin_options);
         }

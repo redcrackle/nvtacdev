@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -13,7 +12,6 @@ namespace WPMailSMTP\Vendor\Monolog\Handler;
 
 use WPMailSMTP\Vendor\Aws\Sdk;
 use WPMailSMTP\Vendor\Aws\DynamoDb\DynamoDbClient;
-use WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface;
 use WPMailSMTP\Vendor\Aws\DynamoDb\Marshaler;
 use WPMailSMTP\Vendor\Monolog\Formatter\ScalarFormatter;
 use WPMailSMTP\Vendor\Monolog\Logger;
@@ -25,7 +23,7 @@ use WPMailSMTP\Vendor\Monolog\Logger;
  */
 class DynamoDbHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProcessingHandler
 {
-    public const DATE_FORMAT = 'Y-m-d\\TH:i:s.uO';
+    const DATE_FORMAT = 'Y-m-d\\TH:i:s.uO';
     /**
      * @var DynamoDbClient
      */
@@ -42,9 +40,14 @@ class DynamoDbHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProcess
      * @var Marshaler
      */
     protected $marshaler;
-    public function __construct(\WPMailSMTP\Vendor\Aws\DynamoDb\DynamoDbClient $client, string $table, $level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG, bool $bubble = \true)
+    /**
+     * @param DynamoDbClient $client
+     * @param string         $table
+     * @param int            $level
+     * @param bool           $bubble
+     */
+    public function __construct(\WPMailSMTP\Vendor\Aws\DynamoDb\DynamoDbClient $client, $table, $level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG, $bubble = \true)
     {
-        /** @phpstan-ignore-next-line */
         if (\defined('Aws\\Sdk::VERSION') && \version_compare(\WPMailSMTP\Vendor\Aws\Sdk::VERSION, '3.0', '>=')) {
             $this->version = 3;
             $this->marshaler = new \WPMailSMTP\Vendor\Aws\DynamoDb\Marshaler();
@@ -56,9 +59,9 @@ class DynamoDbHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProcess
         parent::__construct($level, $bubble);
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    protected function write(array $record) : void
+    protected function write(array $record)
     {
         $filtered = $this->filterEmptyFields($record['formatted']);
         if ($this->version === 3) {
@@ -67,22 +70,22 @@ class DynamoDbHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProcess
             /** @phpstan-ignore-next-line */
             $formatted = $this->client->formatAttributes($filtered);
         }
-        $this->client->putItem(['TableName' => $this->table, 'Item' => $formatted]);
+        $this->client->putItem(array('TableName' => $this->table, 'Item' => $formatted));
     }
     /**
-     * @param  mixed[] $record
-     * @return mixed[]
+     * @param  array $record
+     * @return array
      */
-    protected function filterEmptyFields(array $record) : array
+    protected function filterEmptyFields(array $record)
     {
         return \array_filter($record, function ($value) {
             return !empty($value) || \false === $value || 0 === $value;
         });
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    protected function getDefaultFormatter() : \WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface
+    protected function getDefaultFormatter()
     {
         return new \WPMailSMTP\Vendor\Monolog\Formatter\ScalarFormatter(self::DATE_FORMAT);
     }

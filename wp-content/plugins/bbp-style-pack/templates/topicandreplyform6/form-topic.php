@@ -10,7 +10,6 @@
 // Exit if accessed directly
 defined( 'ABSPATH' ) || exit;
 
-
 if ( ! bbp_is_single_forum() ) : ?>
 
 
@@ -43,18 +42,10 @@ if ( ! bbp_is_single_forum() ) : ?>
 
 					<?php
 						if ( bbp_is_topic_edit() ) :
-							printf( 
-                                                                /* translators: &ldquo; and &rdquo; are encoded double quotes and %s is string for the topic title */
-                                                                esc_html__( 'Now Editing &ldquo;%s&rdquo;', 'bbpress' ), 
-                                                                bbp_get_topic_title() 
-                                                        );
+							printf( esc_html__( 'Now Editing &ldquo;%s&rdquo;', 'bbpress' ), bbp_get_topic_title() );
 						else :
 							( bbp_is_single_forum() && bbp_get_forum_title() )
-								? printf( 
-                                                                        /* translators: &ldquo; and &rdquo; are encoded double quotes and %s is string for the forum title */
-                                                                        esc_html__( 'Create New Topic in &ldquo;%s&rdquo;', 'bbpress' ), 
-                                                                        bbp_get_forum_title() 
-                                                                )
+								? printf( esc_html__( 'Create New Topic in &ldquo;%s&rdquo;', 'bbpress' ), bbp_get_forum_title() )
 								: esc_html_e( 'Create New Topic', 'bbpress' );
 						endif;
 					?>
@@ -94,15 +85,7 @@ if ( ! bbp_is_single_forum() ) : ?>
 					<?php do_action( 'bbp_theme_before_topic_form_title' ); ?>
 
 					<p>
-						<label for="bbp_topic_title">
-                                                        <?php 
-                                                                printf( 
-                                                                        /* translators: %d is number for topic title maximum length */
-                                                                        esc_html__( 'Topic Title (Maximum Length: %d):', 'bbpress' ), 
-                                                                        bbp_get_title_max_length() 
-                                                                ); 
-                                                        ?>
-                                                </label><br />
+						<label for="bbp_topic_title"><?php printf( esc_html__( 'Topic Title (Maximum Length: %d):', 'bbpress' ), bbp_get_title_max_length() ); ?></label><br />
 						<input type="text" id="bbp_topic_title" value="<?php bbp_form_topic_title(); ?>" size="40" name="bbp_topic_title" maxlength="<?php bbp_title_max_length(); ?>" />
 					</p>
 
@@ -117,15 +100,7 @@ if ( ! bbp_is_single_forum() ) : ?>
 					<?php if ( ! ( bbp_use_wp_editor() || current_user_can( 'unfiltered_html' ) ) ) : ?>
 
 						<p class="form-allowed-tags">
-							<label>
-                                                                <?php 
-                                                                        printf( 
-                                                                                /* translators: %s is abbreviation HTML Tag */
-                                                                                esc_html__( 'You may use these %s tags and attributes:', 'bbpress' ), 
-                                                                                '<abbr title="HyperText Markup Language">HTML</abbr>' 
-                                                                        ); 
-                                                                ?>
-                                                        </label><br />
+							<label><?php printf( esc_html__( 'You may use these %s tags and attributes:', 'bbpress' ), '<abbr title="HyperText Markup Language">HTML</abbr>' ); ?></label><br />
 							<code><?php bbp_allowed_tags(); ?></code>
 						</p>
 
@@ -159,11 +134,8 @@ if ( ! bbp_is_single_forum() ) : ?>
 						<p>
 							<label for="bbp_forum_id"><?php esc_html_e( 'Forum:', 'bbpress' ); ?></label><br />
 							<?php
-                                                                $no_forum_str = 
-                                                                        /* translators: &mdash; is encoded long dash (-) */
-                                                                        esc_html__( '&mdash; No forum &mdash;', 'bbpress' );
 								bbp_dropdown( array(
-									'show_none' => $no_forum_str,
+									'show_none' => esc_html__( '&mdash; No forum &mdash;', 'bbpress' ),
 									'selected'  => bbp_get_form_topic_forum()
 								) );
 							?>
@@ -295,15 +267,7 @@ if ( ! bbp_is_single_forum() ) : ?>
 	<div id="forum-closed-<?php bbp_forum_id(); ?>" class="bbp-forum-closed">
 		<div class="bbp-template-notice">
 			<ul>
-				<li>
-                                        <?php 
-                                                printf( 
-                                                        /* translators: &#8216; and &#8217; are encoded apostrophes and %s is string for the forum title */
-                                                        esc_html__( 'The forum &#8216;%s&#8217; is closed to new topics and replies.', 'bbpress' ), 
-                                                        bbp_get_forum_title() 
-                                                ); 
-                                        ?>
-                                </li>
+				<li><?php printf( esc_html__( 'The forum &#8216;%s&#8217; is closed to new topics and replies.', 'bbpress' ), bbp_get_forum_title() ); ?></li>
 			</ul>
 		</div>
 	</div>

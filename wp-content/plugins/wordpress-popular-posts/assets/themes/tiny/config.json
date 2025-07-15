@@ -9,6 +9,7 @@
         }
     ],
     "config": {
+        "title" : "Trending",
         "shorten_title": {
             "active": false
         },

@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -12,7 +11,6 @@ declare (strict_types=1);
 namespace WPMailSMTP\Vendor\Monolog\Handler;
 
 use WPMailSMTP\Vendor\Monolog\Formatter\ChromePHPFormatter;
-use WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface;
 use WPMailSMTP\Vendor\Monolog\Logger;
 use WPMailSMTP\Vendor\Monolog\Utils;
 /**
@@ -21,25 +19,21 @@ use WPMailSMTP\Vendor\Monolog\Utils;
  * This also works out of the box with Firefox 43+
  *
  * @author Christophe Coevoet <stof@notk.org>
- *
- * @phpstan-import-type Record from \Monolog\Logger
  */
 class ChromePHPHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProcessingHandler
 {
-    use WebRequestRecognizerTrait;
     /**
      * Version of the extension
      */
-    protected const VERSION = '4.0';
+    const VERSION = '4.0';
     /**
      * Header name
      */
-    protected const HEADER_NAME = 'X-ChromeLogger-Data';
+    const HEADER_NAME = 'X-ChromeLogger-Data';
     /**
      * Regular expression to detect supported browsers (matches any Chrome, or Firefox 43+)
      */
-    protected const USER_AGENT_REGEX = '{\\b(?:Chrome/\\d+(?:\\.\\d+)*|HeadlessChrome|Firefox/(?:4[3-9]|[5-9]\\d|\\d{3,})(?:\\.\\d)*)\\b}';
-    /** @var bool */
+    const USER_AGENT_REGEX = '{\\b(?:Chrome/\\d+(?:\\.\\d+)*|HeadlessChrome|Firefox/(?:4[3-9]|[5-9]\\d|\\d{3,})(?:\\.\\d)*)\\b}';
     protected static $initialized = \false;
     /**
      * Tracks whether we sent too much data
@@ -49,11 +43,13 @@ class ChromePHPHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProces
      * @var bool
      */
     protected static $overflowed = \false;
-    /** @var mixed[] */
-    protected static $json = ['version' => self::VERSION, 'columns' => ['label', 'log', 'backtrace', 'type'], 'rows' => []];
-    /** @var bool */
+    protected static $json = array('version' => self::VERSION, 'columns' => array('label', 'log', 'backtrace', 'type'), 'rows' => array());
     protected static $sendHeaders = \true;
-    public function __construct($level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG, bool $bubble = \true)
+    /**
+     * @param int  $level  The minimum logging level at which this handler will be triggered
+     * @param bool $bubble Whether the messages that are handled can bubble up the stack or not
+     */
+    public function __construct($level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG, $bubble = \true)
     {
         parent::__construct($level, $bubble);
         if (!\function_exists('json_encode')) {
@@ -61,21 +57,16 @@ class ChromePHPHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProces
         }
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function handleBatch(array $records) : void
+    public function handleBatch(array $records)
     {
-        if (!$this->isWebRequest()) {
-            return;
-        }
-        $messages = [];
+        $messages = array();
         foreach ($records as $record) {
             if ($record['level'] < $this->level) {
                 continue;
             }
-            /** @var Record $message */
-            $message = $this->processRecord($record);
-            $messages[] = $message;
+            $messages[] = $this->processRecord($record);
         }
         if (!empty($messages)) {
             $messages = $this->getFormatter()->formatBatch($messages);
@@ -86,7 +77,7 @@ class ChromePHPHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProces
     /**
      * {@inheritDoc}
      */
-    protected function getDefaultFormatter() : \WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface
+    protected function getDefaultFormatter()
     {
         return new \WPMailSMTP\Vendor\Monolog\Formatter\ChromePHPFormatter();
     }
@@ -95,12 +86,10 @@ class ChromePHPHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProces
      *
      * @see sendHeader()
      * @see send()
+     * @param array $record
      */
-    protected function write(array $record) : void
+    protected function write(array $record)
     {
-        if (!$this->isWebRequest()) {
-            return;
-        }
         self::$json['rows'][] = $record['formatted'];
         $this->send();
     }
@@ -109,7 +98,7 @@ class ChromePHPHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProces
      *
      * @see sendHeader()
      */
-    protected function send() : void
+    protected function send()
     {
         if (self::$overflowed || !self::$sendHeaders) {
             return;
@@ -120,25 +109,28 @@ class ChromePHPHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProces
             if (!self::$sendHeaders) {
                 return;
             }
-            self::$json['request_uri'] = $_SERVER['REQUEST_URI'] ?? '';
+            self::$json['request_uri'] = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
         }
-        $json = \WPMailSMTP\Vendor\Monolog\Utils::jsonEncode(self::$json, \WPMailSMTP\Vendor\Monolog\Utils::DEFAULT_JSON_FLAGS & ~\JSON_UNESCAPED_UNICODE, \true);
-        $data = \base64_encode($json);
+        $json = \WPMailSMTP\Vendor\Monolog\Utils::jsonEncode(self::$json, null, \true);
+        $data = \base64_encode(\utf8_encode($json));
         if (\strlen($data) > 3 * 1024) {
             self::$overflowed = \true;
-            $record = ['message' => 'Incomplete logs, chrome header size limit reached', 'context' => [], 'level' => \WPMailSMTP\Vendor\Monolog\Logger::WARNING, 'level_name' => \WPMailSMTP\Vendor\Monolog\Logger::getLevelName(\WPMailSMTP\Vendor\Monolog\Logger::WARNING), 'channel' => 'monolog', 'datetime' => new \DateTimeImmutable(), 'extra' => []];
+            $record = array('message' => 'Incomplete logs, chrome header size limit reached', 'context' => array(), 'level' => \WPMailSMTP\Vendor\Monolog\Logger::WARNING, 'level_name' => \WPMailSMTP\Vendor\Monolog\Logger::getLevelName(\WPMailSMTP\Vendor\Monolog\Logger::WARNING), 'channel' => 'monolog', 'datetime' => new \DateTime(), 'extra' => array());
             self::$json['rows'][\count(self::$json['rows']) - 1] = $this->getFormatter()->format($record);
-            $json = \WPMailSMTP\Vendor\Monolog\Utils::jsonEncode(self::$json, \WPMailSMTP\Vendor\Monolog\Utils::DEFAULT_JSON_FLAGS & ~\JSON_UNESCAPED_UNICODE, \true);
-            $data = \base64_encode($json);
+            $json = \WPMailSMTP\Vendor\Monolog\Utils::jsonEncode(self::$json, null, \true);
+            $data = \base64_encode(\utf8_encode($json));
         }
         if (\trim($data) !== '') {
-            $this->sendHeader(static::HEADER_NAME, $data);
+            $this->sendHeader(self::HEADER_NAME, $data);
         }
     }
     /**
      * Send header string to the client
+     *
+     * @param string $header
+     * @param string $content
      */
-    protected function sendHeader(string $header, string $content) : void
+    protected function sendHeader($header, $content)
     {
         if (!\headers_sent() && self::$sendHeaders) {
             \header(\sprintf('%s: %s', $header, $content));
@@ -146,12 +138,34 @@ class ChromePHPHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProces
     }
     /**
      * Verifies if the headers are accepted by the current user agent
+     *
+     * @return bool
      */
-    protected function headersAccepted() : bool
+    protected function headersAccepted()
     {
         if (empty($_SERVER['HTTP_USER_AGENT'])) {
             return \false;
         }
-        return \preg_match(static::USER_AGENT_REGEX, $_SERVER['HTTP_USER_AGENT']) === 1;
+        return \preg_match(self::USER_AGENT_REGEX, $_SERVER['HTTP_USER_AGENT']);
+    }
+    /**
+     * BC getter for the sendHeaders property that has been made static
+     */
+    public function __get($property)
+    {
+        if ('sendHeaders' !== $property) {
+            throw new \InvalidArgumentException('Undefined property ' . $property);
+        }
+        return static::$sendHeaders;
+    }
+    /**
+     * BC setter for the sendHeaders property that has been made static
+     */
+    public function __set($property, $value)
+    {
+        if ('sendHeaders' !== $property) {
+            throw new \InvalidArgumentException('Undefined property ' . $property);
+        }
+        static::$sendHeaders = $value;
     }
 }

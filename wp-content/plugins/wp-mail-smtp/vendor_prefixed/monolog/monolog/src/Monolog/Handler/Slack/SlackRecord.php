@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -22,16 +21,13 @@ use WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface;
  * @author Haralan Dobrev <hkdobrev@gmail.com>
  * @see    https://api.slack.com/incoming-webhooks
  * @see    https://api.slack.com/docs/message-attachments
- *
- * @phpstan-import-type FormattedRecord from \Monolog\Handler\AbstractProcessingHandler
- * @phpstan-import-type Record from \Monolog\Logger
  */
 class SlackRecord
 {
-    public const COLOR_DANGER = 'danger';
-    public const COLOR_WARNING = 'warning';
-    public const COLOR_GOOD = 'good';
-    public const COLOR_DEFAULT = '#e3e4e6';
+    const COLOR_DANGER = 'danger';
+    const COLOR_WARNING = 'warning';
+    const COLOR_GOOD = 'good';
+    const COLOR_DEFAULT = '#e3e4e6';
     /**
      * Slack channel (encoded ID or name)
      * @var string|null
@@ -44,7 +40,7 @@ class SlackRecord
     private $username;
     /**
      * User icon e.g. 'ghost', 'http://example.com/user.png'
-     * @var string|null
+     * @var string
      */
     private $userIcon;
     /**
@@ -64,38 +60,35 @@ class SlackRecord
     private $includeContextAndExtra;
     /**
      * Dot separated list of fields to exclude from slack message. E.g. ['context.field1', 'extra.field2']
-     * @var string[]
+     * @var array
      */
     private $excludeFields;
     /**
-     * @var ?FormatterInterface
+     * @var FormatterInterface
      */
     private $formatter;
     /**
      * @var NormalizerFormatter
      */
     private $normalizerFormatter;
-    /**
-     * @param string[] $excludeFields
-     */
-    public function __construct(?string $channel = null, ?string $username = null, bool $useAttachment = \true, ?string $userIcon = null, bool $useShortAttachment = \false, bool $includeContextAndExtra = \false, array $excludeFields = array(), ?\WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface $formatter = null)
+    public function __construct($channel = null, $username = null, $useAttachment = \true, $userIcon = null, $useShortAttachment = \false, $includeContextAndExtra = \false, array $excludeFields = array(), \WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface $formatter = null)
     {
-        $this->setChannel($channel)->setUsername($username)->useAttachment($useAttachment)->setUserIcon($userIcon)->useShortAttachment($useShortAttachment)->includeContextAndExtra($includeContextAndExtra)->excludeFields($excludeFields)->setFormatter($formatter);
+        $this->channel = $channel;
+        $this->username = $username;
+        $this->userIcon = \trim($userIcon, ':');
+        $this->useAttachment = $useAttachment;
+        $this->useShortAttachment = $useShortAttachment;
+        $this->includeContextAndExtra = $includeContextAndExtra;
+        $this->excludeFields = $excludeFields;
+        $this->formatter = $formatter;
         if ($this->includeContextAndExtra) {
             $this->normalizerFormatter = new \WPMailSMTP\Vendor\Monolog\Formatter\NormalizerFormatter();
         }
     }
-    /**
-     * Returns required data in format that Slack
-     * is expecting.
-     *
-     * @phpstan-param FormattedRecord $record
-     * @phpstan-return mixed[]
-     */
-    public function getSlackData(array $record) : array
+    public function getSlackData(array $record)
     {
         $dataArray = array();
-        $record = $this->removeExcludedFields($record);
+        $record = $this->excludeFields($record);
         if ($this->username) {
             $dataArray['username'] = $this->username;
         }
@@ -103,13 +96,12 @@ class SlackRecord
             $dataArray['channel'] = $this->channel;
         }
         if ($this->formatter && !$this->useAttachment) {
-            /** @phpstan-ignore-next-line */
             $message = $this->formatter->format($record);
         } else {
             $message = $record['message'];
         }
         if ($this->useAttachment) {
-            $attachment = array('fallback' => $message, 'text' => $message, 'color' => $this->getAttachmentColor($record['level']), 'fields' => array(), 'mrkdwn_in' => array('fields'), 'ts' => $record['datetime']->getTimestamp(), 'footer' => $this->username, 'footer_icon' => $this->userIcon);
+            $attachment = array('fallback' => $message, 'text' => $message, 'color' => $this->getAttachmentColor($record['level']), 'fields' => array(), 'mrkdwn_in' => array('fields'), 'ts' => $record['datetime']->getTimestamp());
             if ($this->useShortAttachment) {
                 $attachment['title'] = $record['level_name'];
             } else {
@@ -122,7 +114,7 @@ class SlackRecord
                         continue;
                     }
                     if ($this->useShortAttachment) {
-                        $attachment['fields'][] = $this->generateAttachmentField((string) $key, $record[$key]);
+                        $attachment['fields'][] = $this->generateAttachmentField($key, $record[$key]);
                     } else {
                         // Add all extra fields as individual fields in attachment
                         $attachment['fields'] = \array_merge($attachment['fields'], $this->generateAttachmentFields($record[$key]));
@@ -143,135 +135,89 @@ class SlackRecord
         return $dataArray;
     }
     /**
-     * Returns a Slack message attachment color associated with
+     * Returned a Slack message attachment color associated with
      * provided level.
+     *
+     * @param  int    $level
+     * @return string
      */
-    public function getAttachmentColor(int $level) : string
+    public function getAttachmentColor($level)
     {
         switch (\true) {
             case $level >= \WPMailSMTP\Vendor\Monolog\Logger::ERROR:
-                return static::COLOR_DANGER;
+                return self::COLOR_DANGER;
             case $level >= \WPMailSMTP\Vendor\Monolog\Logger::WARNING:
-                return static::COLOR_WARNING;
+                return self::COLOR_WARNING;
             case $level >= \WPMailSMTP\Vendor\Monolog\Logger::INFO:
-                return static::COLOR_GOOD;
+                return self::COLOR_GOOD;
             default:
-                return static::COLOR_DEFAULT;
+                return self::COLOR_DEFAULT;
         }
     }
     /**
      * Stringifies an array of key/value pairs to be used in attachment fields
      *
-     * @param mixed[] $fields
+     * @param array $fields
+     *
+     * @return string
      */
-    public function stringify(array $fields) : string
+    public function stringify($fields)
     {
-        /** @var Record $fields */
         $normalized = $this->normalizerFormatter->format($fields);
+        $prettyPrintFlag = \defined('JSON_PRETTY_PRINT') ? \JSON_PRETTY_PRINT : 128;
+        $flags = 0;
+        if (\PHP_VERSION_ID >= 50400) {
+            $flags = \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE;
+        }
         $hasSecondDimension = \count(\array_filter($normalized, 'is_array'));
         $hasNonNumericKeys = !\count(\array_filter(\array_keys($normalized), 'is_numeric'));
-        return $hasSecondDimension || $hasNonNumericKeys ? \WPMailSMTP\Vendor\Monolog\Utils::jsonEncode($normalized, \JSON_PRETTY_PRINT | \WPMailSMTP\Vendor\Monolog\Utils::DEFAULT_JSON_FLAGS) : \WPMailSMTP\Vendor\Monolog\Utils::jsonEncode($normalized, \WPMailSMTP\Vendor\Monolog\Utils::DEFAULT_JSON_FLAGS);
+        return $hasSecondDimension || $hasNonNumericKeys ? \WPMailSMTP\Vendor\Monolog\Utils::jsonEncode($normalized, $prettyPrintFlag | $flags) : \WPMailSMTP\Vendor\Monolog\Utils::jsonEncode($normalized, $flags);
     }
     /**
-     * Channel used by the bot when posting
+     * Sets the formatter
      *
-     * @param ?string $channel
-     *
-     * @return static
+     * @param FormatterInterface $formatter
      */
-    public function setChannel(?string $channel = null) : self
-    {
-        $this->channel = $channel;
-        return $this;
-    }
-    /**
-     * Username used by the bot when posting
-     *
-     * @param ?string $username
-     *
-     * @return static
-     */
-    public function setUsername(?string $username = null) : self
-    {
-        $this->username = $username;
-        return $this;
-    }
-    public function useAttachment(bool $useAttachment = \true) : self
-    {
-        $this->useAttachment = $useAttachment;
-        return $this;
-    }
-    public function setUserIcon(?string $userIcon = null) : self
-    {
-        $this->userIcon = $userIcon;
-        if (\is_string($userIcon)) {
-            $this->userIcon = \trim($userIcon, ':');
-        }
-        return $this;
-    }
-    public function useShortAttachment(bool $useShortAttachment = \false) : self
-    {
-        $this->useShortAttachment = $useShortAttachment;
-        return $this;
-    }
-    public function includeContextAndExtra(bool $includeContextAndExtra = \false) : self
-    {
-        $this->includeContextAndExtra = $includeContextAndExtra;
-        if ($this->includeContextAndExtra) {
-            $this->normalizerFormatter = new \WPMailSMTP\Vendor\Monolog\Formatter\NormalizerFormatter();
-        }
-        return $this;
-    }
-    /**
-     * @param string[] $excludeFields
-     */
-    public function excludeFields(array $excludeFields = []) : self
-    {
-        $this->excludeFields = $excludeFields;
-        return $this;
-    }
-    public function setFormatter(?\WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface $formatter = null) : self
+    public function setFormatter(\WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface $formatter)
     {
         $this->formatter = $formatter;
-        return $this;
     }
     /**
      * Generates attachment field
      *
-     * @param string|mixed[] $value
+     * @param string       $title
+     * @param string|array $value
      *
-     * @return array{title: string, value: string, short: false}
+     * @return array
      */
-    private function generateAttachmentField(string $title, $value) : array
+    private function generateAttachmentField($title, $value)
     {
-        $value = \is_array($value) ? \sprintf('```%s```', \substr($this->stringify($value), 0, 1990)) : $value;
+        $value = \is_array($value) ? \sprintf('```%s```', $this->stringify($value)) : $value;
         return array('title' => \ucfirst($title), 'value' => $value, 'short' => \false);
     }
     /**
      * Generates a collection of attachment fields from array
      *
-     * @param mixed[] $data
+     * @param array $data
      *
-     * @return array<array{title: string, value: string, short: false}>
+     * @return array
      */
-    private function generateAttachmentFields(array $data) : array
+    private function generateAttachmentFields(array $data)
     {
-        /** @var Record $data */
-        $normalized = $this->normalizerFormatter->format($data);
         $fields = array();
-        foreach ($normalized as $key => $value) {
-            $fields[] = $this->generateAttachmentField((string) $key, $value);
+        foreach ($this->normalizerFormatter->format($data) as $key => $value) {
+            $fields[] = $this->generateAttachmentField($key, $value);
         }
         return $fields;
     }
     /**
      * Get a copy of record with fields excluded according to $this->excludeFields
      *
-     * @phpstan-param FormattedRecord $record
+     * @param array $record
      *
-     * @return mixed[]
+     * @return array
      */
-    private function removeExcludedFields(array $record) : array
+    private function excludeFields(array $record)
     {
         foreach ($this->excludeFields as $field) {
             $keys = \explode('.', $field);

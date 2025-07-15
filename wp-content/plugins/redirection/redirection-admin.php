@@ -34,6 +34,7 @@ class Redirection_Admin {
 		}, 10, 3 );
 		add_action( 'redirection_redirect_updated', [ $this, 'set_default_group' ], 10, 2 );
 		add_action( 'redirection_redirect_updated', [ $this, 'clear_cache' ], 10, 2 );
+		add_filter( 'load_script_translation_file', [ $this, 'load_script_translation_file' ], 10, 3 );
 
 		if ( defined( 'REDIRECTION_FLYING_SOLO' ) && REDIRECTION_FLYING_SOLO ) {
 			add_filter( 'script_loader_src', [ $this, 'flying_solo' ], 10, 2 );
@@ -44,6 +45,22 @@ class Redirection_Admin {
 
 		$this->monitor = new Red_Monitor( red_get_options() );
 		$this->run_hacks();
+	}
+
+	/**
+	 * Massage the Redirection WP translations.
+	 *
+	 * @param [type] $file
+	 * @param [type] $handle
+	 * @param [type] $domain
+	 * @return void
+	 */
+	public function load_script_translation_file( $file, $handle, $domain ) {
+		if ( $domain === 'redirection' ) {
+			return preg_replace( '/-\w*\./', '.', $file );
+		}
+
+		return $file;
 	}
 
 	// These are only called on the single standard site, or in the network admin of the multisite - they run across all available sites
@@ -142,9 +159,7 @@ class Redirection_Admin {
 	// then this can prevent Redirection running and it's a little sensitive about that. We use the nuclear option here to disable
 	// all other JS while viewing Redirection
 	public function flying_solo( $src, $handle ) {
-		$request = Redirection_Request::get_request_url();
-
-		if ( strpos( $request, 'page=redirection.php' ) !== false ) {
+		if ( isset( $_SERVER['REQUEST_URI'] ) && strpos( $_SERVER['REQUEST_URI'], 'page=redirection.php' ) !== false ) {
 			if ( substr( $src, 0, 4 ) === 'http' && $handle !== 'redirection' && strpos( $src, 'plugins' ) !== false ) {
 				if ( $this->ignore_this_plugin( $src ) ) {
 					return false;
@@ -219,14 +234,6 @@ class Redirection_Admin {
 		return admin_url();
 	}
 
-	private function get_query( $name ) {
-		if ( isset( $_GET[ $name ] ) ) {
-			return sanitize_text_field( $_GET[ $name ] );
-		}
-
-		return null;
-	}
-
 	public function redirection_head() {
 		global $wp_version;
 
@@ -237,12 +244,10 @@ class Redirection_Admin {
 			die();
 		}
 
-		if ( isset( $_REQUEST['action'] ) && isset( $_REQUEST['_wpnonce'] ) && is_string( $_REQUEST['action'] ) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'wp_rest' ) ) {
-			$action = sanitize_text_field( $_REQUEST['action'] );
-
-			if ( $action === 'fixit' ) {
+		if ( isset( $_REQUEST['action'] ) && isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'wp_rest' ) ) {
+			if ( $_REQUEST['action'] === 'fixit' ) {
 				$this->run_fixit();
-			} elseif ( $action === 'rest_api' ) {
+			} elseif ( $_REQUEST['action'] === 'rest_api' ) {
 				$this->set_rest_api( intval( $_REQUEST['rest_api'], 10 ) );
 			}
 		}
@@ -282,7 +287,8 @@ class Redirection_Admin {
 		$is_new = false;
 		$major_version = implode( '.', array_slice( explode( '.', REDIRECTION_VERSION ), 0, 2 ) );
 
-		if ( $this->get_query( 'page' ) === 'redirection.php' && strpos( REDIRECTION_VERSION, '-beta' ) === false ) {
+		// phpcs:ignore
+		if ( isset( $_GET['page'] ) && $_GET['page'] === 'redirection.php' && strpos( REDIRECTION_VERSION, '-beta' ) === false ) {
 			$is_new = version_compare( $options['update_notice'], $major_version ) < 0;
 		}
 
@@ -612,13 +618,11 @@ class Redirection_Admin {
 	 * @return string|boolean Current page, or false.
 	 */
 	private function get_current_page( $page = false ) {
+		// $_GET['sub'] is validated below
+		// phpcs:ignore
 		if ( ! $page ) {
 			// phpcs:ignore
-			$page = 'redirect';
-
-			if ( $this->get_query( 'sub' ) ) {
-				$page = $this->get_query( 'sub' );
-			}
+			$page = isset( $_GET['sub'] ) ? $_GET['sub'] : 'redirect';
 		}
 
 		// Are we allowed to access this page?
@@ -632,12 +636,7 @@ class Redirection_Admin {
 
 	private function inject() {
 		// phpcs:ignore
-		$page = false;
-		if ( $this->get_query( 'page' ) ) {
-			$page = $this->get_query( 'page' );
-		}
-
-		if ( $page && $this->get_current_page() !== 'redirect' && $page === 'redirection.php' ) {
+		if ( isset( $_GET['page'] ) && $this->get_current_page() !== 'redirect' && $_GET['page'] === 'redirection.php' ) {
 			$this->try_export_logs();
 			$this->try_export_redirects();
 			$this->try_export_rss();
@@ -645,18 +644,14 @@ class Redirection_Admin {
 	}
 
 	public function try_export_rss() {
-		$token = $this->get_query( 'token' );
-		$sub = $this->get_query( 'sub' );
-
-		if ( $token && $sub === 'rss' && Redirection_Capabilities::has_access( Redirection_Capabilities::CAP_REDIRECT_MANAGE ) ) {
+		// phpcs:ignore
+		if ( isset( $_GET['token'] ) && isset( $_GET['sub'] ) && $_GET['sub'] === 'rss' && Redirection_Capabilities::has_access( Redirection_Capabilities::CAP_REDIRECT_MANAGE ) ) {
 			$options = red_get_options();
 
 			// phpcs:ignore
-			if ( $token === $options['token'] && ! empty( $options['token'] ) ) {
-				$module = $this->get_query( 'module' );
-
+			if ( $_GET['token'] === $options['token'] && ! empty( $options['token'] ) ) {
 				// phpcs:ignore
-				$items = Red_Item::get_all_for_module( intval( $module, 10 ) );
+				$items = Red_Item::get_all_for_module( intval( $_GET['module'], 10 ) );
 
 				$exporter = Red_FileIO::create( 'rss' );
 				$exporter->force_download();
@@ -682,22 +677,18 @@ class Redirection_Admin {
 
 	private function try_export_redirects() {
 		// phpcs:ignore
-		$sub = $this->get_query( 'sub' );
-		if ( $sub !== 'io' ) {
+		if ( ! isset( $_GET['sub'] ) || $_GET['sub'] !== 'io' ) {
 			return;
 		}
 
-		$export = $this->get_query( 'export' );
-		$exporter = $this->get_query( 'exporter' );
-
-		if ( Redirection_Capabilities::has_access( Redirection_Capabilities::CAP_IO_MANAGE ) && $export && $exporter && check_admin_referer( 'wp_rest' ) ) {
-			$export = Red_FileIO::export( $export, $exporter );
+		if ( Redirection_Capabilities::has_access( Redirection_Capabilities::CAP_IO_MANAGE ) && isset( $_GET['exporter'] ) && isset( $_GET['export'] ) && check_admin_referer( 'wp_rest' ) ) {
+			$export = Red_FileIO::export( $_GET['export'], $_GET['exporter'] );
 
 			if ( $export !== false ) {
 				$export['exporter']->force_download();
 
-				// This data is not displayed and will be downloaded to a file
-				echo str_replace( '&amp;', '&', wp_kses( $export['data'], 'strip' ) );
+				// phpcs:ignore
+				echo $export['data'];
 				die();
 			}
 		}

@@ -10,18 +10,15 @@
  */
 
 /**
- * Plugin Name:       BuddyPress
- * Plugin URI:        https://buddypress.org
- * Description:       BuddyPress adds community features to WordPress. Member Profiles, Activity Streams, Direct Messaging, Notifications, and more!
- * Author:            The BuddyPress Community
- * Author URI:        https://buddypress.org
- * License:           GNU General Public License v2 or later
- * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       buddypress
- * Domain Path:       /bp-languages/
- * Requires PHP:      5.6
- * Requires at least: 6.1
- * Version:           14.3.4
+ * Plugin Name: BuddyPress
+ * Plugin URI:  https://buddypress.org/
+ * Description: BuddyPress adds community features to WordPress. Member Profiles, Activity Streams, Direct Messaging, Notifications, and more!
+ * Author:      The BuddyPress Community
+ * Author URI:  https://buddypress.org/
+ * Version:     10.2.0
+ * Text Domain: buddypress
+ * Domain Path: /bp-languages/
+ * License:     GPLv2 or later (license.txt)
  */
 
 /**
@@ -64,7 +61,7 @@ function bp_php_requirements_notice() {
 	<div id="message" class="error notice is-dismissible">
 		<p><strong><?php esc_html_e( 'Your site does not support BuddyPress.', 'buddypress' ); ?></strong></p>
 		<?php /* translators: 1: current PHP version, 2: required PHP version */ ?>
-		<p><?php printf( esc_html__( 'Your site is currently running PHP version %1$s, while BuddyPress requires version %2$s or greater.', 'buddypress' ), esc_html( phpversion() ), esc_html( BP_REQUIRED_PHP_VERSION ) ); ?> <?php printf( esc_html__( 'See <a href="%s">the Codex guide</a> for more information.', 'buddypress' ), 'https://codex.buddypress.org/getting-started/buddypress-2-8-will-require-php-5-3/' ); ?></p>
+		<p><?php printf( esc_html__( 'Your site is currently running PHP version %1$s, while BuddyPress requires version %2$s or greater.', 'buddypress' ), esc_html( phpversion() ), esc_html( BP_REQUIRED_PHP_VERSION ) ); ?> <?php printf( __( 'See <a href="%s">the Codex guide</a> for more information.', 'buddypress' ), 'https://codex.buddypress.org/getting-started/buddypress-2-8-will-require-php-5-3/' ); ?></p>
 		<p><?php esc_html_e( 'Please update your server or deactivate BuddyPress.', 'buddypress' ); ?></p>
 	</div>
 

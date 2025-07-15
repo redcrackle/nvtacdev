@@ -1,10 +1,9 @@
 <?php
 
-declare (strict_types=1);
 namespace WPMailSMTP\Vendor\ParagonIE\ConstantTime;
 
 /**
- *  Copyright (c) 2016 - 2022 Paragon Initiative Enterprises.
+ *  Copyright (c) 2016 - 2017 Paragon Initiative Enterprises.
  *  Copyright (c) 2014 Steve "Sc00bz" Thomas (steve at tobtu dot com)
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,8 +25,8 @@ namespace WPMailSMTP\Vendor\ParagonIE\ConstantTime;
  *  SOFTWARE.
  */
 /**
- * Class Base64UrlSafe
- * [A-Z][a-z][0-9]\-_
+ * Class Base64DotSlash
+ * ./[A-Z][a-z][0-9]
  *
  * @package ParagonIE\ConstantTime
  */
@@ -44,7 +43,7 @@ abstract class Base64UrlSafe extends \WPMailSMTP\Vendor\ParagonIE\ConstantTime\B
      * @param int $src
      * @return int
      */
-    protected static function decode6Bits(int $src) : int
+    protected static function decode6Bits($src)
     {
         $ret = -1;
         // if ($src > 0x40 && $src < 0x5b) $ret += $src - 0x41 + 1; // -64
@@ -66,7 +65,7 @@ abstract class Base64UrlSafe extends \WPMailSMTP\Vendor\ParagonIE\ConstantTime\B
      * @param int $src
      * @return string
      */
-    protected static function encode6Bits(int $src) : string
+    protected static function encode6Bits($src)
     {
         $diff = 0x41;
         // if ($src > 25) $diff += 0x61 - 0x41 - 26; // 6

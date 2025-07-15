@@ -6,14 +6,10 @@
 
 # Log files
 *.log
-*.sql
-
 /app
-/logs
-/conf
 # htaccess
 
-/.htaccess
+.htaccess
 
 .DS_Store
 */.DS_Store

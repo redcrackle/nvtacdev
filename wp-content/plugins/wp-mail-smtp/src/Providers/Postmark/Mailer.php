@@ -2,8 +2,6 @@
 
 namespace WPMailSMTP\Providers\Postmark;
 
-use WPMailSMTP\ConnectionInterface;
-use WPMailSMTP\Helpers\Helpers;
 use WPMailSMTP\WP;
 use WPMailSMTP\MailCatcherInterface;
 use WPMailSMTP\Providers\MailerAbstract;
@@ -29,16 +27,15 @@ class Mailer extends MailerAbstract {
 	 *
 	 * @since 3.1.0
 	 *
-	 * @param MailCatcherInterface $phpmailer  The MailCatcher object.
-	 * @param ConnectionInterface  $connection The Connection object.
+	 * @param MailCatcherInterface $phpmailer The MailCatcher object.
 	 */
-	public function __construct( $phpmailer, $connection = null ) {
+	public function __construct( $phpmailer ) {
 
 		// We want to prefill everything from MailCatcher class, which extends PHPMailer.
-		parent::__construct( $phpmailer, $connection );
+		parent::__construct( $phpmailer );
 
 		// Set mailer specific headers.
-		$this->set_header( 'X-Postmark-Server-Token', $this->connection_options->get( $this->mailer, 'server_api_token' ) );
+		$this->set_header( 'X-Postmark-Server-Token', $this->options->get( $this->mailer, 'server_api_token' ) );
 		$this->set_header( 'Accept', 'application/json' );
 		$this->set_header( 'Content-Type', 'application/json' );
 
@@ -92,7 +89,10 @@ class Mailer extends MailerAbstract {
 		}
 
 		$headers = isset( $this->body['Headers'] ) ? (array) $this->body['Headers'] : [];
-		$value   = $this->sanitize_header_value( $name, $value );
+
+		if ( $name !== 'Message-ID' ) {
+			$value = WP::sanitize_value( $value );
+		}
 
 		// Prevent duplicates.
 		$key = array_search( $name, array_column( $headers, 'Name' ), true );
@@ -316,8 +316,10 @@ class Mailer extends MailerAbstract {
 				continue;
 			}
 
+			$filetype = str_replace( ';', '', trim( $attachment[4] ) );
+
 			$data[] = [
-				'Name'        => $this->get_attachment_file_name( $attachment ),
+				'Name'        => empty( $attachment[2] ) ? 'file-' . wp_hash( microtime() ) . '.' . $filetype : trim( $attachment[2] ),
 				'Content'     => base64_encode( $file ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 				'ContentType' => $attachment[4],
 			];
@@ -378,26 +380,44 @@ class Mailer extends MailerAbstract {
 	 *
 	 * @return string
 	 */
-	public function get_response_error() {
+	public function get_response_error() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh, Generic.Metrics.NestingLevel.MaxExceeded
 
-		$error_text[] = $this->error_message;
+		$error_text = '';
 
 		if ( ! empty( $this->response ) ) {
-			$body = wp_remote_retrieve_body( $this->response );
+			switch ( wp_remote_retrieve_response_code( $this->response ) ) {
+				case 401:
+					$error_text = esc_html__( '401 - Unauthorized: Missing or incorrect Server API Token. Please verify that you used the correct Server API Token.', 'wp-mail-smtp' );
+					break;
 
-			// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-			if ( ! empty( $body->Message ) ) {
-				$message = $body->Message;
-				$code    = ! empty( $body->ErrorCode ) ? $body->ErrorCode : '';
+				case 500:
+					$error_text = esc_html__( '500 - Internal Server Error: This is an issue with Postmark’s servers processing your request. In most cases the message is lost during the process, and Postmark is notified so that they can investigate the issue.', 'wp-mail-smtp' );
+					break;
 
-				$error_text[] = Helpers::format_error_message( $message, $code );
-			} else {
-				$error_text[] = WP::wp_remote_get_response_error_message( $this->response );
+				case 503:
+					$error_text = esc_html__( '503 - The Postmark API is currently unavailable, please try sending your request later.', 'wp-mail-smtp' );
+					break;
+
+				default:
+					$body = $this->response['body'];
+
+					if ( property_exists( $body, 'ErrorCode' ) ) {
+						$error_text = $body->ErrorCode; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+					}
+
+					if ( property_exists( $body, 'Message' ) ) {
+						$error_text .= ' - ' . $body->Message; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+					}
+
+					if ( empty( $error_text ) && ! empty( $this->error_message ) ) {
+						$error_text = $this->error_message;
+					}
 			}
-			// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		} elseif ( ! empty( $this->error_message ) ) {
+			$error_text = $this->error_message;
 		}
 
-		return implode( WP::EOL, array_map( 'esc_textarea', array_filter( $error_text ) ) );
+		return esc_textarea( $error_text );
 	}
 
 	/**
@@ -409,7 +429,7 @@ class Mailer extends MailerAbstract {
 	 */
 	public function get_debug_info() {
 
-		$options = $this->connection_options->get_group( $this->mailer );
+		$options = $this->options->get_group( $this->mailer );
 
 		$text[] = '<strong>' . esc_html__( 'Server API Token:', 'wp-mail-smtp' ) . '</strong> ' .
 							( ! empty( $options['server_api_token'] ) ? 'Yes' : 'No' );
@@ -430,7 +450,7 @@ class Mailer extends MailerAbstract {
 	 */
 	private function get_message_stream() {
 
-		$message_stream = $this->connection_options->get( $this->mailer, 'message_stream' );
+		$message_stream = $this->options->get( $this->mailer, 'message_stream' );
 
 		/**
 		 * Filters Message Stream ID.
@@ -455,29 +475,12 @@ class Mailer extends MailerAbstract {
 	 */
 	public function is_mailer_complete() {
 
-		$options = $this->connection_options->get_group( $this->mailer );
+		$options = $this->options->get_group( $this->mailer );
 
 		if ( ! empty( $options['server_api_token'] ) ) {
 			return true;
 		}
 
 		return false;
-	}
-
-	/**
-	 * Sanitize email header values.
-	 *
-	 * @param string $name  Name of the header.
-	 * @param string $value Value of the header.
-	 *
-	 * @since 3.11.1
-	 */
-	public function sanitize_header_value( $name, $value ) {
-
-		if ( strtolower( $name ) === 'message-id' ) {
-			return $value;
-		}
-
-		return parent::sanitize_header_value( $name, $value );
 	}
 }

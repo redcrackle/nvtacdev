@@ -34,11 +34,11 @@ class Options extends OptionsAbstract {
 	public function display_options() {
 
 		?>
-		<div class="wp-mail-smtp-setting-row wp-mail-smtp-setting-row-content wp-mail-smtp-clear section-heading">
-			<p>
-				<?php esc_html_e( 'We\'re sorry, the Amazon SES mailer is not available on your plan. Please upgrade to the PRO plan to unlock all these awesome features.', 'wp-mail-smtp' ); ?>
-			</p>
-		</div>
+
+		<p>
+			<?php esc_html_e( 'We\'re sorry, the Amazon SES mailer is not available on your plan. Please upgrade to the PRO plan to unlock all these awesome features.', 'wp-mail-smtp' ); ?>
+		</p>
+
 		<?php
 	}
 }

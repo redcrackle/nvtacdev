@@ -108,7 +108,7 @@ class MonsterInsights_Popular_Posts_Themes {
 	 * Go through the themes and apply styles from the stored settings.
 	 *
 	 * @var string $type The instance type: inline/widget/products.
-	 * @var array $themes The themes to process/apply styles for.
+	 * @var array  $themes The themes to process/apply styles for.
 	 */
 	public function process_themes_styles( $type, $themes ) {
 
@@ -143,16 +143,16 @@ class MonsterInsights_Popular_Posts_Themes {
 
 		$themes = array(
 			'alpha'    => array(
-				'label'  => __( 'Alpha', 'google-analytics-for-wordpress' ),
+				'label'  => 'Alpha',
 				'styles' => array(
 					'title'      => array(
 						'color' => '#393F4C',
 						'size'  => 18,
-						'text'  => __( '15 Proven Ways to Repurpose Content on Your WordPress Site', 'google-analytics-for-wordpress' ),
+						'text'  => '15 Proven Ways to Repurpose Content on Your WordPress Site',
 					),
 					'label'      => array(
 						'color' => '#EB5757',
-						'text'  => __( 'Trending', 'google-analytics-for-wordpress' ),
+						'text'  => 'Trending',
 					),
 					'background' => array(
 						'color' => '#F0F2F4',
@@ -161,16 +161,16 @@ class MonsterInsights_Popular_Posts_Themes {
 				'level'  => 'lite',
 			),
 			'beta'     => array(
-				'label'  => __( 'Beta', 'google-analytics-for-wordpress' ),
+				'label'  => 'Beta',
 				'styles' => array(
 					'title'      => array(
 						'color' => '#393F4C',
 						'size'  => 18,
-						'text'  => __( 'How to Use Google Trends to Boost Traffic and Sales (9 Simple Ways)', 'google-analytics-for-wordpress' ),
+						'text'  => 'How to Use Google Trends to Boost Traffic and Sales (9 Simple Ways)',
 					),
 					'label'      => array(
 						'color' => '#EB5757',
-						'text'  => __( 'Trending', 'google-analytics-for-wordpress' ),
+						'text'  => 'Trending',
 					),
 					'background' => array(
 						'border' => '#F0F2F4',
@@ -181,7 +181,7 @@ class MonsterInsights_Popular_Posts_Themes {
 				'level'  => 'lite',
 			),
 			'charlie'  => array(
-				'label'  => __( 'Charlie', 'google-analytics-for-wordpress' ),
+				'label'  => 'Charlie',
 				'styles' => array(
 					'title'  => array(
 						'color' => '#393f4c',
@@ -189,22 +189,22 @@ class MonsterInsights_Popular_Posts_Themes {
 					),
 					'label'  => array(
 						'color' => '#393f4c',
-						'text'  => __( 'Popular Stories Right now', 'google-analytics-for-wordpress' ),
+						'text'  => 'Popular Stories Right now',
 					),
 					'border' => array(
 						'color' => '#D3D7DE',
 					),
 				),
 				'list'   => array(
-					__( '15 Proven Ways to Repurpose Content on Your WordPress Site', 'google-analytics-for-wordpress' ),
-					__( 'How to Use Google Trends to Boost Traffic and Sales (9 Simple Ways)', 'google-analytics-for-wordpress' ),
-					__( 'How to Set Up Online Ordering for Your Restaurant Website', 'google-analytics-for-wordpress' ),
+					'15 Proven Ways to Repurpose Content on Your WordPress Site',
+					'How to Use Google Trends to Boost Traffic and Sales (9 Simple Ways)',
+					'How to Set Up Online Ordering for Your Restaurant Website',
 				),
 				'posts'  => 3,
 				'level'  => 'lite',
 			),
 			'delta'    => array(
-				'label'  => __( 'Delta', 'google-analytics-for-wordpress' ),
+				'label'  => 'Delta',
 				'styles' => array(
 					'icon'       => array(
 						'color' => '#EB5757',
@@ -212,11 +212,11 @@ class MonsterInsights_Popular_Posts_Themes {
 					'title'      => array(
 						'color' => '#393f4c',
 						'size'  => 16,
-						'text'  => __( 'How to Use Google Trends to Boost Traffic and Sales (9 Simple Ways)', 'google-analytics-for-wordpress' ),
+						'text'  => 'How to Use Google Trends to Boost Traffic and Sales (9 Simple Ways)',
 					),
 					'label'      => array(
 						'color' => '#EB5757',
-						'text'  => __( 'Trending', 'google-analytics-for-wordpress' ),
+						'text'  => 'Trending',
 					),
 					'background' => array(
 						'border' => '#F0F2F4',
@@ -225,16 +225,16 @@ class MonsterInsights_Popular_Posts_Themes {
 				'level'  => 'plus',
 			),
 			'echo'     => array(
-				'label'  => __( 'Echo', 'google-analytics-for-wordpress' ),
+				'label'  => 'Echo',
 				'styles' => array(
 					'title'      => array(
 						'color' => '#393f4c',
 						'size'  => 18,
-						'text'  => __( '15 Proven Ways to Repurpose Content on Your WordPress Site', 'google-analytics-for-wordpress' ),
+						'text'  => '15 Proven Ways to Repurpose Content on Your WordPress Site',
 					),
 					'label'      => array(
 						'color' => '#EB5757',
-						'text'  => __( 'Trending:', 'google-analytics-for-wordpress' ),
+						'text'  => 'Trending:',
 					),
 					'background' => array(
 						'color' => '#F0F2F4',
@@ -243,16 +243,16 @@ class MonsterInsights_Popular_Posts_Themes {
 				'level'  => 'plus',
 			),
 			'foxtrot'  => array(
-				'label'  => __( 'Foxtrot', 'google-analytics-for-wordpress' ),
+				'label'  => 'Foxtrot',
 				'styles' => array(
 					'title' => array(
 						'color' => '#393f4c',
 						'size'  => 18,
-						'text'  => __( 'How to Build an Email List in WordPress – Email Marketing 101', 'google-analytics-for-wordpress' ),
+						'text'  => 'How to Build an Email List in WordPress – Email Marketing 101',
 					),
 					'label' => array(
 						'color' => '#EB5757',
-						'text'  => __( 'Trending', 'google-analytics-for-wordpress' ),
+						'text'  => 'Trending',
 					),
 					'image' => 'theme-preview-image.jpg',
 				),
@@ -260,16 +260,16 @@ class MonsterInsights_Popular_Posts_Themes {
 				'level'  => 'plus',
 			),
 			'golf'     => array(
-				'label'  => __( 'Golf', 'google-analytics-for-wordpress' ),
+				'label'  => 'Golf',
 				'styles' => array(
 					'title'  => array(
 						'color' => '#393f4c',
 						'size'  => 16,
-						'text'  => __( '15 Proven Ways to Repurpose Content on Your WordPress Site', 'google-analytics-for-wordpress' ),
+						'text'  => '15 Proven Ways to Repurpose Content on Your WordPress Site',
 					),
 					'label'  => array(
 						'color' => '#EB5757',
-						'text'  => __( 'Popular now', 'google-analytics-for-wordpress' ),
+						'text'  => 'Popular now',
 					),
 					'border' => array(
 						'color'  => '#EB5757',
@@ -279,12 +279,12 @@ class MonsterInsights_Popular_Posts_Themes {
 				'level'  => 'plus',
 			),
 			'hotel'    => array(
-				'label'  => __( 'Hotel', 'google-analytics-for-wordpress' ),
+				'label'  => 'Hotel',
 				'styles' => array(
 					'title' => array(
 						'color' => '#393f4c',
 						'size'  => 18,
-						'text'  => __( 'How to Use Google Trends to Boost Traffic and Sales (9 Simple Ways)', 'google-analytics-for-wordpress' ),
+						'text'  => 'How to Use Google Trends to Boost Traffic and Sales (9 Simple Ways)',
 					),
 					'icon'  => array(
 						'color' => '#EB5757',
@@ -293,16 +293,16 @@ class MonsterInsights_Popular_Posts_Themes {
 				'level'  => 'plus',
 			),
 			'india'    => array(
-				'label'  => __( 'India', 'google-analytics-for-wordpress' ),
+				'label'  => 'India',
 				'styles' => array(
 					'title'      => array(
 						'color' => '#393f4c',
 						'size'  => 14,
-						'text'  => __( 'How to Use Google Trends to Boost Traffic and Sales (9 Simple Ways)', 'google-analytics-for-wordpress' ),
+						'text'  => 'How to Use Google Trends to Boost Traffic and Sales (9 Simple Ways)',
 					),
 					'label'      => array(
 						'color' => '#EB5757',
-						'text'  => __( 'Trending:', 'google-analytics-for-wordpress' ),
+						'text'  => 'Trending:',
 					),
 					'border'     => array(
 						'color' => '#EB5757',
@@ -314,17 +314,17 @@ class MonsterInsights_Popular_Posts_Themes {
 				'level'  => 'plus',
 			),
 			'juliett'  => array(
-				'label'  => __( 'Juliett', 'google-analytics-for-wordpress' ),
+				'label'  => 'Juliett',
 				'styles' => array(
 					'title'  => array(
 						'color' => '#393f4c',
 						'size'  => 18,
-						'text'  => __( 'How to Build an Email List in WordPress – Email Marketing 101', 'google-analytics-for-wordpress' ),
+						'text'  => 'How to Build an Email List in WordPress – Email Marketing 101',
 					),
 					'label'  => array(
 						'color'      => '#393f4c',
 						'background' => '#e2e4e9',
-						'text'       => __( 'Trending', 'google-analytics-for-wordpress' ),
+						'text'       => 'Trending',
 					),
 					'border' => array(
 						'color' => '#e2e4e9',
@@ -334,16 +334,16 @@ class MonsterInsights_Popular_Posts_Themes {
 				'level'  => 'plus',
 			),
 			'kilo'     => array(
-				'label'  => __( 'Kilo', 'google-analytics-for-wordpress' ),
+				'label'  => 'Kilo',
 				'styles' => array(
 					'title'  => array(
 						'color' => '#393f4c',
 						'size'  => 18,
-						'text'  => __( 'How to Use Google Trends to Boost Traffic and Sales (9 Simple Ways)', 'google-analytics-for-wordpress' ),
+						'text'  => 'How to Use Google Trends to Boost Traffic and Sales (9 Simple Ways)',
 					),
 					'label'  => array(
 						'color' => '#EB5757',
-						'text'  => __( 'Popular now', 'google-analytics-for-wordpress' ),
+						'text'  => 'Popular now',
 					),
 					'border' => array(
 						'color'  => '#e2e4e9',
@@ -353,16 +353,16 @@ class MonsterInsights_Popular_Posts_Themes {
 				'level'  => 'plus',
 			),
 			'lima'     => array(
-				'label'  => __( 'Lima', 'google-analytics-for-wordpress' ),
+				'label'  => 'Lima',
 				'styles' => array(
 					'title'      => array(
 						'color' => '#393f4c',
 						'size'  => 18,
-						'text'  => __( '15 Proven Ways to Repurpose Content on Your WordPress Site', 'google-analytics-for-wordpress' ),
+						'text'  => '15 Proven Ways to Repurpose Content on Your WordPress Site',
 					),
 					'label'      => array(
 						'color' => '#EB5757',
-						'text'  => __( 'Trending', 'google-analytics-for-wordpress' ),
+						'text'  => 'Trending',
 					),
 					'background' => array(
 						'color' => '#f0f2f4',
@@ -373,17 +373,17 @@ class MonsterInsights_Popular_Posts_Themes {
 				'level'  => 'plus',
 			),
 			'mike'     => array(
-				'label'  => __( 'Mike', 'google-analytics-for-wordpress' ),
+				'label'  => 'Mike',
 				'styles' => array(
 					'title'      => array(
 						'color' => '#393f4c',
 						'size'  => 18,
-						'text'  => __( 'How to Build an Email List in WordPress – Email Marketing 101', 'google-analytics-for-wordpress' ),
+						'text'  => 'How to Build an Email List in WordPress – Email Marketing 101',
 					),
 					'label'      => array(
 						'color'      => '#fff',
 						'background' => '#f2994a',
-						'text'       => __( 'Trending', 'google-analytics-for-wordpress' ),
+						'text'       => 'Trending',
 					),
 					'background' => array(
 						'color' => '#f0f2f4',
@@ -394,16 +394,16 @@ class MonsterInsights_Popular_Posts_Themes {
 				'level'  => 'plus',
 			),
 			'november' => array(
-				'label'  => __( 'November', 'google-analytics-for-wordpress' ),
+				'label'  => 'November',
 				'styles' => array(
 					'title'      => array(
 						'color' => '#393f4c',
 						'size'  => 16,
-						'text'  => __( 'How to Use Google Trends to Boost Traffic and Sales (9 Simple Ways)', 'google-analytics-for-wordpress' ),
+						'text'  => 'How to Use Google Trends to Boost Traffic and Sales (9 Simple Ways)',
 					),
 					'label'      => array(
 						'color' => '#eb5757',
-						'text'  => __( 'Trending', 'google-analytics-for-wordpress' ),
+						'text'  => 'Trending',
 					),
 					'background' => array(
 						'border' => '#f0f2f4',
@@ -430,7 +430,7 @@ class MonsterInsights_Popular_Posts_Themes {
 
 		$themes = array(
 			'alpha'   => array(
-				'label'  => __( 'Alpha', 'google-analytics-for-wordpress' ),
+				'label'  => 'Alpha',
 				'styles' => array(
 					'title'      => array(
 						'color' => '#393F4C',
@@ -443,16 +443,16 @@ class MonsterInsights_Popular_Posts_Themes {
 				),
 				'list'   => array(
 					'items' => array(
-						__( 'How to Set Up WordPress User Activity Tracking in 3 Easy Steps', 'google-analytics-for-wordpress' ),
-						__( 'How to Share Your Google Analytics Reports with Others (5 Easy Ways)', 'google-analytics-for-wordpress' ),
-						__( '12 Best Social Media Analytics Tools for Marketers (Tried & Tested)', 'google-analytics-for-wordpress' ),
-						__( '9 Proven Ways to Get Google to Index Your Website Right Away', 'google-analytics-for-wordpress' ),
+						'How to Set Up WordPress User Activity Tracking in 3 Easy Steps',
+						'How to Share Your Google Analytics Reports with Others (5 Easy Ways)',
+						'12 Best Social Media Analytics Tools for Marketers (Tried & Tested)',
+						'9 Proven Ways to Get Google to Index Your Website Right Away',
 					),
 				),
 				'level'  => 'lite',
 			),
 			'beta'    => array(
-				'label'  => __( 'Beta', 'google-analytics-for-wordpress' ),
+				'label'  => 'Beta',
 				'styles' => array(
 					'title'      => array(
 						'color' => '#393F4C',
@@ -464,16 +464,16 @@ class MonsterInsights_Popular_Posts_Themes {
 				),
 				'list'   => array(
 					'items' => array(
-						__( '9 Proven Ways to Get Google to Index Your Website Right Away', 'google-analytics-for-wordpress' ),
-						__( 'How to Share Your Google Analytics Reports with Others (5 Easy Ways)', 'google-analytics-for-wordpress' ),
-						__( '12 Best Social Media Analytics Tools for Marketers (Tried & Tested)', 'google-analytics-for-wordpress' ),
-						__( 'Uncover How Much Traffic Does a Website Get (5 Effortless Ways)', 'google-analytics-for-wordpress' ),
+						'9 Proven Ways to Get Google to Index Your Website Right Away',
+						'How to Share Your Google Analytics Reports with Others (5 Easy Ways)',
+						'12 Best Social Media Analytics Tools for Marketers (Tried & Tested)',
+						'Uncover How Much Traffic Does a Website Get (5 Effortless Ways)',
 					),
 				),
 				'level'  => 'lite',
 			),
 			'charlie' => array(
-				'label'  => __( 'Charlie', 'google-analytics-for-wordpress' ),
+				'label'  => 'Charlie',
 				'styles' => array(
 					'title'      => array(
 						'color' => '#393f4c',
@@ -486,16 +486,16 @@ class MonsterInsights_Popular_Posts_Themes {
 				),
 				'list'   => array(
 					'items' => array(
-						__( 'Uncover How Much Traffic Does a Website Get (5 Effortless Ways)', 'google-analytics-for-wordpress' ),
-						__( 'How to Share Your Google Analytics Reports with Others (5 Easy Ways)', 'google-analytics-for-wordpress' ),
-						__( '12 Best Social Media Analytics Tools for Marketers (Tried & Tested)', 'google-analytics-for-wordpress' ),
-						__( '9 Proven Ways to Get Google to Index Your Website Right Away', 'google-analytics-for-wordpress' ),
+						'Uncover How Much Traffic Does a Website Get (5 Effortless Ways)',
+						'How to Share Your Google Analytics Reports with Others (5 Easy Ways)',
+						'12 Best Social Media Analytics Tools for Marketers (Tried & Tested)',
+						'9 Proven Ways to Get Google to Index Your Website Right Away',
 					),
 				),
 				'level'  => 'lite',
 			),
 			'delta'   => array(
-				'label'  => __( 'Delta', 'google-analytics-for-wordpress' ),
+				'label'  => 'Delta',
 				'styles' => array(
 					'title'      => array(
 						'color' => '#393f4c',
@@ -513,10 +513,10 @@ class MonsterInsights_Popular_Posts_Themes {
 				),
 				'list'   => array(
 					'items'  => array(
-						__( '9 Proven Ways to Get Google to Index Your Website Right Away', 'google-analytics-for-wordpress' ),
-						__( 'How to Share Your Google Analytics Reports with Others (5 Easy Ways)', 'google-analytics-for-wordpress' ),
-						__( '12 Best Social Media Analytics Tools for Marketers (Tried & Tested)', 'google-analytics-for-wordpress' ),
-						__( 'Uncover How Much Traffic Does a Website Get (5 Effortless Ways)', 'google-analytics-for-wordpress' ),
+						'9 Proven Ways to Get Google to Index Your Website Right Away',
+						'How to Share Your Google Analytics Reports with Others (5 Easy Ways)',
+						'12 Best Social Media Analytics Tools for Marketers (Tried & Tested)',
+						'Uncover How Much Traffic Does a Website Get (5 Effortless Ways)',
 					),
 					'images' => array(
 						'theme-widget-1.jpg',
@@ -529,7 +529,7 @@ class MonsterInsights_Popular_Posts_Themes {
 				'level'  => 'pro',
 			),
 			'echo'    => array(
-				'label'  => __( 'Echo', 'google-analytics-for-wordpress' ),
+				'label'  => 'Echo',
 				'styles' => array(
 					'title'    => array(
 						'color' => '#393f4c',
@@ -549,10 +549,10 @@ class MonsterInsights_Popular_Posts_Themes {
 				),
 				'list'   => array(
 					'items'  => array(
-						__( '9 Proven Ways to Get Google to Index Your Website Right Away', 'google-analytics-for-wordpress' ),
-						__( 'How to Share Your Google Analytics Reports with Others (5 Easy Ways)', 'google-analytics-for-wordpress' ),
-						__( '12 Best Social Media Analytics Tools for Marketers (Tried & Tested)', 'google-analytics-for-wordpress' ),
-						__( 'Uncover How Much Traffic Does a Website Get (5 Effortless Ways)', 'google-analytics-for-wordpress' ),
+						'9 Proven Ways to Get Google to Index Your Website Right Away',
+						'How to Share Your Google Analytics Reports with Others (5 Easy Ways)',
+						'12 Best Social Media Analytics Tools for Marketers (Tried & Tested)',
+						'Uncover How Much Traffic Does a Website Get (5 Effortless Ways)',
 					),
 					'images' => array(
 						'theme-widget-5.jpg',
@@ -565,7 +565,7 @@ class MonsterInsights_Popular_Posts_Themes {
 				'level'  => 'pro',
 			),
 			'foxtrot' => array(
-				'label'  => __( 'Foxtrot', 'google-analytics-for-wordpress' ),
+				'label'  => 'Foxtrot',
 				'styles' => array(
 					'title'    => array(
 						'color' => '#393f4c',
@@ -585,16 +585,16 @@ class MonsterInsights_Popular_Posts_Themes {
 				),
 				'list'   => array(
 					'items' => array(
-						__( '9 Proven Ways to Get Google to Index Your Website Right Away', 'google-analytics-for-wordpress' ),
-						__( '12 Best Social Media Analytics Tools for Marketers (Tried & Tested) ', 'google-analytics-for-wordpress' ),
-						__( 'Uncover How Much Traffic Does a Website Get (5 Effortless Ways)', 'google-analytics-for-wordpress' ),
-						__( 'How to Share Your Google Analytics Reports with Others (5 Easy Ways)', 'google-analytics-for-wordpress' ),
+						'9 Proven Ways to Get Google to Index Your Website Right Away',
+						'12 Best Social Media Analytics Tools for Marketers (Tried & Tested) ',
+						'Uncover How Much Traffic Does a Website Get (5 Effortless Ways)',
+						'How to Share Your Google Analytics Reports with Others (5 Easy Ways)',
 					),
 				),
 				'level'  => 'pro',
 			),
 			'golf'    => array(
-				'label'  => __( 'Golf', 'google-analytics-for-wordpress' ),
+				'label'  => 'Golf',
 				'styles' => array(
 					'title'    => array(
 						'color' => '#393f4c',
@@ -603,7 +603,7 @@ class MonsterInsights_Popular_Posts_Themes {
 					'label'    => array(
 						'color'      => '#fff',
 						'background' => '#EB5757',
-						'text'       => __( 'Trending:', 'google-analytics-for-wordpress' ),
+						'text'       => 'Trending:',
 						'editable'   => true,
 					),
 					'meta'     => array(
@@ -620,16 +620,16 @@ class MonsterInsights_Popular_Posts_Themes {
 				),
 				'list'   => array(
 					'items' => array(
-						__( '9 Proven Ways to Get Google to Index Your Website Right Away', 'google-analytics-for-wordpress' ),
-						__( '12 Best Social Media Analytics Tools for Marketers (Tried & Tested) ', 'google-analytics-for-wordpress' ),
-						__( 'Uncover How Much Traffic Does a Website Get (5 Effortless Ways)', 'google-analytics-for-wordpress' ),
-						__( 'How to Share Your Google Analytics Reports with Others (5 Easy Ways)', 'google-analytics-for-wordpress' ),
+						'9 Proven Ways to Get Google to Index Your Website Right Away',
+						'12 Best Social Media Analytics Tools for Marketers (Tried & Tested) ',
+						'Uncover How Much Traffic Does a Website Get (5 Effortless Ways)',
+						'How to Share Your Google Analytics Reports with Others (5 Easy Ways)',
 					),
 				),
 				'level'  => 'pro',
 			),
 			'hotel'   => array(
-				'label'  => __( 'Hotel', 'google-analytics-for-wordpress' ),
+				'label'  => 'Hotel',
 				'styles' => array(
 					'title' => array(
 						'color' => '#fff',
@@ -644,10 +644,10 @@ class MonsterInsights_Popular_Posts_Themes {
 				),
 				'list'   => array(
 					'items'  => array(
-						__( 'How to Allow WordPress to Upload All File Types (The Easy Way)', 'google-analytics-for-wordpress' ),
-						__( '14 Handy Google Search Operators for SEO (A Complete List)', 'google-analytics-for-wordpress' ),
-						__( 'How to Write Irresistible Meta Descriptions for SEO & More Clicks?', 'google-analytics-for-wordpress' ),
-						__( 'Uncover How Much Traffic Does a Website Get (5 Effortless Ways)', 'google-analytics-for-wordpress' ),
+						'How to Allow WordPress to Upload All File Types (The Easy Way)',
+						'14 Handy Google Search Operators for SEO (A Complete List)',
+						'How to Write Irresistible Meta Descriptions for SEO & More Clicks?',
+						'Uncover How Much Traffic Does a Website Get (5 Effortless Ways)',
 					),
 					'images' => array(
 						'theme-widget-5.jpg',
@@ -673,7 +673,7 @@ class MonsterInsights_Popular_Posts_Themes {
 	public function get_themes_products() {
 		$themes = array(
 			'alpha'   => array(
-				'label'  => __( 'Alpha', 'google-analytics-for-wordpress' ),
+				'label'  => 'Alpha',
 				'styles' => array(
 					'title'      => array(
 						'color' => '#393F4C',
@@ -697,10 +697,10 @@ class MonsterInsights_Popular_Posts_Themes {
 				),
 				'list'   => array(
 					'items'  => array(
-						__( 'WPBeginner 10-Year Anniversary Gray T-Shirt', 'google-analytics-for-wordpress' ),
-						__( 'WPForms Small White Logo T-Shirt', 'google-analytics-for-wordpress' ),
-						__( 'OptinMonster White Text Color Mascot T-Shirt', 'google-analytics-for-wordpress' ),
-						__( 'WPForms Make Things Simple Gray T-Shirt', 'google-analytics-for-wordpress' ),
+						'WPBeginner 10-Year Anniversary Gray T-Shirt',
+						'WPForms Small White Logo T-Shirt',
+						'OptinMonster White Text Color Mascot T-Shirt',
+						'WPForms Make Things Simple Gray T-Shirt',
 					),
 					'images' => array(
 						'theme-products-1.jpg',
@@ -717,7 +717,7 @@ class MonsterInsights_Popular_Posts_Themes {
 				),
 			),
 			'beta'    => array(
-				'label'  => __( 'Beta', 'google-analytics-for-wordpress' ),
+				'label'  => 'Beta',
 				'styles' => array(
 					'title'      => array(
 						'color' => '#393F4C',
@@ -741,10 +741,10 @@ class MonsterInsights_Popular_Posts_Themes {
 				),
 				'list'   => array(
 					'items'  => array(
-						__( 'Admin WPBeginner Black T-Shirt', 'google-analytics-for-wordpress' ),
-						__( 'Black WP Beginner logo T-Shirt', 'google-analytics-for-wordpress' ),
-						__( 'Technically Awesome Groovy White T-Shirt', 'google-analytics-for-wordpress' ),
-						__( 'Technically Awesome Code Comment Black T-Shirt', 'google-analytics-for-wordpress' ),
+						'Admin WPBeginner Black T-Shirt',
+						'Black WP Beginner logo T-Shirt',
+						'Technically Awesome Groovy White T-Shirt',
+						'Technically Awesome Code Comment Black T-Shirt',
 					),
 					'images' => array(
 						'theme-products-5.jpg',
@@ -761,7 +761,7 @@ class MonsterInsights_Popular_Posts_Themes {
 				),
 			),
 			'charlie' => array(
-				'label'  => __( 'Charlie', 'google-analytics-for-wordpress' ),
+				'label'  => 'Charlie',
 				'styles' => array(
 					'title'  => array(
 						'color' => '#fff',
@@ -781,10 +781,10 @@ class MonsterInsights_Popular_Posts_Themes {
 				),
 				'list'   => array(
 					'items'  => array(
-						__( 'Admin WPBeginner Black T-Shirt', 'google-analytics-for-wordpress' ),
-						__( 'Black WP Beginner logo T-Shirt', 'google-analytics-for-wordpress' ),
-						__( 'Technically Awesome Groovy White T-Shirt', 'google-analytics-for-wordpress' ),
-						__( 'Technically Awesome Code Comment Black T-Shirt', 'google-analytics-for-wordpress' ),
+						'Admin WPBeginner Black T-Shirt',
+						'Black WP Beginner logo T-Shirt',
+						'Technically Awesome Groovy White T-Shirt',
+						'Technically Awesome Code Comment Black T-Shirt',
 					),
 					'images' => array(
 						'theme-products-5.jpg',
@@ -802,7 +802,7 @@ class MonsterInsights_Popular_Posts_Themes {
 				'image'  => true,
 			),
 			'delta'   => array(
-				'label'  => __( 'Delta', 'google-analytics-for-wordpress' ),
+				'label'  => 'Delta',
 				'styles' => array(
 					'title'  => array(
 						'color' => '#393f4c',
@@ -823,10 +823,10 @@ class MonsterInsights_Popular_Posts_Themes {
 				),
 				'list'   => array(
 					'items'  => array(
-						__( 'Admin WPBeginner Black T-Shirt', 'google-analytics-for-wordpress' ),
-						__( 'Black WP Beginner logo T-Shirt', 'google-analytics-for-wordpress' ),
-						__( 'Technically Awesome Groovy White T-Shirt', 'google-analytics-for-wordpress' ),
-						__( 'Technically Awesome Code Comment Black T-Shirt', 'google-analytics-for-wordpress' ),
+						'Admin WPBeginner Black T-Shirt',
+						'Black WP Beginner logo T-Shirt',
+						'Technically Awesome Groovy White T-Shirt',
+						'Technically Awesome Code Comment Black T-Shirt',
 					),
 					'images' => array(
 						'theme-products-5.jpg',

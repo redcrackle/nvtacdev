@@ -59,9 +59,8 @@ class Themer {
         $directories = new \DirectoryIterator($this->path);
 
         foreach( $directories as $fileinfo ) {
-            if ( $fileinfo->isDot() || $fileinfo->isFile() ) {
+            if ( $fileinfo->isDot() || $fileinfo->isFile() )
                 continue;
-            }
             $this->load_theme($fileinfo->getPathName());
         }
 
@@ -82,10 +81,10 @@ class Themer {
      * @since   5.0.0
      * @param   string  $path   Path to theme folder
      */
-    private function load_theme(string $path)
+    private function load_theme($path)
     {
         $theme_folder = is_string($path) && is_dir($path) && is_readable($path) ? basename($path) : null;
-        $theme_folder = $theme_folder ? preg_replace('/[^a-z0-9\_\-\.]/i', '', $theme_folder) : null;
+        $theme_folder = $theme_folder ? preg_replace("/[^a-z0-9\_\-\.]/i", '', $theme_folder) : null;
         $theme_path = $theme_folder ? $path : null;
 
         if (
@@ -97,7 +96,7 @@ class Themer {
             && file_exists($theme_path . '/config.json')
             && file_exists($theme_path . '/style.css')
         ) {
-            $str = file_get_contents($theme_path . '/config.json'); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- We're loading a local file
+            $str = file_get_contents($theme_path . '/config.json');
             $json = json_decode($str, true);
 
             if ( $this->is_valid_config($json) ) {
@@ -127,7 +126,7 @@ class Themer {
      * @param   string  $theme
      * @return  array|bool
      */
-    public function get_theme(string $theme)
+    public function get_theme($theme)
     {
         return isset($this->themes[$theme]) ? $this->themes[$theme] : false;
     }
@@ -139,7 +138,7 @@ class Themer {
      * @param   array
      * @return  bool
      */
-    public function is_valid_config(array $json)
+    public function is_valid_config($json = [])
     {
         return is_array($json) && ! empty($json) && isset($json['name']) && isset($json['config']) && is_array($json['config']);
     }

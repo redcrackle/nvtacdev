@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -12,7 +11,6 @@ declare (strict_types=1);
 namespace WPMailSMTP\Vendor\Monolog\Handler;
 
 use WPMailSMTP\Vendor\Monolog\Formatter\LineFormatter;
-use WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface;
 use WPMailSMTP\Vendor\Monolog\Logger;
 /**
  * Logs to a Redis key using rpush
@@ -24,23 +22,20 @@ use WPMailSMTP\Vendor\Monolog\Logger;
  *   $log->pushHandler($redis);
  *
  * @author Thomas Tourlourat <thomas@tourlourat.com>
- *
- * @phpstan-import-type FormattedRecord from AbstractProcessingHandler
  */
 class RedisHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProcessingHandler
 {
-    /** @var \Predis\Client<\Predis\Client>|\Redis */
     private $redisClient;
-    /** @var string */
     private $redisKey;
-    /** @var int */
     protected $capSize;
     /**
-     * @param \Predis\Client<\Predis\Client>|\Redis $redis   The redis instance
+     * @param \Predis\Client|\Redis $redis   The redis instance
      * @param string                $key     The key name to push records to
-     * @param int                   $capSize Number of entries to limit list size to, 0 = unlimited
+     * @param int                   $level   The minimum logging level at which this handler will be triggered
+     * @param bool                  $bubble  Whether the messages that are handled can bubble up the stack or not
+     * @param int|false             $capSize Number of entries to limit list size to
      */
-    public function __construct($redis, string $key, $level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG, bool $bubble = \true, int $capSize = 0)
+    public function __construct($redis, $key, $level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG, $bubble = \true, $capSize = \false)
     {
         if (!($redis instanceof \WPMailSMTP\Vendor\Predis\Client || $redis instanceof \Redis)) {
             throw new \InvalidArgumentException('Predis\\Client or Redis instance required');
@@ -53,7 +48,7 @@ class RedisHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProcessing
     /**
      * {@inheritDoc}
      */
-    protected function write(array $record) : void
+    protected function write(array $record)
     {
         if ($this->capSize) {
             $this->writeCapped($record);
@@ -65,9 +60,10 @@ class RedisHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProcessing
      * Write and cap the collection
      * Writes the record to the redis list and caps its
      *
-     * @phpstan-param FormattedRecord $record
+     * @param  array $record associative record array
+     * @return void
      */
-    protected function writeCapped(array $record) : void
+    protected function writeCapped(array $record)
     {
         if ($this->redisClient instanceof \Redis) {
             $mode = \defined('\\Redis::MULTI') ? \Redis::MULTI : 1;
@@ -84,7 +80,7 @@ class RedisHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProcessing
     /**
      * {@inheritDoc}
      */
-    protected function getDefaultFormatter() : \WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface
+    protected function getDefaultFormatter()
     {
         return new \WPMailSMTP\Vendor\Monolog\Formatter\LineFormatter();
     }

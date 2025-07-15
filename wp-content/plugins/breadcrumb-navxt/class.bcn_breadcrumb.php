@@ -1,6 +1,6 @@
 <?php
 /*  
-	Copyright 2007-2025  John Havlik  (email : john.havlik@mtekk.us)
+	Copyright 2007-2022  John Havlik  (email : john.havlik@mtekk.us)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ require_once(dirname(__FILE__) . '/includes/block_direct_access.php');
 class bcn_breadcrumb
 {
 	//Our member variables
-	const version = '7.4.1';
+	const version = '7.0.2';
 	//The main text that will be shown
 	protected $title;
 	//The breadcrumb's template, used durring assembly
@@ -75,6 +75,7 @@ class bcn_breadcrumb
 				$this->set_template(bcn_breadcrumb::get_default_template());
 			}
 		}
+		//Always null if unlinked
 		$this->set_url($url);
 		$this->set_linked($linked);
 	}

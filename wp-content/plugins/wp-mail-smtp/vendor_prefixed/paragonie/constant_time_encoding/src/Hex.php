@@ -1,12 +1,9 @@
 <?php
 
-declare (strict_types=1);
 namespace WPMailSMTP\Vendor\ParagonIE\ConstantTime;
 
-use RangeException;
-use TypeError;
 /**
- *  Copyright (c) 2016 - 2022 Paragon Initiative Enterprises.
+ *  Copyright (c) 2016 - 2017 Paragon Initiative Enterprises.
  *  Copyright (c) 2014 Steve "Sc00bz" Thomas (steve at tobtu dot com)
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -37,20 +34,15 @@ abstract class Hex implements \WPMailSMTP\Vendor\ParagonIE\ConstantTime\EncoderI
      * Convert a binary string into a hexadecimal string without cache-timing
      * leaks
      *
-     * @param string $binString (raw binary)
+     * @param string $bin_string (raw binary)
      * @return string
-     * @throws TypeError
      */
-    public static function encode(
-        #[\SensitiveParameter]
-        string $binString
-    ) : string
+    public static function encode($bin_string)
     {
         $hex = '';
-        $len = \WPMailSMTP\Vendor\ParagonIE\ConstantTime\Binary::safeStrlen($binString);
+        $len = \WPMailSMTP\Vendor\ParagonIE\ConstantTime\Binary::safeStrlen($bin_string);
         for ($i = 0; $i < $len; ++$i) {
-            /** @var array<int, int> $chunk */
-            $chunk = \unpack('C', $binString[$i]);
+            $chunk = \unpack('C', \WPMailSMTP\Vendor\ParagonIE\ConstantTime\Binary::safeSubstr($bin_string, $i, 2));
             $c = $chunk[1] & 0xf;
             $b = $chunk[1] >> 4;
             $hex .= \pack('CC', 87 + $b + ($b - 10 >> 8 & ~38), 87 + $c + ($c - 10 >> 8 & ~38));
@@ -61,20 +53,15 @@ abstract class Hex implements \WPMailSMTP\Vendor\ParagonIE\ConstantTime\EncoderI
      * Convert a binary string into a hexadecimal string without cache-timing
      * leaks, returning uppercase letters (as per RFC 4648)
      *
-     * @param string $binString (raw binary)
+     * @param string $bin_string (raw binary)
      * @return string
-     * @throws TypeError
      */
-    public static function encodeUpper(
-        #[\SensitiveParameter]
-        string $binString
-    ) : string
+    public static function encodeUpper($bin_string)
     {
         $hex = '';
-        $len = \WPMailSMTP\Vendor\ParagonIE\ConstantTime\Binary::safeStrlen($binString);
+        $len = \WPMailSMTP\Vendor\ParagonIE\ConstantTime\Binary::safeStrlen($bin_string);
         for ($i = 0; $i < $len; ++$i) {
-            /** @var array<int, int> $chunk */
-            $chunk = \unpack('C', $binString[$i]);
+            $chunk = \unpack('C', \WPMailSMTP\Vendor\ParagonIE\ConstantTime\Binary::safeSubstr($bin_string, $i, 2));
             $c = $chunk[1] & 0xf;
             $b = $chunk[1] >> 4;
             $hex .= \pack('CC', 55 + $b + ($b - 10 >> 8 & ~6), 55 + $c + ($c - 10 >> 8 & ~6));
@@ -85,32 +72,21 @@ abstract class Hex implements \WPMailSMTP\Vendor\ParagonIE\ConstantTime\EncoderI
      * Convert a hexadecimal string into a binary string without cache-timing
      * leaks
      *
-     * @param string $encodedString
-     * @param bool $strictPadding
+     * @param string $encoded_string
      * @return string (raw binary)
-     * @throws RangeException
+     * @throws \RangeException
      */
-    public static function decode(
-        #[\SensitiveParameter]
-        string $encodedString,
-        bool $strictPadding = \false
-    ) : string
+    public static function decode($encoded_string)
     {
         $hex_pos = 0;
         $bin = '';
         $c_acc = 0;
-        $hex_len = \WPMailSMTP\Vendor\ParagonIE\ConstantTime\Binary::safeStrlen($encodedString);
+        $hex_len = \WPMailSMTP\Vendor\ParagonIE\ConstantTime\Binary::safeStrlen($encoded_string);
         $state = 0;
         if (($hex_len & 1) !== 0) {
-            if ($strictPadding) {
-                throw new \RangeException('Expected an even number of hexadecimal characters');
-            } else {
-                $encodedString = '0' . $encodedString;
-                ++$hex_len;
-            }
+            throw new \RangeException('Expected an even number of hexadecimal characters');
         }
-        /** @var array<int, int> $chunk */
-        $chunk = \unpack('C*', $encodedString);
+        $chunk = \unpack('C*', $encoded_string);
         while ($hex_pos < $hex_len) {
             ++$hex_pos;
             $c = $chunk[$hex_pos];
@@ -119,7 +95,7 @@ abstract class Hex implements \WPMailSMTP\Vendor\ParagonIE\ConstantTime\EncoderI
             $c_alpha = ($c & ~32) - 55;
             $c_alpha0 = ($c_alpha - 10 ^ $c_alpha - 16) >> 8;
             if (($c_num0 | $c_alpha0) === 0) {
-                throw new \RangeException('Expected hexadecimal character');
+                throw new \RangeException('hexEncode() only expects hexadecimal characters');
             }
             $c_val = $c_num0 & $c_num | $c_alpha & $c_alpha0;
             if ($state === 0) {

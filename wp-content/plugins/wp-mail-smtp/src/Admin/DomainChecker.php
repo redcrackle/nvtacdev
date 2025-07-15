@@ -2,8 +2,6 @@
 
 namespace WPMailSMTP\Admin;
 
-use WPMailSMTP\Helpers\Helpers;
-
 /**
  * Class for interacting with the Domain Checker API.
  *
@@ -55,12 +53,7 @@ class DomainChecker {
 			'domain' => $sending_domain,
 		];
 
-		$response = wp_remote_get(
-			add_query_arg( $params, self::ENDPOINT ),
-			[
-				'user-agent' => Helpers::get_default_user_agent(),
-			]
-		);
+		$response = wp_remote_get( add_query_arg( $params, self::ENDPOINT ) );
 
 		if ( is_wp_error( $response ) ) {
 			$this->results = [

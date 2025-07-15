@@ -7,7 +7,6 @@ namespace Composer\Autoload;
 class ComposerStaticInit5251c6df6cf3bfc1691db7b8368628bd
 {
     public static $classMap = array (
-        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'WP_Tabbed_Navigation' => __DIR__ . '/..' . '/objectivco/wp_tabbed_navigation/src/class-wp-tabbed-navigation.php',
         'WordPress_SimpleSettings' => __DIR__ . '/..' . '/objectivco/wordpress-simple-settings/src/wordpress-simple-settings.php',
     );

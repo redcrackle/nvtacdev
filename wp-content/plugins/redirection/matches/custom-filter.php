@@ -26,7 +26,7 @@ class Custom_Match extends Red_Match {
 	}
 
 	public function sanitize_filter( $name ) {
-		$name = preg_replace( '/[^A-Za-z0-9\-_]/', '', sanitize_text_field( $name ) );
+		$name = preg_replace( '/[^A-Za-z0-9\-_]/', '', $name );
 
 		return trim( $name );
 	}

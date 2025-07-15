@@ -4,8 +4,6 @@
  */
 
 require_once WPCF7_PLUGIN_DIR . '/includes/swv/schema-holder.php';
-require_once WPCF7_PLUGIN_DIR . '/includes/swv/script-loader.php';
-require_once WPCF7_PLUGIN_DIR . '/includes/swv/php/abstract-rules.php';
 
 
 /**
@@ -13,30 +11,21 @@ require_once WPCF7_PLUGIN_DIR . '/includes/swv/php/abstract-rules.php';
  */
 function wpcf7_swv_available_rules() {
 	$rules = array(
-		'required' => 'Contactable\SWV\RequiredRule',
-		'requiredfile' => 'Contactable\SWV\RequiredFileRule',
-		'email' => 'Contactable\SWV\EmailRule',
-		'url' => 'Contactable\SWV\URLRule',
-		'tel' => 'Contactable\SWV\TelRule',
-		'number' => 'Contactable\SWV\NumberRule',
-		'date' => 'Contactable\SWV\DateRule',
-		'time' => 'Contactable\SWV\TimeRule',
-		'file' => 'Contactable\SWV\FileRule',
-		'enum' => 'Contactable\SWV\EnumRule',
-		'dayofweek' => 'Contactable\SWV\DayofweekRule',
-		'minitems' => 'Contactable\SWV\MinItemsRule',
-		'maxitems' => 'Contactable\SWV\MaxItemsRule',
-		'minlength' => 'Contactable\SWV\MinLengthRule',
-		'maxlength' => 'Contactable\SWV\MaxLengthRule',
-		'minnumber' => 'Contactable\SWV\MinNumberRule',
-		'maxnumber' => 'Contactable\SWV\MaxNumberRule',
-		'mindate' => 'Contactable\SWV\MinDateRule',
-		'maxdate' => 'Contactable\SWV\MaxDateRule',
-		'minfilesize' => 'Contactable\SWV\MinFileSizeRule',
-		'maxfilesize' => 'Contactable\SWV\MaxFileSizeRule',
-		'stepnumber' => 'Contactable\SWV\StepNumberRule',
-		'all' => 'Contactable\SWV\AllRule',
-		'any' => 'Contactable\SWV\AnyRule',
+		'required' => 'WPCF7_SWV_RequiredRule',
+		'requiredfile' => 'WPCF7_SWV_RequiredFileRule',
+		'email' => 'WPCF7_SWV_EmailRule',
+		'url' => 'WPCF7_SWV_URLRule',
+		'tel' => 'WPCF7_SWV_TelRule',
+		'number' => 'WPCF7_SWV_NumberRule',
+		'date' => 'WPCF7_SWV_DateRule',
+		'file' => 'WPCF7_SWV_FileRule',
+		'minlength' => 'WPCF7_SWV_MinLengthRule',
+		'maxlength' => 'WPCF7_SWV_MaxLengthRule',
+		'minnumber' => 'WPCF7_SWV_MinNumberRule',
+		'maxnumber' => 'WPCF7_SWV_MaxNumberRule',
+		'mindate' => 'WPCF7_SWV_MinDateRule',
+		'maxdate' => 'WPCF7_SWV_MaxDateRule',
+		'maxfilesize' => 'WPCF7_SWV_MaxFileSizeRule',
 	);
 
 	return apply_filters( 'wpcf7_swv_available_rules', $rules );
@@ -53,7 +42,7 @@ function wpcf7_swv_load_rules() {
 
 	foreach ( array_keys( $rules ) as $rule ) {
 		$file = sprintf( '%s.php', $rule );
-		$path = path_join( WPCF7_PLUGIN_DIR . '/includes/swv/php/rules', $file );
+		$path = path_join( WPCF7_PLUGIN_DIR . '/includes/swv/rules', $file );
 
 		if ( file_exists( $path ) ) {
 			include_once $path;
@@ -67,7 +56,7 @@ function wpcf7_swv_load_rules() {
  *
  * @param string $rule_name Rule name.
  * @param string|array $properties Optional. Rule properties.
- * @return \Contactable\SWV\Rule|null The rule object, or null if it failed.
+ * @return WPCF7_SWV_Rule|null The rule object, or null if it failed.
  */
 function wpcf7_swv_create_rule( $rule_name, $properties = '' ) {
 	$rules = wpcf7_swv_available_rules();
@@ -116,13 +105,6 @@ function wpcf7_swv_get_meta_schema() {
 								'type' => 'string',
 							),
 						),
-						'base' => array(
-							'type' => 'string',
-						),
-						'interval' => array(
-							'type' => 'number',
-							'minimum' => 0,
-						),
 						'threshold' => array(
 							'type' => 'string',
 						),
@@ -136,37 +118,165 @@ function wpcf7_swv_get_meta_schema() {
 
 
 /**
- * The schema class as a composite rule.
+ * The base class of SWV rules.
  */
-class WPCF7_SWV_Schema extends \Contactable\SWV\CompositeRule {
+abstract class WPCF7_SWV_Rule {
 
-	/**
-	 * The human-readable version of the schema.
-	 */
-	const version = 'Contact Form 7 SWV Schema 2024-10';
+	protected $properties = array();
 
-
-	/**
-	 * Constructor.
-	 */
 	public function __construct( $properties = '' ) {
-		$this->properties = wp_parse_args( $properties, array(
-			'version' => self::version,
-		) );
+		$this->properties = wp_parse_args( $properties, array() );
 	}
 
 
 	/**
-	 * Validates with this schema.
+	 * Returns true if this rule matches the given context.
+	 *
+	 * @param array $context Context.
+	 */
+	public function matches( $context ) {
+		$field = $this->get_property( 'field' );
+
+		if ( ! empty( $context['field'] ) ) {
+			if ( $field and ! in_array( $field, (array) $context['field'], true ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Validates with this rule's logic.
+	 *
+	 * @param array $context Context.
+	 */
+	public function validate( $context ) {
+		return true;
+	}
+
+
+	/**
+	 * Converts the properties to an array.
+	 *
+	 * @return array Array of properties.
+	 */
+	public function to_array() {
+		return (array) $this->properties;
+	}
+
+
+	/**
+	 * Returns the property value specified by the given property name.
+	 *
+	 * @param string $name Property name.
+	 * @return mixed Property value.
+	 */
+	public function get_property( $name ) {
+		if ( isset( $this->properties[$name] ) ) {
+			return $this->properties[$name];
+		}
+	}
+
+}
+
+
+/**
+ * The base class of SWV composite rules.
+ */
+abstract class WPCF7_SWV_CompositeRule extends WPCF7_SWV_Rule {
+
+	protected $rules = array();
+
+
+	/**
+	 * Adds a sub-rule to this composite rule.
+	 *
+	 * @param WPCF7_SWV_Rule $rule Sub-rule to be added.
+	 */
+	public function add_rule( $rule ) {
+		if ( $rule instanceof WPCF7_SWV_Rule ) {
+			$this->rules[] = $rule;
+		}
+	}
+
+
+	/**
+	 * Returns an iterator of sub-rules.
+	 */
+	public function rules() {
+		foreach ( $this->rules as $rule ) {
+			yield $rule;
+		}
+	}
+
+
+	/**
+	 * Returns true if this rule matches the given context.
+	 *
+	 * @param array $context Context.
+	 */
+	public function matches( $context ) {
+		return true;
+	}
+
+
+	/**
+	 * Validates with this rule's logic.
 	 *
 	 * @param array $context Context.
 	 */
 	public function validate( $context ) {
 		foreach ( $this->rules() as $rule ) {
 			if ( $rule->matches( $context ) ) {
-				yield $rule->validate( $context );
+				$result = $rule->validate( $context );
+
+				if ( is_wp_error( $result ) ) {
+					return $result;
+				}
 			}
 		}
+
+		return true;
+	}
+
+
+	/**
+	 * Converts the properties to an array.
+	 *
+	 * @return array Array of properties.
+	 */
+	public function to_array() {
+		$rules_arrays = array_map(
+			function ( $rule ) {
+				return $rule->to_array();
+			},
+			$this->rules
+		);
+
+		return array_merge(
+			parent::to_array(),
+			array(
+				'rules' => $rules_arrays,
+			)
+		);
+	}
+
+}
+
+
+/**
+ * The schema class as a composite rule.
+ */
+class WPCF7_SWV_Schema extends WPCF7_SWV_CompositeRule {
+
+	const version = 'Contact Form 7 SWV Schema 2022-03';
+
+	public function __construct( $properties = '' ) {
+		$this->properties = wp_parse_args( $properties, array(
+			'version' => self::version,
+		) );
 	}
 
 }

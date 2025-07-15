@@ -16,6 +16,96 @@ function um_unsanitize_value( input ) {
 	return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
 }
 
+
+function um_init_datetimepicker() {
+	jQuery('.um-datepicker:not(.picker__input)').each(function(){
+		var elem = jQuery(this);
+
+		var disable = false;
+		if ( typeof elem.attr('data-disabled_weekdays') != 'undefined' && elem.attr('data-disabled_weekdays') !== '' ) {
+			disable = JSON.parse( elem.attr('data-disabled_weekdays') );
+		}
+
+		var years_n = null;
+		if ( typeof elem.attr('data-years') != 'undefined' ) {
+			years_n = elem.attr('data-years');
+		}
+
+		var minRange = elem.attr('data-date_min');
+		var maxRange = elem.attr('data-date_max');
+
+		var minSplit = [], maxSplit = [];
+		if ( typeof minRange != 'undefined' ) {
+			minSplit = minRange.split(",");
+		}
+		if ( typeof maxRange != 'undefined' ) {
+			maxSplit = maxRange.split(",");
+		}
+
+		var min = minSplit.length ? new Date(minSplit) : null;
+		var max = minSplit.length ? new Date(maxSplit) : null;
+
+		// fix min date for safari
+		if ( min && min.toString() == 'Invalid Date' && minSplit.length == 3 ) {
+			var minDateString = minSplit[1] + '/' + minSplit[2] + '/' + minSplit[0];
+			min = new Date(Date.parse(minDateString));
+		}
+
+		// fix max date for safari
+		if ( max && max.toString() == 'Invalid Date' && maxSplit.length == 3 ) {
+			var maxDateString = maxSplit[1] + '/' + maxSplit[2] + '/' + maxSplit[0];
+			max = new Date(Date.parse(maxDateString));
+		}
+
+		var data = {
+			disable: disable,
+			format: elem.attr( 'data-format' ),
+			formatSubmit: 'yyyy/mm/dd',
+			hiddenName: true,
+			onOpen: function() { elem.blur(); },
+			onClose: function() { elem.blur(); }
+		};
+
+		if ( years_n !== null ) {
+			data.selectYears = years_n;
+		}
+
+		if ( min !== null ) {
+			data.min = min;
+		}
+
+		if ( max !== null ) {
+			data.max = max;
+		}
+
+		elem.pickadate( data );
+	});
+
+	jQuery('.um-timepicker:not(.picker__input)').each(function(){
+		var elem = jQuery(this);
+
+		elem.pickatime({
+			format: elem.attr('data-format'),
+			interval: parseInt( elem.attr('data-intervals') ),
+			formatSubmit: 'HH:i',
+			hiddenName: true,
+			onOpen: function() { elem.blur(); },
+			onClose: function() { elem.blur(); }
+		});
+	});
+}
+
+
+
+function init_tipsy() {
+	if ( typeof( jQuery.fn.tipsy ) === 'function' ) {
+		jQuery('.um-tip-n').tipsy({gravity: 'n', opacity: 1, live: 'a.live', offset: 3 });
+		jQuery('.um-tip-w').tipsy({gravity: 'w', opacity: 1, live: 'a.live', offset: 3 });
+		jQuery('.um-tip-e').tipsy({gravity: 'e', opacity: 1, live: 'a.live', offset: 3 });
+		jQuery('.um-tip-s').tipsy({gravity: 's', opacity: 1, live: 'a.live', offset: 3 });
+	}
+}
+
 jQuery(document).ready(function() {
 
 	jQuery( document.body ).on('click', '.um-dropdown a.real_url', function() {
@@ -105,6 +195,8 @@ jQuery(document).ready(function() {
 		} );
 	}
 
+	init_tipsy();
+
 	if ( typeof( jQuery.fn.um_raty ) === 'function' ) {
 		jQuery('.um-rating').um_raty({
 			half:       false,
@@ -163,125 +255,72 @@ jQuery(document).ready(function() {
 		}
 	});
 
-	jQuery(document.body).on('click', '.um-single-image-preview a.cancel', function(e) {
+
+	um_init_datetimepicker();
+
+	jQuery(document).on('click', '.um .um-single-image-preview a.cancel', function( e ) {
 		e.preventDefault();
+		var parent = jQuery(this).parents('.um-field');
 
-		let isModal = false;
-		if ( jQuery(this).parents('.um-modal-body').length > 0 ) {
-			isModal = true;
-		}
+		var filename = parent.find( 'input[type="hidden"]#' + parent.data('key') + '-' + jQuery(this).parents('form').find('input[type="hidden"][name="form_id"]').val() ).val();
 
-		let parent, mode, src, args;
+		var src = jQuery(this).parents('.um-field').find('.um-single-image-preview img').attr('src');
+		var mode = parent.data('mode');
 
-		if ( ! isModal ) {
-			parent = jQuery(this).parents('.um-field');
-			mode   = parent.data('mode');
-			src    = parent.find('.um-single-image-preview img').attr('src');
-
-			let filename = parent.find( 'input[type="hidden"]#' + parent.data('key') + '-' + jQuery(this).parents('form').find('input[type="hidden"][name="form_id"]').val() ).val();
-
-			args = {
-				data: {
-					mode: mode,
-					filename: filename,
-					src: src,
-					nonce: um_scripts.nonce
-				},
-				success: function() {
-					parent.find('.um-single-image-preview img').replaceWith('<img src="" alt="" />');
-					parent.find('.um-single-image-preview').removeAttr('style').hide();
-					parent.find('.um-btn-auto-width').html( parent.data('upload-label') );
-					parent.find('input[type="hidden"]').val( 'empty_file' );
-				}
-			};
-
-			if ( mode !== 'register' ) {
-				args.data.user_id = jQuery(this).parents('form').find('#user_id').val();
+		var args = {
+			data: {
+				mode: mode,
+				filename: filename,
+				src: src,
+				nonce: um_scripts.nonce
+			},
+			success: function() {
+				parent.find('.um-single-image-preview img').attr( 'src', '' );
+				parent.find('.um-single-image-preview').hide();
+				parent.find('.um-btn-auto-width').html( parent.data('upload-label') );
+				parent.find('input[type="hidden"]').val( 'empty_file' );
 			}
-		} else {
-			parent = jQuery(this).parents('.um-modal-body');
-			mode   = parent.find('.um-single-image-upload').data('set_mode');
-			src    = parent.find('.um-single-image-preview img').attr('src');
+		};
 
-			args = {
-				data: {
-					src: src,
-					mode: mode,
-					nonce: um_scripts.nonce
-				},
-				success: function() {
-					wp.hooks.doAction( 'um_after_removing_preview' );
-
-					parent.find('.um-single-image-preview img').replaceWith('<img src="" alt="" />'); // required replaceWith for flushing DOM before re-init Cropper.
-					parent.find('.um-single-image-preview').removeAttr('style').hide();
-					parent.find('.ajax-upload-dragdrop').show();
-					parent.find('.um-modal-btn.um-finish-upload').addClass( 'disabled' );
-
-					um_modal_responsive();
-				}
-			};
+		if ( mode !== 'register' ) {
+			args.data.user_id = jQuery(this).parents('form' ).find( '#user_id' ).val();
 		}
 
 		wp.ajax.send( 'um_remove_file', args );
+
+		return false;
 	});
 
-	jQuery(document.body).on('click', '.um-single-file-preview a.cancel', function(e) {
+	jQuery(document).on('click', '.um .um-single-file-preview a.cancel', function( e ) {
 		e.preventDefault();
+		var parent = jQuery(this).parents('.um-field');
+		var filename = parent.find( 'input[type="hidden"]#' + parent.data('key') + '-' + jQuery(this).parents('form').find('input[type="hidden"][name="form_id"]').val() ).val();
+		var src = jQuery(this).parents('.um-field').find('.um-single-fileinfo a').attr('href');
+		var mode = parent.data('mode');
 
-		let isModal = false;
-		if ( jQuery(this).parents('.um-modal-body').length > 0 ) {
-			isModal = true;
-		}
-
-		let parent, mode, src, args;
-
-		if ( ! isModal ) {
-			parent = jQuery(this).parents('.um-field');
-			src    = parent.find('.um-single-fileinfo a').attr('href');
-			mode   = parent.data('mode');
-
-			let filename = parent.find( 'input[type="hidden"]#' + parent.data('key') + '-' + jQuery(this).parents('form').find('input[type="hidden"][name="form_id"]').val() ).val();
-
-			args = {
-				data: {
-					mode: mode,
-					filename: filename,
-					src: src,
-					nonce: um_scripts.nonce
-				},
-				success: function() {
-					parent.find('.um-single-file-preview').hide();
-					parent.find('.um-btn-auto-width').html( parent.data('upload-label') );
-					parent.find('input[type=hidden]').val( 'empty_file' );
-				}
-			};
-
-			if ( mode !== 'register' ) {
-				args.data.user_id = jQuery(this).parents('form' ).find( '#user_id' ).val();
+		var args = {
+			data: {
+				mode: mode,
+				filename: filename,
+				src: src,
+				nonce: um_scripts.nonce
+			},
+			success: function() {
+				parent.find('.um-single-file-preview').hide();
+				parent.find('.um-btn-auto-width').html( parent.data('upload-label') );
+				parent.find('input[type=hidden]').val( 'empty_file' );
 			}
-		} else {
-			parent = jQuery(this).parents('.um-modal-body');
-			src    = parent.find('.um-single-fileinfo a').attr('href');
-			mode   = parent.find('.um-single-file-upload').data('set_mode');
+		};
 
-			args = {
-				data: {
-					src: src,
-					mode: mode,
-					nonce: um_scripts.nonce
-				},
-				success: function() {
-					parent.find('.um-single-file-preview').hide();
-					parent.find('.ajax-upload-dragdrop').show();
-					parent.find('.um-modal-btn.um-finish-upload').addClass('disabled');
-					um_modal_responsive();
-				}
-			};
+		if ( mode !== 'register' ) {
+			args.data.user_id = jQuery(this).parents('form' ).find( '#user_id' ).val();
 		}
+
 		wp.ajax.send( 'um_remove_file', args );
+
+		return false;
 	});
 
-	// @todo deprecate
 	jQuery(document).on('click', '.um-field-group-head:not(.disabled)', function() {
 		var field = jQuery(this).parents('.um-field-group');
 		var limit = field.data('max_entries');
@@ -309,7 +348,7 @@ jQuery(document).ready(function() {
 
 		}
 	});
-	// @todo deprecate
+
 	jQuery(document).on('click', '.um-field-group-cancel', function( e ) {
 		e.preventDefault();
 		var field = jQuery(this).parents('.um-field-group');
@@ -390,7 +429,7 @@ jQuery(document).ready(function() {
 			});
 		} else {
 			var args = jQuery(this).data('args');
-			var container = jQuery(this).parents('.um.um-profile.um-viewing').find('.um-ajax-items');
+			var container = jQuery(this).parents('.um').find('.um-ajax-items');
 
 			jQuery.ajax({
 				url: wp.ajax.settings.url,
@@ -417,7 +456,7 @@ jQuery(document).ready(function() {
 		e.preventDefault();
 		var hook = jQuery(this).data('hook');
 		var user_id = jQuery(this).data('user_id');
-		var args = jQuery(this).data('args');
+		var arguments = jQuery(this).data('arguments');
 
 		if ( jQuery(this).data('js-remove') ){
 			jQuery(this).parents('.'+jQuery(this).data('js-remove')).fadeOut('fast');
@@ -430,7 +469,7 @@ jQuery(document).ready(function() {
 				action: 'um_muted_action',
 				hook: hook,
 				user_id: user_id,
-				arguments: args,
+				arguments: arguments,
 				nonce: um_scripts.nonce
 			},
 			success: function(data){
@@ -619,22 +658,11 @@ jQuery(document).ready(function() {
 		});
 
 		me.select2('destroy');
-		if ( me.hasClass( 'um-s1' ) ) {
-			me.select2({
-				data: arr_items,
-				allowClear: true,
-				dropdownParent: me.parent()
-			});
-		} else if ( me.hasClass( 'um-s2' ) ) {
-			me.select2({
-				data: arr_items,
-				allowClear: true,
-				minimumResultsForSearch: 10,
-				dropdownParent: me.parent()
-			});
-		}
-
-
+		me.select2({
+			data: arr_items,
+			allowClear: true,
+			minimumResultsForSearch: 10
+		});
 
 		if ( data.post.members_directory === 'yes' ) {
 			me.find('option').each( function() {
@@ -685,25 +713,4 @@ jQuery(document).ready(function() {
 		}
 	}
 
-	jQuery( document.body ).on('click', '.um-toggle-password', function (){
-		let parent = jQuery(this).closest('.um-field-area-password');
-		let passwordField = parent.find('input');
-		let type = passwordField.attr('type');
-		if ( 'text' === type ) {
-			passwordField.attr('type', 'password');
-			parent.find('i').toggleClass('um-icon-eye um-icon-eye-disabled');
-		} else {
-			passwordField.attr('type', 'text');
-			parent.find('i').toggleClass('um-icon-eye um-icon-eye-disabled');
-		}
-	});
 });
-
-// Makes the honeypot.
-jQuery( window ).on( 'load', function() {
-	let $honeypotField = jQuery('input[name="um_request"]');
-	if ( $honeypotField.length ) {
-		$honeypotField.val('');
-	}
-});
-

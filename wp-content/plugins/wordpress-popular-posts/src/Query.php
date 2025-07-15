@@ -5,13 +5,7 @@
  * To use this class, you must pass it an array of parameters (mostly the same ones used with
  * the wpp_get_mostpopular() template tag).
  *
- * eg.:
- * $popular_posts = new \WordPressPopularPosts\Query([
- *  'range' => 'last7days',
- *  'order_by' => 'views',
- *  'limit' => 5
- * ]);
- * var_dump( $popular_posts->get_posts() );
+ * eg.: $popular_posts = new Query(['range' => 'last7days', 'order_by' => 'views', 'limit' => 5]);
  *
  * @since             4.0.0
  * @package           WordPressPopularPosts
@@ -55,8 +49,9 @@ class Query {
      */
     public function __construct(array $options = [])
     {
-        $this->set_options($options)
-            ->execute();
+        $this->options = $options;
+        $this->build_query();
+        $this->run_query();
     }
 
     /**
@@ -64,15 +59,10 @@ class Query {
      *
      * @since   5.0.0
      * @param   array   $options
-     * @return  WordPressPopularPosts\Query
      */
     public function set_options(array $options = [])
     {
         $this->options = $options;
-        // Reset posts array
-        $this->posts = [];
-
-        return $this;
     }
 
     /**
@@ -95,24 +85,24 @@ class Query {
                 (array) $this->options
             );
 
-            $now = new \DateTime(Helper::now(), wp_timezone());
+            $now = new \DateTime(Helper::now(), new \DateTimeZone(Helper::get_timezone()));
             $args = [];
-            $fields = 'p.ID AS id, p.post_title AS title, p.post_author AS uid';
-            $table = '';
-            $join = '';
-            $where = 'WHERE 1 = 1';
-            $groupby = '';
-            $orderby = '';
-            $limit = 'LIMIT ' . (filter_var($this->options['limit'], FILTER_VALIDATE_INT) && $this->options['limit'] > 0 ? $this->options['limit'] : 10) . (isset($this->options['offset']) && filter_var($this->options['offset'], FILTER_VALIDATE_INT) !== false && $this->options['offset'] >= 0 ? " OFFSET {$this->options['offset']}" : '');
+            $fields = "p.ID AS id, p.post_title AS title, p.post_author AS uid";
+            $table = "";
+            $join = "";
+            $where = "WHERE 1 = 1";
+            $groupby = "";
+            $orderby = "";
+            $limit = "LIMIT " . (filter_var($this->options['limit'], FILTER_VALIDATE_INT) && $this->options['limit'] > 0 ? $this->options['limit'] : 10) . (isset($this->options['offset']) && filter_var($this->options['offset'], FILTER_VALIDATE_INT) !== false && $this->options['offset'] >= 0 ? " OFFSET {$this->options['offset']}" : "");
 
             // Get post date
             if ( isset($this->options['stats_tag']['date']['active']) && $this->options['stats_tag']['date']['active'] ) {
-                $fields .= ', p.post_date AS date';
+                $fields .= ", p.post_date AS date";
             }
 
             // Get post excerpt $instance
             if ( isset($this->options['post-excerpt']['active']) && $this->options['post-excerpt']['active'] ) {
-                $fields .= ', p.post_excerpt AS post_excerpt, p.post_content AS post_content';
+                $fields .= ", p.post_excerpt AS post_excerpt, p.post_content AS post_content";
             }
 
             // Get entries from these post types
@@ -120,16 +110,16 @@ class Query {
 
             if ( isset($this->options['post_type']) && ! empty($this->options['post_type']) ) {
 
-                $post_types = explode(',', $this->options['post_type']);
+                $post_types = explode(",", $this->options['post_type']);
                 $pt = '';
-                $where .= ' AND p.post_type IN(';
+                $where .= " AND p.post_type IN(";
 
                 foreach( $post_types as $post_type ) {
-                    $pt .= '%s, ';
+                    $pt .= "%s, ";
                     array_push($args, trim($post_type));
                 }
 
-                $where .= rtrim($pt, ', ') . ')';
+                $where .= rtrim($pt, ", ") . ")";
 
             }
             else {
@@ -139,20 +129,20 @@ class Query {
             // Get entries from these authors
             if ( isset($this->options['author']) && ! empty($this->options['author']) ) {
 
-                $author_IDs = explode(',', $this->options['author']);
+                $author_IDs = explode(",", $this->options['author']);
                 $uid = '';
-                $where .= ' AND p.post_author IN(';
+                $where .= " AND p.post_author IN(";
 
                 foreach( $author_IDs as $author_ID ) {
-                    $uid .= '%d, ';
+                    $uid .= "%d, ";
                     array_push($args, trim($author_ID));
                 }
 
-                $where .= rtrim($uid, ', ') . ')';
+                $where .= rtrim($uid, ", ") . ")";
 
             }
 
-            // Get / exclude entries from these taxonomies
+            // Get / exclude entries from this taxonomies
             if (
                 ( isset($this->options['taxonomy']) && ! empty($this->options['taxonomy']) ) &&
                 ( ( isset($this->options['cat']) && ! empty($this->options['cat']) )
@@ -210,28 +200,33 @@ class Query {
                             && ! empty($term_IDs_for_taxonomies)
                         ) {
 
-                            $tax_terms = [];
+                            $term_IDs = array();
+                            foreach( $term_IDs_for_taxonomies as $term_IDs_for_single_taxonomy ) {
+                                $term_IDs[] = explode(",", $term_IDs_for_single_taxonomy);
+                            }
+                            $in_term_IDs_for_taxonomies = array();
+                            $out_term_IDs_for_taxonomies = array();
 
-                            foreach( $taxonomies as $taxIndex => $taxonomy ) {
-                                $tax_terms[$taxonomy] = [
-                                    'term_id_include' => [],
-                                    'term_id_exclude' => []
-                                ];
+                            foreach( $term_IDs as $term_IDs_for_single_taxonomy ) {
+                                $in_term_IDs_for_taxonomy = [];
+                                $out_term_IDs_for_taxonomy = [];
 
-                                $term_IDs = array_map('trim', explode(',', $term_IDs_for_taxonomies[$taxIndex]));
-
-                                foreach ( $term_IDs as $term_ID ) {
-                                    if ( $term_ID >= 0 ) {
-                                        $tax_terms[$taxonomy]['term_id_include'][] = (int) $term_ID;
-                                    } else {
-                                        $tax_terms[$taxonomy]['term_id_exclude'][] = abs((int) $term_ID);
-                                    }
+                                foreach ( $term_IDs_for_single_taxonomy as $term_ID ) {
+                                    if ( $term_ID >= 0 )
+                                        $in_term_IDs_for_taxonomy[] = trim($term_ID);
+                                    else
+                                        $out_term_IDs_for_taxonomy[] = trim($term_ID) * -1;
                                 }
+
+                                $in_term_IDs_for_taxonomies[] = $in_term_IDs_for_taxonomy;
+                                $out_term_IDs_for_taxonomies[] = $out_term_IDs_for_taxonomy;
                             }
 
-                            foreach( $tax_terms as $taxonomy => $terms ) {
+                            foreach( $taxonomies as $taxIndex => $taxonomy ) {
+                                $in_term_IDs = $in_term_IDs_for_taxonomies[$taxIndex];
+                                $out_term_IDs = $out_term_IDs_for_taxonomies[$taxIndex];
 
-                                if ( ! empty($terms['term_id_include']) ) {
+                                if ( ! empty($in_term_IDs) ) {
                                     $where .= " AND p.ID IN (
                                         SELECT object_id
                                         FROM `{$wpdb->term_relationships}` AS r
@@ -242,16 +237,16 @@ class Query {
 
                                     $inTID = '';
 
-                                    foreach ($terms['term_id_include'] as $term_ID) {
-                                        $inTID .= '%d, ';
-                                        array_push($args, $term_ID);
+                                    foreach ($in_term_IDs as $in_term_ID) {
+                                        $inTID .= "%d, ";
+                                        array_push($args, $in_term_ID);
                                     }
 
-                                    $where .= ' AND x.term_id IN(' . rtrim($inTID, ', ') . ') )';
+                                    $where .= " AND x.term_id IN(" . rtrim($inTID, ", ") . ") )";
                                 }
 
-                                if ( ! empty($terms['term_id_exclude']) ) {
-                                    //phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+                                if ( ! empty($out_term_IDs) ) {
+
                                     $post_ids = get_posts(
                                         [
                                             'post_type' => $post_types,
@@ -260,29 +255,18 @@ class Query {
                                                 [
                                                     'taxonomy' => $taxonomy,
                                                     'field' => 'id',
-                                                    'terms' => $terms['term_id_exclude'],
+                                                    'terms' => $out_term_IDs,
                                                 ],
                                             ],
                                             'fields' => 'ids'
                                         ]
                                     );
-                                    //phpcs:enable
 
                                     if ( is_array($post_ids) && ! empty($post_ids) ) {
-                                        if ( isset($this->options['exclude']) && ! empty($this->options['exclude']) ) {
-                                            $pid_arr = explode(',', $this->options['exclude']);
-                                            $pid_arr = array_merge($pid_arr, $post_ids);
-
-                                            // Remove duplicates
-                                            $pid_arr_no_dupes = [];
-                                            foreach( $pid_arr as $key => $post_id ) {
-                                                $pid_arr_no_dupes[$post_id] = true;
-                                            }
-                                            $pid_arr_no_dupes = array_keys($pid_arr_no_dupes);
-
-                                            $this->options['exclude'] = implode(',', $pid_arr_no_dupes);
+                                        if ( isset($this->options['pid']) && ! empty($this->options['pid']) ) {
+                                            $this->options['pid'] .= "," . implode(",", $post_ids);
                                         } else {
-                                            $this->options['exclude'] = implode(',', $post_ids);
+                                            $this->options['pid'] = implode(",", $post_ids);
                                         }
                                     }
                                 }
@@ -293,61 +277,61 @@ class Query {
             }
 
             // Exclude these entries from the listing
-            if ( isset($this->options['exclude']) && ! empty($this->options['exclude']) ) {
-                $excluded_post_IDs = explode(',', $this->options['exclude']);
+            if ( isset($this->options['pid']) && ! empty($this->options['pid']) ) {
+                $excluded_post_IDs = explode(",", $this->options['pid']);
                 $xpid = '';
-                $where .= ' AND p.ID NOT IN(';
+                $where .= " AND p.ID NOT IN(";
 
                 foreach( $excluded_post_IDs as $excluded_post_ID ) {
-                    $xpid .= '%d, ';
+                    $xpid .= "%d, ";
                     array_push($args, trim($excluded_post_ID));
                 }
 
-                $where .= rtrim($xpid, ', ') . ')';
+                $where .= rtrim($xpid, ", ") . ")";
             }
 
             $table = "`{$wpdb->posts}` p";
 
             // All-time range
-            if ( 'all' == $this->options['range'] ) {
+            if ( "all" == $this->options['range'] ) {
 
                 // Order by views count
-                if ( 'comments' != $this->options['order_by'] ) {
+                if ( "comments" != $this->options['order_by'] ) {
 
                     $join = "INNER JOIN `{$wpdb->prefix}popularpostsdata` v ON p.ID = v.postid";
 
                     // Order by views
-                    if ( 'views' == $this->options['order_by'] ) {
+                    if ( "views" == $this->options['order_by'] ) {
                         if ( ! isset($this->options['stats_tag']['views']) || $this->options['stats_tag']['views'] ) {
-                            $fields .= ', v.pageviews';
+                            $fields .= ", v.pageviews";
                         }
-                        $orderby = 'ORDER BY v.pageviews DESC';
+                        $orderby = "ORDER BY v.pageviews DESC";
                     }
                     // Order by average views
                     else {
                         $fields .= ", ( v.pageviews/(IF ( DATEDIFF('{$now->format('Y-m-d')}', MIN(v.day)) > 0, DATEDIFF('{$now->format('Y-m-d')}', MIN(v.day)), 1) ) ) AS avg_views";
-                        $groupby = 'GROUP BY v.postid';
-                        $orderby = 'ORDER BY avg_views DESC';
+                        $groupby = "GROUP BY v.postid";
+                        $orderby = "ORDER BY avg_views DESC";
                     }
 
                     // Display comments count, too
                     if ( isset($this->options['stats_tag']['comment_count']) && $this->options['stats_tag']['comment_count'] ) {
-                        $fields .= ', p.comment_count';
+                        $fields .= ", p.comment_count";
                     }
                 }
                 // Order by comments count
                 else {
-                    $where .= ' AND p.comment_count > 0';
-                    $orderby = 'ORDER BY p.comment_count DESC';
+                    $where .= " AND p.comment_count > 0";
+                    $orderby = "ORDER BY p.comment_count DESC";
 
                     // Display comment count
                     if ( isset($this->options['stats_tag']['comment_count']) && $this->options['stats_tag']['comment_count'] ) {
-                        $fields .= ', p.comment_count';
+                        $fields .= ", p.comment_count";
                     }
 
                     // Display views count, too
                     if ( isset($this->options['stats_tag']['views']) && $this->options['stats_tag']['views'] ) {
-                        $fields .= ', IFNULL(v.pageviews, 0) AS pageviews';
+                        $fields .= ", IFNULL(v.pageviews, 0) AS pageviews";
                         $join = "INNER JOIN `{$wpdb->prefix}popularpostsdata` v ON p.ID = v.postid";
                     }
                 }
@@ -358,26 +342,26 @@ class Query {
 
                 // Determine time range
                 switch( $this->options['range'] ){
-                    case 'last24hours':
-                    case 'daily':
+                    case "last24hours":
+                    case "daily":
                         $start_date = $start_date->sub(new \DateInterval('P1D'));
                         $start_datetime = $start_date->format('Y-m-d H:i:s');
                         $views_time_range = "view_datetime >= '{$start_datetime}'";
                         break;
-                    case 'last7days':
-                    case 'weekly':
+                    case "last7days":
+                    case "weekly":
                         $start_date = $start_date->sub(new \DateInterval('P6D'));
                         $start_datetime = $start_date->format('Y-m-d');
                         $views_time_range = "view_date >= '{$start_datetime}'";
                         break;
-                    case 'last30days':
-                    case 'monthly':
+                    case "last30days":
+                    case "monthly":
                         $start_date = $start_date->sub(new \DateInterval('P29D'));
                         $start_datetime = $start_date->format('Y-m-d');
                         $views_time_range = "view_date >= '{$start_datetime}'";
                         break;
-                    case 'custom':
-                        $time_units = ['MINUTE', 'HOUR', 'DAY', 'WEEK', 'MONTH'];
+                    case "custom":
+                        $time_units = ["MINUTE", "HOUR", "DAY", "WEEK", "MONTH"];
 
                         // Valid time unit
                         if (
@@ -432,35 +416,35 @@ class Query {
                 }
 
                 // Order by views count
-                if ( 'comments' != $this->options['order_by'] ) {
+                if ( "comments" != $this->options['order_by'] ) {
                     // Order by views
-                    if ( 'views' == $this->options['order_by'] ) {
-                        $fields .= ', v.pageviews';
+                    if ( "views" == $this->options['order_by'] ) {
+                        $fields .= ", v.pageviews";
                         $join = "INNER JOIN (SELECT SUM(pageviews) AS pageviews, postid FROM `{$wpdb->prefix}popularpostssummary` WHERE {$views_time_range} GROUP BY postid) v ON p.ID = v.postid";
-                        $orderby = 'ORDER BY pageviews DESC';
+                        $orderby = "ORDER BY pageviews DESC";
                     }
                     // Order by average views
                     else {
-                        $fields .= ', v.avg_views';
+                        $fields .= ", v.avg_views";
                         $join = "INNER JOIN (SELECT SUM(pageviews)/(IF ( DATEDIFF('{$now->format('Y-m-d H:i:s')}', '{$start_datetime}') > 0, DATEDIFF('{$now->format('Y-m-d H:i:s')}', '{$start_datetime}'), 1) ) AS avg_views, postid FROM `{$wpdb->prefix}popularpostssummary` WHERE {$views_time_range} GROUP BY postid) v ON p.ID = v.postid";
-                        $orderby = 'ORDER BY avg_views DESC';
+                        $orderby = "ORDER BY avg_views DESC";
                     }
 
                     // Display comments count, too
                     if ( isset($this->options['stats_tag']['comment_count']) && $this->options['stats_tag']['comment_count'] ) {
-                        $fields .= ', IFNULL(c.comment_count, 0) AS comment_count';
+                        $fields .= ", IFNULL(c.comment_count, 0) AS comment_count";
                         $join .= " LEFT JOIN (SELECT comment_post_ID, COUNT(comment_post_ID) AS comment_count FROM `{$wpdb->comments}` WHERE comment_date_gmt >= '{$start_datetime}' AND comment_approved = '1' GROUP BY comment_post_ID) c ON p.ID = c.comment_post_ID";
                     }
                 }
                 // Order by comments count
                 else {
-                    $fields .= ', c.comment_count';
+                    $fields .= ", c.comment_count";
                     $join = "INNER JOIN (SELECT COUNT(comment_post_ID) AS comment_count, comment_post_ID FROM `{$wpdb->comments}` WHERE comment_date_gmt >= '{$start_datetime}' AND comment_approved = '1' GROUP BY comment_post_ID) c ON p.ID = c.comment_post_ID";
-                    $orderby = 'ORDER BY comment_count DESC';
+                    $orderby = "ORDER BY comment_count DESC";
 
                     // Display views count, too
                     if ( isset($this->options['stats_tag']['views']) && $this->options['stats_tag']['views'] ) {
-                        $fields .= ', v.pageviews';
+                        $fields .= ", v.pageviews";
                         $join .= " INNER JOIN (SELECT SUM(pageviews) AS pageviews, postid FROM `{$wpdb->prefix}popularpostssummary` WHERE {$views_time_range} GROUP BY postid) v ON p.ID = v.postid";
                     }
                 }
@@ -469,8 +453,8 @@ class Query {
             // List only published, non password-protected posts
             $where .= " AND p.post_password = '' AND p.post_status = 'publish'";
 
-            if ( ! empty($args) ) {
-                $where = $wpdb->prepare($where, $args); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $where and $args are built and prepared dynamically, see above
+            if ( !empty($args) ) {
+                $where = $wpdb->prepare($where, $args);
             }
 
             $fields = apply_filters('wpp_query_fields', $fields, $this->options);
@@ -500,23 +484,9 @@ class Query {
          */
         global $wpdb;
 
-        if ( isset($wpdb) && ! empty($this->query) && ! is_wp_error($this->query) ) {
-            $this->posts = $wpdb->get_results($this->query); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- at this point $this->query has been prepared already
+        if ( isset($wpdb) && !empty($this->query) && !is_wp_error($this->query) ) {
+            $this->posts = $wpdb->get_results($this->query);
         }
-    }
-
-    /**
-     * Executes the query.
-     *
-     * @since   6.0.0
-     * @return  WordPressPopularPosts\Query
-     */
-    public function execute()
-    {
-        $this->build_query();
-        $this->run_query();
-
-        return $this;
     }
 
     /**

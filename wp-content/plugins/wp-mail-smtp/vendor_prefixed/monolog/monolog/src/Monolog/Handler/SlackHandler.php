@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -20,8 +19,6 @@ use WPMailSMTP\Vendor\Monolog\Handler\Slack\SlackRecord;
  *
  * @author Greg Kedzierski <greg@gregkedzierski.com>
  * @see    https://api.slack.com/
- *
- * @phpstan-import-type FormattedRecord from AbstractProcessingHandler
  */
 class SlackHandler extends \WPMailSMTP\Vendor\Monolog\Handler\SocketHandler
 {
@@ -41,32 +38,37 @@ class SlackHandler extends \WPMailSMTP\Vendor\Monolog\Handler\SocketHandler
      * @param  string|null               $username               Name of a bot
      * @param  bool                      $useAttachment          Whether the message should be added to Slack as attachment (plain text otherwise)
      * @param  string|null               $iconEmoji              The emoji name to use (or null)
-     * @param  bool                      $useShortAttachment     Whether the context/extra messages added to Slack as attachments are in a short style
+     * @param  int                       $level                  The minimum logging level at which this handler will be triggered
+     * @param  bool                      $bubble                 Whether the messages that are handled can bubble up the stack or not
+     * @param  bool                      $useShortAttachment     Whether the the context/extra messages added to Slack as attachments are in a short style
      * @param  bool                      $includeContextAndExtra Whether the attachment should include context and extra data
-     * @param  string[]                  $excludeFields          Dot separated list of fields to exclude from slack message. E.g. ['context.field1', 'extra.field2']
+     * @param  array                     $excludeFields          Dot separated list of fields to exclude from slack message. E.g. ['context.field1', 'extra.field2']
      * @throws MissingExtensionException If no OpenSSL PHP extension configured
      */
-    public function __construct(string $token, string $channel, ?string $username = null, bool $useAttachment = \true, ?string $iconEmoji = null, $level = \WPMailSMTP\Vendor\Monolog\Logger::CRITICAL, bool $bubble = \true, bool $useShortAttachment = \false, bool $includeContextAndExtra = \false, array $excludeFields = array(), bool $persistent = \false, float $timeout = 0.0, float $writingTimeout = 10.0, ?float $connectionTimeout = null, ?int $chunkSize = null)
+    public function __construct($token, $channel, $username = null, $useAttachment = \true, $iconEmoji = null, $level = \WPMailSMTP\Vendor\Monolog\Logger::CRITICAL, $bubble = \true, $useShortAttachment = \false, $includeContextAndExtra = \false, array $excludeFields = array())
     {
         if (!\extension_loaded('openssl')) {
             throw new \WPMailSMTP\Vendor\Monolog\Handler\MissingExtensionException('The OpenSSL PHP extension is required to use the SlackHandler');
         }
-        parent::__construct('ssl://slack.com:443', $level, $bubble, $persistent, $timeout, $writingTimeout, $connectionTimeout, $chunkSize);
-        $this->slackRecord = new \WPMailSMTP\Vendor\Monolog\Handler\Slack\SlackRecord($channel, $username, $useAttachment, $iconEmoji, $useShortAttachment, $includeContextAndExtra, $excludeFields);
+        parent::__construct('ssl://slack.com:443', $level, $bubble);
+        $this->slackRecord = new \WPMailSMTP\Vendor\Monolog\Handler\Slack\SlackRecord($channel, $username, $useAttachment, $iconEmoji, $useShortAttachment, $includeContextAndExtra, $excludeFields, $this->formatter);
         $this->token = $token;
     }
-    public function getSlackRecord() : \WPMailSMTP\Vendor\Monolog\Handler\Slack\SlackRecord
+    public function getSlackRecord()
     {
         return $this->slackRecord;
     }
-    public function getToken() : string
+    public function getToken()
     {
         return $this->token;
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
+     * @param  array  $record
+     * @return string
      */
-    protected function generateDataStream(array $record) : string
+    protected function generateDataStream($record)
     {
         $content = $this->buildContent($record);
         return $this->buildHeader($content) . $content;
@@ -74,18 +76,21 @@ class SlackHandler extends \WPMailSMTP\Vendor\Monolog\Handler\SocketHandler
     /**
      * Builds the body of API call
      *
-     * @phpstan-param FormattedRecord $record
+     * @param  array  $record
+     * @return string
      */
-    private function buildContent(array $record) : string
+    private function buildContent($record)
     {
         $dataArray = $this->prepareContentData($record);
         return \http_build_query($dataArray);
     }
     /**
-     * @phpstan-param FormattedRecord $record
-     * @return string[]
+     * Prepares content data
+     *
+     * @param  array $record
+     * @return array
      */
-    protected function prepareContentData(array $record) : array
+    protected function prepareContentData($record)
     {
         $dataArray = $this->slackRecord->getSlackData($record);
         $dataArray['token'] = $this->token;
@@ -96,8 +101,11 @@ class SlackHandler extends \WPMailSMTP\Vendor\Monolog\Handler\SocketHandler
     }
     /**
      * Builds the header of the API Call
+     *
+     * @param  string $content
+     * @return string
      */
-    private function buildHeader(string $content) : string
+    private function buildHeader($content)
     {
         $header = "POST /api/chat.postMessage HTTP/1.1\r\n";
         $header .= "Host: slack.com\r\n";
@@ -107,9 +115,11 @@ class SlackHandler extends \WPMailSMTP\Vendor\Monolog\Handler\SocketHandler
         return $header;
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
+     * @param array $record
      */
-    protected function write(array $record) : void
+    protected function write(array $record)
     {
         parent::write($record);
         $this->finalizeWrite();
@@ -120,7 +130,7 @@ class SlackHandler extends \WPMailSMTP\Vendor\Monolog\Handler\SocketHandler
      * If we do not read some but close the socket too early, slack sometimes
      * drops the request entirely.
      */
-    protected function finalizeWrite() : void
+    protected function finalizeWrite()
     {
         $res = $this->getResource();
         if (\is_resource($res)) {
@@ -128,60 +138,41 @@ class SlackHandler extends \WPMailSMTP\Vendor\Monolog\Handler\SocketHandler
         }
         $this->closeSocket();
     }
-    public function setFormatter(\WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface $formatter) : \WPMailSMTP\Vendor\Monolog\Handler\HandlerInterface
+    /**
+     * Returned a Slack message attachment color associated with
+     * provided level.
+     *
+     * @param  int    $level
+     * @return string
+     * @deprecated Use underlying SlackRecord instead
+     */
+    protected function getAttachmentColor($level)
+    {
+        \trigger_error('SlackHandler::getAttachmentColor() is deprecated. Use underlying SlackRecord instead.', \E_USER_DEPRECATED);
+        return $this->slackRecord->getAttachmentColor($level);
+    }
+    /**
+     * Stringifies an array of key/value pairs to be used in attachment fields
+     *
+     * @param  array  $fields
+     * @return string
+     * @deprecated Use underlying SlackRecord instead
+     */
+    protected function stringify($fields)
+    {
+        \trigger_error('SlackHandler::stringify() is deprecated. Use underlying SlackRecord instead.', \E_USER_DEPRECATED);
+        return $this->slackRecord->stringify($fields);
+    }
+    public function setFormatter(\WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface $formatter)
     {
         parent::setFormatter($formatter);
         $this->slackRecord->setFormatter($formatter);
         return $this;
     }
-    public function getFormatter() : \WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface
+    public function getFormatter()
     {
         $formatter = parent::getFormatter();
         $this->slackRecord->setFormatter($formatter);
         return $formatter;
-    }
-    /**
-     * Channel used by the bot when posting
-     */
-    public function setChannel(string $channel) : self
-    {
-        $this->slackRecord->setChannel($channel);
-        return $this;
-    }
-    /**
-     * Username used by the bot when posting
-     */
-    public function setUsername(string $username) : self
-    {
-        $this->slackRecord->setUsername($username);
-        return $this;
-    }
-    public function useAttachment(bool $useAttachment) : self
-    {
-        $this->slackRecord->useAttachment($useAttachment);
-        return $this;
-    }
-    public function setIconEmoji(string $iconEmoji) : self
-    {
-        $this->slackRecord->setUserIcon($iconEmoji);
-        return $this;
-    }
-    public function useShortAttachment(bool $useShortAttachment) : self
-    {
-        $this->slackRecord->useShortAttachment($useShortAttachment);
-        return $this;
-    }
-    public function includeContextAndExtra(bool $includeContextAndExtra) : self
-    {
-        $this->slackRecord->includeContextAndExtra($includeContextAndExtra);
-        return $this;
-    }
-    /**
-     * @param string[] $excludeFields
-     */
-    public function excludeFields(array $excludeFields) : self
-    {
-        $this->slackRecord->excludeFields($excludeFields);
-        return $this;
     }
 }

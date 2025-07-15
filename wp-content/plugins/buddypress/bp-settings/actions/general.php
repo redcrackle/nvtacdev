@@ -19,6 +19,8 @@
  * users accounts already, without knowing their existing password.
  *
  * @since 1.6.0
+ *
+ * @global BuddyPress $bp
  */
 function bp_settings_action_general() {
 	if ( ! bp_is_post_request() ) {
@@ -42,24 +44,22 @@ function bp_settings_action_general() {
 	}
 
 	// Define local defaults
-	$bp            = buddypress();           // The instance
-	$email_error   = false;                  // invalid|blocked|taken|empty|nochange
-	$pass_error    = false;                  // invalid|mismatch|empty|nochange
-	$pass_changed  = false;                  // true if the user changes their password
-	$email_changed = false;                  // true if the user changes their email
-	$feedback_type = 'error';                // success|error
-	$feedback      = array();                // array of strings for feedback.
-	$user_id       = bp_displayed_user_id(); // The ID of the user being displayed.
-	$path_chunks   = array( bp_get_settings_slug() );
+	$bp            = buddypress(); // The instance
+	$email_error   = false;        // invalid|blocked|taken|empty|nochange
+	$pass_error    = false;        // invalid|mismatch|empty|nochange
+	$pass_changed  = false;        // true if the user changes their password
+	$email_changed = false;        // true if the user changes their email
+	$feedback_type = 'error';      // success|error
+	$feedback      = array();      // array of strings for feedback.
 
 	// Nonce check.
-	check_admin_referer( 'bp_settings_general' );
+	check_admin_referer('bp_settings_general');
 
 	// Validate the user again for the current password when making a big change.
-	if ( ( is_super_admin() ) || ( ! empty( $_POST['pwd'] ) && wp_check_password( $_POST['pwd'], $bp->displayed_user->userdata->user_pass, $user_id ) ) ) {
+	if ( ( is_super_admin() ) || ( !empty( $_POST['pwd'] ) && wp_check_password( $_POST['pwd'], $bp->displayed_user->userdata->user_pass, bp_displayed_user_id() ) ) ) {
 
 		$update_user = array(
-			'ID' => (int) $user_id,
+			'ID' => (int) bp_displayed_user_id(),
 		);
 
 		/* Email Change Attempt ******************************************/
@@ -99,17 +99,13 @@ function bp_settings_action_general() {
 						'newemail' => $user_email,
 					);
 
-					bp_update_user_meta( $user_id, 'pending_email_change', $pending_email );
-					$verify_link = add_query_arg(
-						'verify_email_change',
-						$hash,
-						bp_displayed_user_url( bp_members_get_path_chunks( $path_chunks ) )
-					);
+					bp_update_user_meta( bp_displayed_user_id(), 'pending_email_change', $pending_email );
+					$verify_link = bp_displayed_user_domain() . bp_get_settings_slug() . '/?verify_email_change=' . $hash;
 
 					// Send the verification email.
 					$args = array(
 						'tokens' => array(
-							'displayname'    => bp_core_get_user_displayname( $user_id ),
+							'displayname'    => bp_core_get_user_displayname( bp_displayed_user_id() ),
 							'old-user.email' => $old_user_email,
 							'user.email'     => $user_email,
 							'verify.url'     => esc_url( $verify_link ),
@@ -185,7 +181,7 @@ function bp_settings_action_general() {
 		// Clear cached data, so that the changed settings take effect
 		// on the current page load.
 		if ( ( false === $email_error ) && ( false === $pass_error ) && ( wp_update_user( $update_user ) ) ) {
-			$bp->displayed_user->userdata = bp_core_get_core_userdata( $user_id );
+			$bp->displayed_user->userdata = bp_core_get_core_userdata( bp_displayed_user_id() );
 		}
 
 	// Password Error.
@@ -230,26 +226,18 @@ function bp_settings_action_general() {
 		}
 	}
 
-	// Set the URL to redirect the user to.
-	$path_chunks[] = 'general';
-	$redirect_to   = bp_displayed_user_url( bp_members_get_path_chunks( $path_chunks ) );
+	// Set the feedback.
+	bp_core_add_message( implode( "\n", $feedback ), $feedback_type );
 
 	/**
 	 * Fires after the general settings have been saved, and before redirect.
 	 *
 	 * @since 1.5.0
-	 * @since 11.0.0 Add the `$user_id` & `$redirect_to` parameters.
-	 *
-	 * @param int    $user_id     The ID of the user being displayed.
-	 * @param string $redirect_to The Default Front-end General Settings Screen URL.
 	 */
-	do_action( 'bp_core_general_settings_after_save', $user_id, $redirect_to );
-
-	// Set the feedback.
-	bp_core_add_message( implode( "\n", $feedback ), $feedback_type );
+	do_action( 'bp_core_general_settings_after_save' );
 
 	// Redirect to prevent issues with browser back button.
-	bp_core_redirect( $redirect_to );
+	bp_core_redirect( trailingslashit( bp_displayed_user_domain() . bp_get_settings_slug() . '/general' ) );
 }
 add_action( 'bp_actions', 'bp_settings_action_general' );
 
@@ -267,7 +255,7 @@ function bp_settings_verify_email_change() {
 		return;
 	}
 
-	$redirect_to = bp_displayed_user_url( bp_members_get_path_chunks( array( bp_get_settings_slug() ) ) );
+	$redirect_to = trailingslashit( bp_displayed_user_domain() . bp_get_settings_slug() );
 
 	// Email change is being verified.
 	if ( isset( $_GET['verify_email_change'] ) ) {

@@ -31,11 +31,6 @@ if ( ! class_exists( 'um\core\Profile' ) ) {
 		 */
 		var $active_tab;
 
-		/**
-		 * @var null
-		 */
-		public $active_subnav = null;
-
 
 		/**
 		 * Profile constructor.
@@ -103,24 +98,7 @@ if ( ! class_exists( 'um\core\Profile' ) ) {
 		 * @return array
 		 */
 		public function tabs_privacy() {
-			/**
-			 * Filters a privacy list extend.
-			 *
-			 * @since 2.7.0
-			 * @hook um_profile_tabs_privacy_list
-			 *
-			 * @param {array} $privacy_option Add options for profile tabs' privacy.
-			 *
-			 * @return {array} Options for profile tabs' privacy.
-			 *
-			 * @example <caption>Add options for profile tabs' privacy.</caption>
-			 * function um_profile_menu_link_attrs( $privacy_option ) {
-			 *     // your code here
-			 *     return $privacy_option;
-			 * }
-			 * add_filter( 'um_profile_tabs_privacy_list', 'um_profile_tabs_privacy_list', 10, 1 );
-			 */
-			return apply_filters(
+			$privacy = apply_filters(
 				'um_profile_tabs_privacy_list',
 				array(
 					0 => __( 'Anyone', 'ultimate-member' ),
@@ -131,46 +109,53 @@ if ( ! class_exists( 'um\core\Profile' ) ) {
 					5 => __( 'Owner and specific roles', 'ultimate-member' ),
 				)
 			);
+
+			return $privacy;
 		}
+
 
 		/**
 		 * All tab data
 		 *
 		 * @return array
 		 */
-		public function tabs() {
-			$tabs = array(
-				'main'     => array(
-					'name' => __( 'About', 'ultimate-member' ),
-					'icon' => 'um-faicon-user',
-				),
-				'posts'    => array(
-					'name' => __( 'Posts', 'ultimate-member' ),
-					'icon' => 'um-faicon-pencil',
-				),
-				'comments' => array(
-					'name' => __( 'Comments', 'ultimate-member' ),
-					'icon' => 'um-faicon-comment',
-				),
-			);
+		function tabs() {
+
 			/**
-			 * Filters user profile tabs
+			 * UM hook
 			 *
-			 * @since 1.3.x
-			 * @hook um_profile_tabs
-			 *
-			 * @param {array} $tabs tabs list.
-			 *
-			 * @return {array} tabs list.
-			 *
-			 * @example <caption>Add user profile tabs.</caption>
-			 * function um_profile_tabs( $tabs ) {
+			 * @type filter
+			 * @title um_profile_tabs
+			 * @description Extend user profile tabs
+			 * @input_vars
+			 * [{"var":"$tabs","type":"array","desc":"Profile tabs"}]
+			 * @change_log
+			 * ["Since: 2.0"]
+			 * @usage
+			 * <?php add_filter( 'um_profile_tabs', 'function_name', 10, 1 ); ?>
+			 * @example
+			 * <?php
+			 * add_filter( 'um_profile_tabs', 'my_profile_tabs', 10, 1 );
+			 * function my_profile_tabs( $tabs ) {
 			 *     // your code here
 			 *     return $tabs;
 			 * }
-			 * add_filter( 'um_profile_tabs', 'um_profile_tabs' );
+			 * ?>
 			 */
-			$tabs = apply_filters( 'um_profile_tabs', $tabs );
+			$tabs = apply_filters( 'um_profile_tabs', array(
+				'main' => array(
+					'name' => __( 'About', 'ultimate-member' ),
+					'icon' => 'um-faicon-user'
+				),
+				'posts' => array(
+					'name' => __( 'Posts', 'ultimate-member' ),
+					'icon' => 'um-faicon-pencil'
+				),
+				'comments' => array(
+					'name' => __( 'Comments', 'ultimate-member' ),
+					'icon' => 'um-faicon-comment'
+				)
+			) );
 
 			// disable private tabs
 			if ( ! is_admin() ) {
@@ -414,13 +399,14 @@ if ( ! class_exists( 'um\core\Profile' ) ) {
 			return $this->active_subnav;
 		}
 
+
 		/**
 		 * Show meta in profile
 		 *
 		 * @param array $array Meta Array
 		 * @return string
 		 */
-		public function show_meta( $array, $args ) {
+		function show_meta( $array ) {
 			$output = '';
 
 			$fields_without_metakey = UM()->builtin()->get_fields_without_metakey();
@@ -428,13 +414,6 @@ if ( ! class_exists( 'um\core\Profile' ) ) {
 			if ( ! empty( $array ) ) {
 				foreach ( $array as $key ) {
 					if ( $key ) {
-						if ( '_um_last_login' === $key ) {
-							$show_last_login = get_user_meta( um_user( 'ID' ), 'um_show_last_login', true );
-							if ( ! empty( $show_last_login ) && 'no' === $show_last_login[0] ) {
-								continue;
-							}
-						}
-
 						$data = array();
 						if ( isset( UM()->builtin()->all_user_fields[ $key ] ) ) {
 							$data = UM()->builtin()->all_user_fields[ $key ];
@@ -443,30 +422,7 @@ if ( ! class_exists( 'um\core\Profile' ) ) {
 						$data['in_profile_meta'] = true;
 
 						$value = um_filtered_value( $key, $data );
-
-						$description_key = UM()->profile()->get_show_bio_key( $args );
-						if ( $description_key === $key ) {
-							$global_setting = UM()->options()->get( 'profile_show_html_bio' );
-							$bio_html       = ! empty( $global_setting );
-
-							if ( ! empty( $args['custom_fields'][ $description_key ] ) ) {
-								if ( empty( $args['custom_fields'][ $description_key ]['html'] ) ) {
-									$bio_html = false;
-								}
-							}
-
-							if ( $bio_html ) {
-								$data['html'] = true;
-								$value = um_filtered_value( $key, $data );
-								$res = wp_kses_post( make_clickable( wpautop( $value ) ) );
-							} else {
-								$res = esc_html( $value );
-							}
-
-							$value = nl2br( $res );
-						}
-
-						if ( ! $value && ( ! array_key_exists( 'type', $data ) || ! in_array( $data['type'], $fields_without_metakey, true ) ) ) {
+						if ( ! $value && ( ! array_key_exists( 'type', $data ) || ! in_array( $data['type'], $fields_without_metakey ) ) ) {
 							continue;
 						}
 
@@ -523,28 +479,35 @@ if ( ! class_exists( 'um\core\Profile' ) ) {
 			<?php
 		}
 
+
 		/**
 		 * UM Placeholders for user link, avatar link
-		 * @deprecated 2.10.5
+		 *
 		 * @param $placeholders
 		 *
 		 * @return array
 		 */
-		public function add_placeholder( $placeholders ) {
-			_deprecated_function( __METHOD__, '2.10.5' );
+		function add_placeholder( $placeholders ) {
+			$placeholders[] = '{user_profile_link}';
+			$placeholders[] = '{user_avatar_url}';
+			$placeholders[] = '{password}';
 			return $placeholders;
 		}
 
+
 		/**
 		 * UM Replace Placeholders for user link, avatar link
-		 * @deprecated 2.10.5
+		 *
 		 * @param $replace_placeholders
 		 *
 		 * @return array
 		 */
-		public function add_replace_placeholder( $replace_placeholders ) {
-			_deprecated_function( __METHOD__, '2.10.5' );
+		function add_replace_placeholder( $replace_placeholders ) {
+			$replace_placeholders[] = um_get_user_avatar_url();
+			$replace_placeholders[] = um_user_profile_url();
+			$replace_placeholders[] = esc_html__( 'Your set password', 'ultimate-member' );
 			return $replace_placeholders;
 		}
+
 	}
 }

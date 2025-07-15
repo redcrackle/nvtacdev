@@ -12,48 +12,16 @@ class PP_Capabilities_Admin_Features
     {
         $elements = [];
 
-        //Add toolbar
-        $elements['Admin Toolbar'] = self::formatAdminToolbar();
-
         //Add header and footer
-        $elements['Header and Footer'] = self::formatHeaderFooter();
+        $elements[esc_html__('Header and Footer', 'capsman-enhanced')] = self::formatHeaderFooter();
+
+        //Add toolbar
+        $elements[esc_html__('Admin Toolbar', 'capsman-enhanced')] = self::formatAdminToolbar();
 
         //Add dashboard widget
-        $elements['Dashboard widgets'] = self::formatDashboardWidgets();
+        $elements[esc_html__('Dashboard widgets', 'capsman-enhanced')] = self::formatDashboardWidgets();
 
         return apply_filters('pp_capabilities_admin_features_elements', $elements);
-    }
-
-    /**
-     * Retrieve all items title.
-     *
-     * @return array Items titles.
-     */
-    public static function elementLayoutItemTitles()
-    {
-        $titles = [];
-        
-        $titles['Header and Footer']    = esc_html__('Hide Default Items', 'capability-manager-enhanced');
-        $titles['Admin Toolbar']        = esc_html__('Hide Admin Toolbar', 'capability-manager-enhanced');
-        $titles['Dashboard widgets']    = esc_html__('Hide Dashboard Widgets', 'capability-manager-enhanced');
-
-        return apply_filters('pp_capabilities_admin_features_titles', $titles);
-    }
-
-    /**
-     * Retrieve all items action.
-     *
-     * @return array Items action.
-     */
-    public static function elementLayoutItemActions()
-    {
-        $actions = [];
-        
-        $actions['Header and Footer']    = 'ppc_header_footer';
-        $actions['Admin Toolbar']        = 'ppc_adminbar';
-        $actions['Dashboard widgets']    = 'ppc_dashboard_widget';
-
-        return apply_filters('pp_capabilities_admin_features_actions', $actions);
     }
 
     /**
@@ -88,17 +56,17 @@ class PP_Capabilities_Admin_Features
     {
         $title = [];
 
-        $title['menu-toggle']      = esc_html__('Mobile Menu Toggle', 'capability-manager-enhanced');
-        $title['wp-logo']          = esc_html__('WordPress Logo', 'capability-manager-enhanced');
-        $title['wp-logo-external'] = esc_html__('WordPress External Links', 'capability-manager-enhanced');
-        $title['updates']          = esc_html__('Updates');
-        $title['comments']         = esc_html__('Comments');
-        $title['top-secondary']    = esc_html__('Right bar', 'capability-manager-enhanced');
-        $title['user-actions']     = esc_html__('User actions', 'capability-manager-enhanced');
-        $title['new-content']      = esc_html__('New', 'capability-manager-enhanced');
-        $title['new-content']      = esc_html__('New', 'capability-manager-enhanced');
-        $title['user-info']        = esc_html__('User Display Name', 'capability-manager-enhanced');
-        $title['wpseo-menu']       = esc_html__('Yoast SEO', 'capability-manager-enhanced');
+        $title['menu-toggle']      = esc_html__('Mobile Menu Toggle', 'capsman-enhanced');
+        $title['wp-logo']          = esc_html__('WordPress Logo', 'capsman-enhanced');
+        $title['wp-logo-external'] = esc_html__('WordPress External Links', 'capsman-enhanced');
+        $title['updates']          = esc_html__('Updates', 'capsman-enhanced');
+        $title['comments']         = esc_html__('Comments', 'capsman-enhanced');
+        $title['top-secondary']    = esc_html__('Right bar', 'capsman-enhanced');
+        $title['user-actions']     = esc_html__('User actions', 'capsman-enhanced');
+        $title['new-content']      = esc_html__('New', 'capsman-enhanced');
+        $title['new-content']      = esc_html__('New', 'capsman-enhanced');
+        $title['user-info']        = esc_html__('User Display Name', 'capsman-enhanced');
+        $title['wpseo-menu']       = esc_html__('Yoast SEO', 'capsman-enhanced');
 
         return isset($title[$id]) ? $title[$id] : $id;
     }
@@ -110,10 +78,10 @@ class PP_Capabilities_Admin_Features
      */
     public static function formatHeaderFooter()
     {
-        $elements_item['screen_options'] = ['label'  => esc_html__('Screen Options'), 'action' => 'ppc_header_footer'];
-        $elements_item['screen_help'] = ['label'  => esc_html__('Help'), 'action' => 'ppc_header_footer'];
-        $elements_item['footer_thankyou'] = ['label'  => esc_html__('Thank you for creating with WordPress', 'capability-manager-enhanced'), 'action' => 'ppc_header_footer'];
-        $elements_item['footer_upgrade'] = ['label'  => sprintf( esc_html__( 'Version %s' ), get_bloginfo('version'), 'capability-manager-enhanced' ), 'action' => 'ppc_header_footer'];
+        $elements_item['screen_options'] = ['label'  => esc_html__('Screen Options', 'capsman-enhanced'), 'action' => 'ppc_header_footer'];
+        $elements_item['screen_help'] = ['label'  => esc_html__('Help', 'capsman-enhanced'), 'action' => 'ppc_header_footer'];
+        $elements_item['footer_thankyou'] = ['label'  => esc_html__('Thank you for creating with WordPress', 'capsman-enhanced'), 'action' => 'ppc_header_footer'];
+        $elements_item['footer_upgrade'] = ['label'  => sprintf( esc_html__( 'Version %s' ), get_bloginfo('version'), 'capsman-enhanced' ), 'action' => 'ppc_header_footer'];
 
         return $elements_item;
     }
@@ -162,7 +130,7 @@ class PP_Capabilities_Admin_Features
 
         $elements_widget = [];
         //add widget that may not be part of wp_meta_boxes
-        $elements_widget['dashboard_welcome_panel'] = ['label'  => esc_html__('Welcome panel', 'capability-manager-enhanced'), 'context' => 'normal', 'action' => 'ppc_dashboard_widget'];
+        $elements_widget['dashboard_welcome_panel'] = ['label'  => esc_html__('Welcome panel', 'capsman-enhanced'), 'context' => 'normal', 'action' => 'ppc_dashboard_widget'];
         //loop other widgets
         foreach ($widgets as $context => $priority) {
             foreach ($priority as $data) {
@@ -186,18 +154,6 @@ class PP_Capabilities_Admin_Features
     public static function formatAdminToolbar()
     {
         global $toolbar_items;
-
-        if (!is_array($toolbar_items)) {
-            $toolbar_items = [];
-        }
-        
-        $toolbar_items['admintoolbar'] = [
-            'label'    => esc_html__('Remove Admin Toolbar', 'capability-manager-enhanced'),
-            'parent'   => '',
-            'step'     => 999999999999,
-            'position' => 999999999999,
-            'action'   => 'ppc_adminbar'
-        ];
 
         $toolbars    = (array)$GLOBALS['ppcAdminBar'];
         $toolbarTree = self::formatAdminToolbarTree($toolbars);
@@ -237,10 +193,6 @@ class PP_Capabilities_Admin_Features
     {
         global $toolbar_items;
 
-        if (!is_array($toolbar_items)) {
-            $toolbar_items = [];
-        }
-
         $position = 0;
         foreach ($toolbarTrees as $toolbarTree) {
             $position++;
@@ -277,7 +229,7 @@ class PP_Capabilities_Admin_Features
         $title = preg_replace('#(<img.*?>)#', '', $title);
 
         //strip other html tags
-        $title = wp_strip_all_tags($title);
+        $title = strip_tags($title);
 
         return $title;
     }
@@ -308,11 +260,6 @@ class PP_Capabilities_Admin_Features
     public static function adminFeaturedRestriction()
     {
 		global $ppc_disabled_toolbar, $ppc_disabled_widget;
-        
-        if (is_multisite() && is_super_admin() && !defined('PP_CAPABILITIES_RESTRICT_SUPER_ADMIN')) {
-            return;
-        }
-
         // Get all user roles.
         $user_roles = wp_get_current_user()->roles;
         $disabled_features = get_option("capsman_disabled_admin_features", []);
@@ -373,7 +320,7 @@ class PP_Capabilities_Admin_Features
             add_action('admin_head', [__CLASS__, 'contextual_help_list_remove'], 999);
         }
         if(in_array('ppc_header_footer||footer_thankyou', $ppc_header_footer)){
-            add_filter( 'admin_footer_text', '__return_empty_string', 999 );
+            add_filter( 'admin_footer_text', '__return_false', 999 );
         }
         if(in_array('ppc_header_footer||footer_upgrade', $ppc_header_footer)){
             add_filter( 'update_footer', '__return_false', 999 );
@@ -395,8 +342,8 @@ class PP_Capabilities_Admin_Features
 	 */
     public static function disableDashboardBarBackend()
     {
-        //add inline styles
-        ppc_add_inline_style('html.wp-toolbar { padding-top:0!important; } #wpadminbar {display:none !important;}');
+        echo '<style>html.wp-toolbar { padding-top:0!important; }</style>';
+        echo '<style>#wpadminbar { display:none!important }</style>';
     }
 
 	/**

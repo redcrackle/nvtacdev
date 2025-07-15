@@ -121,11 +121,13 @@ class Simple_Content_Templates_Admin {
 		global $wp_tabbed_navigation;
 
 		add_submenu_page( "edit.php?post_type={$this->plugin->post_type}", "Simple Content Templates Settings", "Settings", "manage_options", "sct-settings", array($this, 'admin_settings_page') );
+		add_submenu_page("edit.php?post_type={$this->plugin->post_type}", "Simple Content Templates Support", "Support", "manage_options", "sct-support", array($this, 'admin_support_page') );
 		add_submenu_page("edit.php?post_type={$this->plugin->post_type}", "Simple Content Templates Upgrade", "Upgrade", "manage_options", "sct-upgrade", array($this, 'admin_upgrade_page') );
 
 		$wp_tabbed_navigation = new WP_Tabbed_Navigation('Simple Content Templates Settings');
 
 		$wp_tabbed_navigation->add_tab('Settings', menu_page_url('sct-settings', false) );
+		$wp_tabbed_navigation->add_tab('Support', menu_page_url('sct-support', false ) );
 		$wp_tabbed_navigation->add_tab('Upgrade', menu_page_url('sct-upgrade', false ) );
 	}
 
@@ -137,6 +139,15 @@ class Simple_Content_Templates_Admin {
 	 */
 	function admin_settings_page() {
 		include_once('partials/advanced-content-templates-admin-display.php');
+	}
+
+	/**
+	 * admin_support_page function
+	 * @access public
+	 * @return void
+	 */
+	function admin_support_page() {
+		include_once('partials/advanced-content-templates-admin-support.php');
 	}
 
 	/**

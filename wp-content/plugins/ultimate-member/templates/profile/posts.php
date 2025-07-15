@@ -1,19 +1,4 @@
-<?php
-/**
- * Template for the profile posts
- *
- * This template can be overridden by copying it to your-theme/ultimate-member/profile/posts.php
- *
- * Page: "Profile"
- *
- * @version 2.6.1
- *
- * @var object $posts
- * @var int    $count_posts
- */
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+<?php if ( ! defined( 'ABSPATH' ) ) exit;
 
 if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 	//Only for AJAX loading posts

@@ -1,9 +1,10 @@
-=== Simple Content Templates for Blog Posts & Pages ===
+=== Plugin Name ===
 Contributors: clifgriffin, nodleredoy
+Donate link: https://advancedcontenttemplates.com
 Tags: post template, content template, post from template, templates, copy, clone, duplicate
 Requires at least: 3.6
-Tested up to: 6.8
-Stable tag: 2.2.61
+Tested up to: 5.6
+Stable tag: 2.2.1
 
 Create content templates for your posts and pages. When creating a new post or page use one of your content templates as the starting point!
 
@@ -20,52 +21,17 @@ This plugin makes it simple to create content templates for your posts and pages
 5. After the page refreshes, edit the post or page however you want and publish it like normal.
 6. ...next time you need to write a similar post or create a similar page, do it all over again!
 
-**Unlock More Features**
+**Custom Post Types, Custom Fields, Tags, Categories, Featured Images:** if you need any of these, you should check out the pro version of this plugin, Advanced Content Templates: <a href="https://advancedcontenttemplates.com">Advanced Content Templates</a>
 
-* Custom Post Types
-* Custom Fields
-* Tags
-* Categories
-* Featured Images:
+**Support**
 
-If you need any of these, you should check out the pro version of this plugin, Advanced Content Templates: <a href="https://advancedcontenttemplates.com/?utm_campaign=free&utm_source=wprepo">Advanced Content Templates</a>
+If you need support, visit the support tab within the plugin settings.
 
-https://youtu.be/VeZwerk2aN0
+**Hire Us**
 
-We hope you enjoy creating with Simple Content Templates!
+If you need WordPress developers, we're available for hire: [Contact Objectiv](https://objectiv.co/contact/ "Contact Objectiv")
 
-== Changelog ==
-
-**Version 2.2.61**
-
-* Bump version
-* Update dependencies
-
-**Version 2.2.6**
-
-* Bump version
-* Update dependencies
-
-**Version 2.2.5**
-
-* Bump version
-* Missed on small fix I wanted to make earlier, tweak applied
-
-**Version 2.2.4**
-
-* Bump version
-
-**Version 2.2.3**
-
-* Update tested to version.
-* Fix php notice in logs.
-* Upgrade dependencies.
-* Clean a few things up.
-
-**Version 2.2.2**
-
-* Update tested to version.
-* Various small code tweaks.
+= Version History =
 
 **Version 2.2.1**
 
@@ -81,6 +47,7 @@ We hope you enjoy creating with Simple Content Templates!
 **Version 2.1.9**
 
 * Update tested to version.
+* Tweak support to send response to proper place.
 * Update vendor assets.
 
 **Version 2.1.8**
@@ -90,6 +57,7 @@ We hope you enjoy creating with Simple Content Templates!
 **Version 2.1.7**
 
 * Prevent conflict resulting in fatal error.
+* Enable easier support.
 
 **Version 2.1.6**
 

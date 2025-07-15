@@ -55,21 +55,21 @@ class MonsterInsights_Notification_Event {
 	 */
 	public $notification_type;
 
-	/**
-	 * Category of this notification: alert or insight
-	 *
-	 * @var string
-	 *
-	 * @since 8.2.0
-	 */
-	public $notification_category;
+    /**
+     * Category of this notification: alert or insight
+     *
+     * @var string
+     *
+     * @since 8.2.0
+     */
+    public $notification_category;
 
-	/**
-	 * Priority of this notification: 1-3
-	 *
-	 * @var int
-	 */
-	public $notification_priority;
+    /**
+     * Priority of this notification: 1-3
+     *
+     * @var int
+     */
+    public $notification_priority;
 
 	/**
 	 * Report start date if required e.g: "-15 day"(Readable Time)
@@ -105,7 +105,7 @@ class MonsterInsights_Notification_Event {
 	 */
 	public function __construct() {
 
-		$this->notification_active_from = date( 'm/d/Y g:i a', strtotime( 'now' ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- We need this to depend on the runtime timezone.
+		$this->notification_active_from = date( 'm/d/Y g:i a', strtotime( 'now' ) );
 		$this->report_end_to            = '-1 day'; // Yesterday.
 
 		if ( ! empty( $this->notification_id ) && ! empty( $this->notification_interval ) ) {
@@ -113,7 +113,7 @@ class MonsterInsights_Notification_Event {
 			// Register notification in our custom runner.
 			monsterinsights_notification_event_runner()->register_notification( $this );
 
-			$this->notification_active_for = date( 'm/d/Y', strtotime( '+' . ( $this->notification_interval - 2 ) . ' day' ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- We need this to depend on the runtime timezone.
+			$this->notification_active_for = date( 'm/d/Y', strtotime( '+' . ( $this->notification_interval - 2 ) . ' day' ) );
 			$this->report_start_from       = '-' . $this->notification_interval . ' day';
 
 			if ( ! isset( $this->notification_icon ) || empty( $this->notification_icon ) ) {
@@ -133,7 +133,7 @@ class MonsterInsights_Notification_Event {
 	 * @since 7.12.3
 	 */
 	public function get_formatted_date( $readable_time ) {
-		return date( 'Y-m-d', strtotime( $readable_time ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- We need this to depend on the runtime timezone.
+		return date( 'Y-m-d', strtotime( $readable_time ) );
 	}
 
 	/**
@@ -176,7 +176,7 @@ class MonsterInsights_Notification_Event {
 	 *
 	 * @return string
 	 */
-	public function get_view_url( $scroll_to, $page, $tab = '' ) {
+	public function get_view_url( $scroll_to, $page, $tab='' ) {
 		return MonsterInsights()->notifications->get_view_url( $scroll_to, $page, $tab );
 	}
 
@@ -198,8 +198,7 @@ class MonsterInsights_Notification_Event {
 		$notifications = MonsterInsights()->notifications;
 
 		$notification             = array();
-		// Make sure we never add the same notification on the same day.
-		$notification['id']       = $this->notification_id . '_' . date( 'Ymd' ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date -- We need this to depend on the runtime timezone.
+		$notification['id']       = $this->notification_id . '_' . date( 'Ymd' ); // Make sure we never add the same notification on the same day.
 		$notification['icon']     = $this->notification_icon;
 		$notification['title']    = '';
 		$notification['content']  = '';

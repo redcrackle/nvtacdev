@@ -69,14 +69,14 @@
 </tr>
 <tr class="ppc-menu-row parent-menu pp-promo-overlay-row">
    <td colspan="2">
-      <div class="pp-promo-upgrade-notice" style="left: calc(50% - 145px);">
+      <div class="pp-promo-upgrade-notice">
          <p>
             <?php esc_html_e('You can block pages by URL or hide Admin elements by entering a CSS class or ID. This feature is available in PublishPress Capabilities Pro.',
-               'capability-manager-enhanced'); ?>
+               'capsman-enhanced'); ?>
          </p>
          <p>
             <a href="https://publishpress.com/links/capabilities-banner" target="_blank">
-            <?php esc_html_e('Upgrade to Pro', 'capability-manager-enhanced'); ?>
+            <?php esc_html_e('Upgrade to Pro', 'capsman-enhanced'); ?>
             </a>
          </p>
       </div>

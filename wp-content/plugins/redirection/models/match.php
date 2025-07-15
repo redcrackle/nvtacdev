@@ -46,14 +46,14 @@ abstract class Red_Match {
 	/**
 	 * Get the match name
 	 *
-	 * @return string
+	 * @return String
 	 */
 	abstract public function name();
 
 	/**
 	 * Match the URL against the specific matcher conditions
 	 *
-	 * @param string $url Requested URL.
+	 * @param String $url Requested URL.
 	 * @return boolean
 	 */
 	abstract public function is_match( $url );
@@ -61,11 +61,11 @@ abstract class Red_Match {
 	/**
 	 * Get the target URL for this match. Some matches may have a matched/unmatched target.
 	 *
-	 * @param string           $original_url The client URL (not decoded).
-	 * @param string           $matched_url The URL in the redirect.
+	 * @param String           $original_url The client URL (not decoded).
+	 * @param String           $matched_url The URL in the redirect.
 	 * @param Red_Source_Flags $flag Source flags.
 	 * @param boolean          $is_matched Was the match successful.
-	 * @return string|false
+	 * @return String|false
 	 */
 	abstract public function get_target_url( $original_url, $matched_url, Red_Source_Flags $flag, $is_matched );
 
@@ -79,7 +79,7 @@ abstract class Red_Match {
 	/**
 	 * Load the match data into this instance.
 	 *
-	 * @param string $values Match values, as read from the database (plain text or serialized PHP).
+	 * @param String $values Match values, as read from the database (plain text or serialized PHP).
 	 * @return void
 	 */
 	abstract public function load( $values );
@@ -87,8 +87,8 @@ abstract class Red_Match {
 	/**
 	 * Sanitize a match URL
 	 *
-	 * @param string $url URL.
-	 * @return string
+	 * @param String $url URL.
+	 * @return String
 	 */
 	public function sanitize_url( $url ) {
 		// No new lines
@@ -145,7 +145,7 @@ abstract class Red_Match {
 	/**
 	 * Get all Red_Match objects
 	 *
-	 * @return string[]
+	 * @return String[]
 	 */
 	public static function all() {
 		$data = [];

@@ -52,7 +52,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 		 * @param bool $echo
 		 * @return string
 		 */
-		public function render_form( $echo = true ) {
+		function render_form( $echo = true ) {
 
 			if ( empty( $this->form_data['fields'] ) ) {
 				return '';
@@ -64,7 +64,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 			ob_start();
 
 			foreach ( $this->form_data['fields'] as $field_data ) {
-				if ( isset( $field_data['type'] ) && 'hidden' === $field_data['type'] ) {
+				if ( isset( $field_data['type'] ) && 'hidden' == $field_data['type'] ) {
 					echo $this->render_form_row( $field_data );
 				}
 			}
@@ -97,50 +97,24 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 			}
 		}
 
+
 		/**
 		 * @param array $data
 		 *
 		 * @return string
 		 */
-		public function render_form_row( $data ) {
+		function render_form_row( $data ) {
 
 			if ( empty( $data['type'] ) ) {
 				return '';
 			}
 
-			if ( ! empty( $data['value'] ) && $data['type'] != 'email_template' ) {
+			if ( !empty( $data['value'] ) && $data['type'] != 'email_template' ) {
 				$data['value'] = wp_unslash( $data['value'] );
 
 				/*for multi_text*/
-				if ( ! is_array( $data['value'] ) && ! in_array( $data['type'], array('info_text','wp_editor' ) ) ) {
+				if ( ! is_array( $data['value'] ) && $data['type'] != 'wp_editor' ) {
 					$data['value'] = esc_attr( $data['value'] );
-				}
-
-				if ( 'info_text' === $data['type'] ) {
-					$arr_kses = array(
-						'a' => array(
-							'href'    => array(),
-							'title'   => array(),
-							'target'  => array(),
-							'class'   => array(),
-							'onclick' => array(),
-						),
-						'button' => array(
-							'class' => array(),
-						),
-						'i' => array(
-							'class' => array(),
-						),
-						'span' => array(
-							'class' => array(),
-						),
-						'br' => array(),
-						'em' => array(),
-						'strong' => array(
-							'style' => array()
-						),
-					);
-					$data['value'] = wp_kses( $data['value'], $arr_kses );
 				}
 			}
 
@@ -168,9 +142,8 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 
 						}
 
-						if ( ! empty( $data['description'] ) ) {
+						if ( ! empty( $data['description'] ) )
 							$html .= '<p class="description">' . $data['description'] . '</p>';
-						}
 
 						$html .= '</div>';
 
@@ -190,9 +163,8 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 
 							}
 
-							if ( ! empty( $data['description'] ) ) {
+							if ( ! empty( $data['description'] ) )
 								$html .= '<p class="description">' . $data['description'] . '</p>';
-							}
 
 							$html .= '</div>';
 
@@ -210,9 +182,8 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 
 							}
 
-							if ( ! empty( $data['description'] ) ) {
+							if ( ! empty( $data['description'] ) )
 								$html .= '<p class="description">' . $data['description'] . '</p>';
-							}
 
 							$html .= '</div>';
 
@@ -235,9 +206,8 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 
 						}
 
-						if ( ! empty( $data['description'] ) ) {
-							$html .= '<div class="clear"></div><p class="description">' . $data['description'] . '</p>';
-						}
+						if ( ! empty( $data['description'] ) )
+							$html .= '<div class="um-admin-clear"></div><p class="description">' . $data['description'] . '</p>';
 
 						$html .= '</td></tr>';
 
@@ -258,9 +228,8 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 
 							}
 
-							if ( ! empty( $data['description'] ) ) {
-								$html .= '<div class="clear"></div><p class="description">' . $data['description'] . '</p>';
-							}
+							if ( ! empty( $data['description'] ) )
+								$html .= '<div class="um-admin-clear"></div><p class="description">' . $data['description'] . '</p>';
 
 							$html .= '</td></tr>';
 
@@ -280,14 +249,15 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 
 							}
 
-							if ( ! empty( $data['description'] ) ) {
-								$html .= '<div class="clear"></div><p class="description">' . $data['description'] . '</p>';
-							}
+							if ( ! empty( $data['description'] ) )
+								$html .= '<div class="um-admin-clear"></div><p class="description">' . $data['description'] . '</p>';
 
 							$html .= '</td></tr>';
+
 						}
 					}
 				}
+
 			} else {
 				$html .= $this->render_hidden( $data );
 			}
@@ -537,129 +507,42 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 		 *
 		 * @return bool|string
 		 */
-		public function render_icon( $field_data ) {
-			if ( empty( $field_data['id'] ) ) {
-				return false;
-			}
-			$html = '';
+		function render_icon( $field_data ) {
 
-			$id      = ( ! empty( $this->form_data['prefix_id'] ) ? $this->form_data['prefix_id'] : '' ) . '_' . $field_data['id'];
-			$id_attr = ' id="' . esc_attr( $id ) . '" ';
-
-			$name      = $field_data['id'];
-			$name      = ! empty( $this->form_data['prefix_id'] ) ? $this->form_data['prefix_id'] . '[' . $name . ']' : $name;
-			$name_attr = ' name="' . esc_attr( $name ) . '" ';
-
-			$value      = $this->get_field_value( $field_data );
-			$value_attr = ' value="' . esc_attr( $value ) . '" ';
-
-			UM()->setup()->set_icons_options();
-			$um_icons_list = get_option( 'um_icons_list' );
-
-			$first_activation_date = get_option( 'um_first_activation_date', false );
-
-			// @todo new version
-			if ( empty( $first_activation_date ) || $first_activation_date >= 1716336000 || empty( $value ) || array_key_exists( $value, $um_icons_list ) ) {
-				$html .= '<select ' . $name_attr . ' ' . $id_attr . ' class="um-icon-select-field" data-placeholder="' . esc_attr__( 'Select Icon', 'ultimate-member' ) . '" ><option value="">' . esc_html__( 'Select Icon', 'ultimate-member' ) . '</option>';
-				if ( ! empty( $value ) && array_key_exists( $value, $um_icons_list ) ) {
-					$html .= '<option ' . $value_attr . ' selected>' . esc_html( $um_icons_list[ $value ]['label'] ) . '</option>';
-				}
-				$html .= '</select>';
-			} else {
-				// Required modal scripts for proper functioning
-				UM()->admin()->enqueue()->load_modal();
-
-				$html .= '<select name="um_ui_icon_new" id="um_ui_icon_new" class="um-icon-select-field" data-placeholder="' . esc_attr__( 'Select Icon', 'ultimate-member' ) . '" ><option value="">' . esc_html__( 'Select Icon', 'ultimate-member' ) . '</option>';
-				$html .= '</select>';
-
-				$html .= '<span class="um_admin_fonticon_wrapper"><span>' . esc_html__( 'The selected icon is using an outdated version. Please select the icon above to use latest version.', 'ultimate-member' ) . '</span>
-					<span class="um-admin-icon-value">';
-
-				$html .= '<i class="' . esc_attr( $value ) . '"></i>';
-				$html .= '</span><input type="hidden" ' . $name_attr . ' ' . $id_attr . ' ' . $value_attr . ' class="um_old_icon_field_value"/>';
-				$html .= '<span class="um-admin-icon-clear show"><i class="um-icon-android-cancel"></i></span>';
-				$html .= '</span></span>';
-
-				// Required include the fonticons modal *.php file.
-				UM()->metabox()->init_icon = true;
-			}
-
-			return $html;
-		}
-
-		/**
-		 * @param $field_data
-		 *
-		 * @return bool|string
-		 */
-		public function render_users_dropdown( $field_data ) {
 			if ( empty( $field_data['id'] ) ) {
 				return false;
 			}
 
-			$multiple = ! empty( $field_data['multi'] ) ? 'multiple' : '';
-
-			$id      = ( ! empty( $this->form_data['prefix_id'] ) ? $this->form_data['prefix_id'] : '' ) . '_' . $field_data['id'];
+			$id = ( ! empty( $this->form_data['prefix_id'] ) ? $this->form_data['prefix_id'] : '' ) . '_' . $field_data['id'];
 			$id_attr = ' id="' . esc_attr( $id ) . '" ';
 
-			$class      = ! empty( $field_data['class'] ) ? $field_data['class'] . ' ' : ' ';
-			$class     .= ! empty( $field_data['size'] ) ? 'um-' . $field_data['size'] . '-field' : 'um-long-field';
-			$class_attr = ' class="um-forms-field um-user-select-field' . esc_attr( $class ) . '" ';
-
-			$data = array(
-				'field_id' => $field_data['id'],
-				'avatar'   => ! empty( $field_data['avatar'] ) ? 1 : 0,
-			);
-
-			if ( ! empty( $field_data['data'] ) && is_array( $field_data['data'] ) ) {
-				$data = array_merge( $data, $field_data['data'] );
-			}
-
-			$data_attr = '';
-			foreach ( $data as $key => $value ) {
-				$data_attr .= ' data-' . $key . '="' . esc_attr( $value ) . '" ';
-			}
-
-			$name             = $field_data['id'];
-			$name             = ! empty( $this->form_data['prefix_id'] ) ? $this->form_data['prefix_id'] . '[' . $name . ']' : $name;
-			$hidden_name_attr = ' name="' . $name . '" ';
-
-			$name      = $name . ( ! empty( $field_data['multi'] ) ? '[]' : '' );
+			$name = $field_data['id'];
+			$name = ! empty( $this->form_data['prefix_id'] ) ? $this->form_data['prefix_id'] . '[' . $name . ']' : $name;
 			$name_attr = ' name="' . $name . '" ';
 
 			$value = $this->get_field_value( $field_data );
+			$value_attr = ' value="' . $value . '" ';
 
-			$users = array();
+			$html = '<span class="um_admin_fonticon_wrapper"><a href="javascript:void(0);" class="button" data-modal="UM_fonticons" data-modal-size="normal" data-dynamic-content="um_admin_fonticon_selector" data-arg1="" data-arg2="" data-back="">' . __( 'Choose Icon', 'ultimate-member' ) . '</a>
+				<span class="um-admin-icon-value">';
+
 			if ( ! empty( $value ) ) {
-				$users = get_users(
-					array(
-						'include' => $value,
-						'fields'  => array( 'ID', 'user_login' ),
-					)
-				);
-			}
-
-			$options = '';
-			if ( ! empty( $users ) ) {
-				foreach ( $users as $user ) {
-					if ( ! empty( $field_data['avatar'] ) ) {
-						$url      = get_avatar_url( $user->ID, 'size=20' );
-						$options .= '<option data-img="' . esc_url( $url ) . '" value="' . esc_attr( $user->ID ) . '" selected>' . esc_html( $user->user_login . ' (#' . $user->ID . ')' ) . '</option>';
-					} else {
-						$options .= '<option value="' . esc_attr( $user->ID ) . '" selected>' . esc_html( $user->user_login . ' (#' . $user->ID . ')' ) . '</option>';
-					}
-				}
-			}
-
-			$placeholder = ! empty( $field_data['placeholder'] ) ? $field_data['placeholder'] : __( 'Select Users', 'ultimate-member' );
-
-			$hidden = '';
-			if ( ! empty( $multiple ) ) {
-				$hidden = "<input type=\"hidden\" $hidden_name_attr value=\"\" />";
+				$html .= '<i class="' . $value . '"></i>';
 			} else {
-				$options = '<option></option>' . $options;
+				$html .= __( 'No Icon', 'ultimate-member' );
 			}
-			$html = "$hidden<select $multiple $id_attr $name_attr $class_attr $data_attr data-placeholder=\"" . esc_attr( $placeholder ) . "\" placeholder=\"" . esc_attr( $placeholder ) . "\">$options</select>";
+
+			$html .= '</span><input type="hidden" ' . $name_attr . ' ' . $id_attr . ' ' . $value_attr . ' />';
+
+			if ( ! empty( $value ) ) {
+				$html .= '<span class="um-admin-icon-clear show"><i class="um-icon-android-cancel"></i></span>';
+			} else {
+				$html .= '<span class="um-admin-icon-clear"><i class="um-icon-android-cancel"></i></span>';
+			}
+
+			$html .= '</span></span>';
+
+			UM()->metabox()->init_icon = true;
 
 			return $html;
 		}
@@ -900,11 +783,8 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 
 			$value = $this->get_field_value( $field_data );
 
-			add_filter( 'wp_default_editor', array( &$this, 'set_default_editor_fix' ) );
-
 			ob_start();
-			wp_editor(
-				$value,
+			wp_editor( $value,
 				$id,
 				array(
 					'textarea_name' => $name,
@@ -912,36 +792,24 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 					'editor_height' => 425,
 					'wpautop'       => false,
 					'media_buttons' => false,
-					'editor_class'  => $class,
+					'editor_class'  => $class
 				)
 			);
 
 			$html = ob_get_clean();
-
-			remove_filter( 'wp_default_editor', array( &$this, 'set_default_editor_fix' ) );
-
 			return $html;
 		}
 
-		/**
-		 * Fix the displaying wp_editor on macOS
-		 *
-		 * @return string
-		 */
-		public function set_default_editor_fix() {
-			return 'html';
-		}
 
 		/**
 		 * @param $field_data
 		 *
 		 * @return bool|string
 		 */
-		public function render_checkbox( $field_data ) {
+		function render_checkbox( $field_data ) {
 
-			if ( empty( $field_data['id'] ) ) {
+			if ( empty( $field_data['id'] ) )
 				return false;
-			}
 
 			$id = ( ! empty( $this->form_data['prefix_id'] ) ? $this->form_data['prefix_id'] : '' ) . '_' . $field_data['id'];
 			$id_attr = ' id="' . esc_attr( $id ) . '" ';
@@ -952,7 +820,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 			$class_attr = ' class="um-forms-field ' . esc_attr( $class ) . '" ';
 
 			$data = array(
-				'field_id' => $field_data['id'],
+				'field_id' => $field_data['id']
 			);
 
 			if ( ! empty( $field_data['data'] ) ) {
@@ -970,22 +838,20 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 
 			$value = $this->get_field_value( $field_data );
 
-			$checkbox_label = ! empty( $field_data['checkbox_label'] ) ? $field_data['checkbox_label'] : '';
+			$html = "<input type=\"hidden\" $id_attr_hidden $name_attr value=\"0\" />
+			<input type=\"checkbox\" $id_attr $class_attr $name_attr $data_attr " . checked( $value, true, false ) . " value=\"1\" />";
 
-			$field_html = "<input type=\"checkbox\" $id_attr $class_attr $name_attr $data_attr " . checked( $value, true, false ) . " value=\"1\" " . disabled( ! empty( $field_data['disabled'] ), true, false ) . " />";
-			if ( '' !== $checkbox_label ) {
-				$field_html = "<label>$field_html $checkbox_label</label>";
-			}
-			$html = "<input type=\"hidden\" $id_attr_hidden $name_attr value=\"0\" " . disabled( ! empty( $field_data['disabled'] ), true, false ) . " />{$field_html}";
-			return apply_filters( 'um_admin_render_checkbox_field_html', $html, $field_data );
+
+			return $html;
 		}
+
 
 		/**
 		 * @param $field_data
 		 *
 		 * @return bool|string
 		 */
-		public function render_same_page_update( $field_data ) {
+		function render_same_page_update( $field_data ) {
 
 			if ( empty( $field_data['id'] ) ) {
 				return false;
@@ -1000,7 +866,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 			$class_attr = ' class="um-forms-field ' . esc_attr( $class ) . '" ';
 
 			$data = array(
-				'field_id' => $field_data['id'],
+				'field_id' => $field_data['id']
 			);
 
 			if ( ! empty( $field_data['data'] ) ) {
@@ -1022,13 +888,8 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 
 			$value = $this->get_field_value( $field_data );
 
-			$checkbox_label = ! empty( $field_data['checkbox_label'] ) ? $field_data['checkbox_label'] : '';
-
-			$field_html = "<input type=\"checkbox\" $id_attr $class_attr $name_attr $data_attr " . checked( $value, true, false ) . " value=\"1\" " . disabled( ! empty( $field_data['disabled'] ), true, false ) . " />";
-			if ( '' !== $checkbox_label ) {
-				$field_html = "<label>$field_html $checkbox_label</label>";
-			}
-			$html = "<input type=\"hidden\" $id_attr_hidden $name_attr value=\"0\" " . disabled( ! empty( $field_data['disabled'] ), true, false ) . " />{$field_html}";
+			$html = "<input type=\"hidden\" $id_attr_hidden $name_attr value=\"0\" />
+			<input type=\"checkbox\" $id_attr $class_attr $name_attr $data_attr " . checked( $value, true, false ) . " value=\"1\" />";
 
 			if ( ! empty( $field_data['upgrade_cb'] ) ) {
 				$html .= '<div class="um-same-page-update-wrapper um-same-page-update-' . esc_attr( $field_data['upgrade_cb'] ) . '"><div class="um-same-page-update-description">' . $field_data['upgrade_description'] . '</div><input type="button" data-upgrade_cb="' . $field_data['upgrade_cb'] . '" class="button button-primary um-admin-form-same-page-update" value="' . esc_attr__( 'Run', 'ultimate-member' ) . '"/>
@@ -1037,6 +898,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 
 			return $html;
 		}
+
 
 		/**
 		 * @param $field_data
@@ -1100,79 +962,6 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 			return $html;
 		}
 
-		/**
-		 * @param $field_data
-		 *
-		 * @since 2.8.3
-		 *
-		 * @return bool|string
-		 */
-		public function render_page_select( $field_data ) {
-			if ( empty( $field_data['id'] ) ) {
-				return false;
-			}
-
-			$multiple = ! empty( $field_data['multi'] ) ? 'multiple' : '';
-
-			$id = ( ! empty( $this->form_data['prefix_id'] ) ? sanitize_title( $this->form_data['prefix_id'] ) : '' ) . '_' . $field_data['id'];
-			$id_attr = ' id="' . esc_attr( $id ) . '" ';
-
-			$class = ! empty( $field_data['class'] ) ? $field_data['class'] . ' ' : ' ';
-			$class .= ! empty( $field_data['size'] ) ? 'um-' . $field_data['size'] . '-field' : 'um-long-field';
-			$class_attr = ' class="um-forms-field um-pages-select2 ' . esc_attr( $class ) . '" ';
-
-			$data = array(
-				'field_id' => $field_data['id'],
-			);
-
-			if ( ! empty( $field_data['placeholder'] ) ) {
-				$data['placeholder'] = $field_data['placeholder'];
-			}
-
-			$data_attr = '';
-			foreach ( $data as $key => $value ) {
-				$data_attr .= ' data-' . $key . '="' . esc_attr( $value ) . '" ';
-			}
-
-			$name = $field_data['id'];
-			$name = ! empty( $this->form_data['prefix_id'] ) ? $this->form_data['prefix_id'] . '[' . $name . ']' : $name;
-			$hidden_name_attr = ' name="' . $name . '" ';
-			$name = $name . ( ! empty( $field_data['multi'] ) ? '[]' : '' );
-			$name_attr = ' name="' . $name . '" ';
-
-			$value = $this->get_field_value( $field_data );
-
-			$options = '<option value="">' . esc_html( $data['placeholder'] ) . '</option>';
-			if ( ! empty( $field_data['options'] ) ) {
-				foreach ( $field_data['options'] as $key => $option ) {
-					if ( ! empty( $field_data['multi'] ) ) {
-
-						if ( ! is_array( $value ) || empty( $value ) ) {
-							$value = array();
-						}
-
-						$options .= '<option value="' . $key . '" ' . selected( in_array( $key, $value ), true, false ) . '>' . esc_html( $option ) . '</option>';
-					} else {
-						$options .= '<option value="' . $key . '" ' . selected( (string)$key == $value, true, false ) . '>' . esc_html( $option ) . '</option>';
-					}
-				}
-			}
-
-			$hidden = '';
-			if ( ! empty( $multiple ) ) {
-				$hidden = "<input type=\"hidden\" $hidden_name_attr value=\"\" />";
-			}
-
-			$button = '';
-			$slug   = str_replace( 'core_', '', $field_data['id'] );
-			if ( ! um_get_predefined_page_id( $slug ) || 'publish' !== get_post_status( um_get_predefined_page_id( $slug ) ) ) {
-				$button = '&nbsp;<a href="' . esc_url( add_query_arg( array( 'um_adm_action' => 'install_predefined_page', 'um_page_slug' => $slug, '_wpnonce' => wp_create_nonce( 'install_predefined_page' ), ) ) ) . '" class="button button-primary">' . esc_html__( 'Create Default', 'ultimate-member' ) . '</a>';
-			}
-
-			$html = "$hidden<select $multiple $id_attr $name_attr $class_attr $data_attr>$options</select>$button";
-
-			return $html;
-		}
 
 		/**
 		 * @param $field_data
@@ -1280,14 +1069,15 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 		 * @return bool|string
 		 */
 		function render_multi_checkbox( $field_data ) {
+
 			if ( empty( $field_data['id'] ) ) {
 				return false;
 			}
 
 			$id = ( ! empty( $this->form_data['prefix_id'] ) ? $this->form_data['prefix_id'] : '' ) . '_' . $field_data['id'];
 
-			$class      = ! empty( $field_data['class'] ) ? $field_data['class'] : '';
-			$class     .= ! empty( $field_data['size'] ) ? $field_data['size'] : 'um-long-field';
+			$class = ! empty( $field_data['class'] ) ? $field_data['class'] : '';
+			$class .= ! empty( $field_data['size'] ) ? $field_data['size'] : 'um-long-field';
 			$class_attr = ' class="um-forms-field ' . esc_attr( $class ) . '" ';
 
 			$name = $field_data['id'];
@@ -1298,27 +1088,19 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 				$values = array();
 			}
 
-			$i    = 0;
+			$i = 0;
 			$html = '';
 
 			$columns = ( ! empty( $field_data['columns'] ) && is_numeric( $field_data['columns'] ) ) ? $field_data['columns'] : 1;
 			while ( $i < $columns ) {
-				$per_page                = ceil( count( $field_data['options'] ) / $columns );
-				$section_fields_per_page = array_slice( $field_data['options'], $i * $per_page, $per_page, true );
-				$html                   .= '<span class="um-form-fields-section" style="width:' . floor( 100 / $columns ) . '% !important;">';
+				$per_page = ceil( count( $field_data['options'] ) / $columns );
+				$section_fields_per_page = array_slice( $field_data['options'], $i*$per_page, $per_page, true );
+				$html .= '<span class="um-form-fields-section" style="width:' . floor( 100 / $columns ) . '% !important;">';
 
 				foreach ( $section_fields_per_page as $k => $title ) {
-					$id_attr  = ' id="' . esc_attr( $id . '_' . $k ) . '" ';
+					$id_attr = ' id="' . esc_attr( $id . '_' . $k ) . '" ';
 					$for_attr = ' for="' . esc_attr( $id . '_' . $k ) . '" ';
-
-					if ( ! empty( $field_data['assoc'] ) ) {
-						$name_attr  = ' name="' . esc_attr( $name ) . '[]" ';
-						$value_attr = ' value="' . esc_attr( $k ) . '" ';
-					} else {
-						$name_attr  = ' name="' . esc_attr( $name ) . '[' . esc_attr( $k ) . ']" ';
-						$value_attr = ' value="1" ';
-					}
-					$disabed_attr = '';
+					$name_attr = ' name="' . $name . '[' . $k . ']" ';
 
 					$data = array(
 						'field_id' => $field_data['id'] . '_' . $k,
@@ -1330,18 +1112,14 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 
 					$data_attr = '';
 					foreach ( $data as $key => $value ) {
-						if ( 'checkbox_key' === $value ) {
+						if ( $value == 'checkbox_key' ) {
 							$value = $k;
 						}
 						$data_attr .= ' data-' . $key . '="' . esc_attr( $value ) . '" ';
 					}
 
-					if ( isset( $field_data['options_disabled'] ) && in_array( $k, $field_data['options_disabled'], true ) ) {
-						$disabed_attr = 'disabled="disabled"';
-					}
-
 					$html .= "<label $for_attr>
-						<input type=\"checkbox\" " . checked( in_array( $k, $values, true ), true, false ) . "$disabed_attr $id_attr $name_attr $data_attr $value_attr $class_attr>
+						<input type=\"checkbox\" " . checked( in_array( $k, $values ), true, false ) . "$id_attr $name_attr $data_attr value=\"1\" $class_attr>
 						<span>$title</span>
 					</label>";
 				}
@@ -1458,20 +1236,13 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 
 			$upload_frame_title = ! empty( $field_data['upload_frame_title'] ) ? $field_data['upload_frame_title'] : __( 'Select media', 'ultimate-member' );
 
-			$image_id        = ! empty( $value['id'] ) ? $value['id'] : '';
-			$image_width     = ! empty( $value['width'] ) ? $value['width'] : '';
-			$image_height    = ! empty( $value['height'] ) ? $value['height'] : '';
+			$image_id = ! empty( $value['id'] ) ? $value['id'] : '';
+			$image_width = ! empty( $value['width'] ) ? $value['width'] : '';
+			$image_height = ! empty( $value['height'] ) ? $value['height'] : '';
 			$image_thumbnail = ! empty( $value['thumbnail'] ) ? $value['thumbnail'] : '';
-			$image_url       = ! empty( $value['url'] ) ? $value['url'] : '';
+			$image_url = ! empty( $value['url'] ) ? $value['url'] : '';
 
-			$wrapper_classes = array();
-			if ( ! isset( $field_data['preview'] ) || false !== $field_data['preview'] ) {
-				$wrapper_classes[] = 'um-media-preview-enabled';
-			}
-			$wrapper_classes = implode( ' ', $wrapper_classes );
-			$wrapper_classes = ! empty( $wrapper_classes ) ? ' ' . $wrapper_classes : '';
-
-			$html = '<div class="um-media-upload' . $wrapper_classes . '">' .
+			$html = "<div class=\"um-media-upload\">" .
 					"<input type=\"hidden\" class=\"um-media-upload-data-id\" name=\"{$name}[id]\" id=\"{$id}_id\" value=\"$image_id\">" .
 					"<input type=\"hidden\" class=\"um-media-upload-data-width\" name=\"{$name}[width]\" id=\"{$id}_width\" value=\"$image_width\">" .
 					"<input type=\"hidden\" class=\"um-media-upload-data-height\" name=\"{$name}[height]\" id=\"{$id}_height\" value=\"$image_height\">" .
@@ -1733,30 +1504,16 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 			if ( ! empty( $values ) && is_array( $values ) ) {
 				foreach ( $values as $k => $value ) {
 
-					$other_key   = '';
+					$other_key = '';
 					$other_label = '';
-					$other_type  = '';
-					$other_order = '';
-
 					if ( is_array( $value ) ) {
-						$keys      = array_keys( $value );
+						$keys = array_keys( $value );
 						$other_key = $keys[0];
 
-						if ( ! empty( $value['label'] ) ) {
-							$other_label = $value['label'];
-						} else {
-							$labels      = array_values( $value );
-							$other_label = $labels[0];
-						}
-
-						if ( ! empty( $value['type'] ) ) {
-							$other_type = $value['type'];
-						}
-						if ( ! empty( $value['order'] ) ) {
-							$other_order = $value['order'];
-						}
+						$labels = array_values( $value );
+						$other_label = $labels[0];
 					} else {
-						if ( ! array_key_exists( $value, $field_data['options'] ) ) {
+						if ( ! in_array( $value, array_keys( $field_data['options'] ) ) ) {
 							continue;
 						}
 					}
@@ -1766,7 +1523,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 					$options = '';
 					foreach ( $field_data['options'] as $key => $option ) {
 						if ( is_array( $value ) ) {
-							$selected = selected( 'other' === $key, true, false );
+							$selected = selected( $key == 'other', true, false );
 						} else {
 							$selected = selected( $key == $value, true, false );
 						}
@@ -1778,25 +1535,12 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 					if ( $sorting ) {
 						$html .= '<span class="um-field-icon"><i class="um-faicon-sort"></i></span>';
 					}
-
-					$data_types_html = '';
-					foreach ( UM()->member_directory()->sort_data_types as $type_key => $type_label ) {
-						$data_types_html .= '<option value="' . esc_attr( $type_key ) . '" ' . selected( $other_type, $type_key, false ) . '>' . esc_html( $type_label ) . '</option>';
-					}
-
-					$html .= '<span class="um-field-wrapper">
-						<select ' . $id_attr . ' ' . $name_attr . ' ' . $class_attr . ' ' . $data_attr . '>' . $options . '</select></span>
-						<span class="um-field-control"><a href="javascript:void(0);" class="um-select-delete">' . __( 'Remove', 'ultimate-member' ) . '</a></span>
-						<span class="um-field-wrapper um-custom-order-fields"><label>' . __( 'Meta key', 'ultimate-member' ) . ':&nbsp;<input type="text" name="um_metadata[_um_sorting_fields][other_data][' . $k . '][meta_key]" value="' . esc_attr( $other_key ) . '" /></label></span>
-						<span class="um-field-wrapper um-custom-order-fields"><label>' . __( 'Data type', 'ultimate-member' ) . ':&nbsp;<select name="um_metadata[_um_sorting_fields][other_data][' . $k . '][data_type]" />' .
-						$data_types_html .
-						'</select></label></span>
-						<span class="um-field-wrapper um-custom-order-fields"><label>' . __( 'Order', 'ultimate-member' ) . ':&nbsp;<select name="um_metadata[_um_sorting_fields][other_data][' . $k . '][order]" />
-						<option value="ASC" ' . selected( $other_order, 'ASC', false ) . '>' . __( 'ASC', 'ultimate-member' ) . '</option>
-						<option value="DESC" ' . selected( $other_order, 'DESC', false ) . '>' . __( 'DESC', 'ultimate-member' ) . '</option>
-						</select></label></span>
-						<span class="um-field-wrapper um-custom-order-fields"><label>' . __( 'Label', 'ultimate-member' ) . ':&nbsp;<input type="text" name="um_metadata[_um_sorting_fields][other_data][' . $k . '][label]" value="' . esc_attr( $other_label ) . '" /></label></span>
-						</li>';
+					$html .= "<span class=\"um-field-wrapper\">
+						<select $id_attr $name_attr $class_attr $data_attr>$options</select></span>
+						<span class=\"um-field-control\"><a href=\"javascript:void(0);\" class=\"um-select-delete\">" . __( 'Remove', 'ultimate-member' ) . "</a></span>
+						<span class=\"um-field-wrapper um-custom-order-fields\"><label>" . __( 'Meta key', 'ultimate-member' ) . ":&nbsp;<input type=\"text\" name=\"um_metadata[_um_sorting_fields][other_data][" . $k . "][meta_key]\" value=\"" . esc_attr( $other_key ) . "\" /></label></span>
+						<span class=\"um-field-wrapper um-custom-order-fields\"><label>" . __( 'Label', 'ultimate-member' ) . ":&nbsp;<input type=\"text\" name=\"um_metadata[_um_sorting_fields][other_data][" . $k . "][label]\" value=\"" . esc_attr( $other_label ) . "\" /></label></span>
+						</li>";
 				}
 			} elseif ( ! empty( $field_data['show_default_number'] ) && is_numeric( $field_data['show_default_number'] ) && $field_data['show_default_number'] > 0 ) {
 				$i = 0;
@@ -1829,6 +1573,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 			return $html;
 		}
 
+
 		/**
 		 * Get field value
 		 *
@@ -1858,25 +1603,6 @@ if ( ! class_exists( 'um\admin\core\Admin_Forms' ) ) {
 			$value = is_string( $value ) ? stripslashes( $value ) : $value;
 
 			return $value;
-		}
-
-		public function render_external_link( $data ) {
-			$defaults = array(
-				'url'  => '',
-				'html' => '',
-			);
-			$data     = wp_parse_args( $data, $defaults );
-			if ( empty( $data['url'] ) || empty( $data['html'] ) ) {
-				return '';
-			}
-			ob_start();
-			?>
-			<a target="_blank" href="<?php echo esc_url( $data['url'] ); ?>">
-				<?php echo esc_html( $data['html'] ); ?>
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="um-external-link-icon" aria-hidden="true" focusable="false"><path d="M19.5 4.5h-7V6h4.44l-5.97 5.97 1.06 1.06L18 7.06v4.44h1.5v-7Zm-13 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3H17v3a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h3V5.5h-3Z"></path></svg>
-			</a>
-			<?php
-			return ob_get_clean();
 		}
 	}
 }

@@ -1,11 +1,12 @@
 <?php
 namespace um\core;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 
 if ( ! class_exists( 'um\core\Account' ) ) {
+
 
 	/**
 	 * Class Account
@@ -13,111 +14,117 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 	 */
 	class Account {
 
-		/**
-		 * @var array
-		 */
-		private $account_exist = array();
 
 		/**
 		 * @var
 		 */
-		public $tabs;
+		var $tabs;
+
 
 		/**
 		 * @var string
 		 */
-		public $current_tab = 'general';
+		var $current_tab = 'general';
+
 
 		/**
 		 * @var array
 		 */
-		public $displayed_fields = array();
+		var $displayed_fields = array();
+
 
 		/**
 		 * @var array
 		 */
-		public $tab_output = array();
+		var $tab_output = array();
+
 
 		/**
 		 * Account constructor.
 		 */
-		public function __construct() {
+		function __construct() {
 			add_shortcode( 'ultimatemember_account', array( &$this, 'ultimatemember_account' ) );
 			add_action( 'template_redirect', array( &$this, 'account_page_restrict' ), 10001 );
 			add_action( 'template_redirect', array( &$this, 'account_submit' ), 10002 );
 			add_filter( 'um_predefined_fields_hook', array( &$this, 'predefined_fields_hook' ), 1 );
 		}
 
+
 		/**
-		 * Init AllTabs for user account.
+		 * Init AllTabs for user account
 		 *
-		 * @param array $args
+		 * @param $args
 		 *
 		 * @throws \Exception
 		 */
-		public function init_tabs( $args ) {
+		function init_tabs( $args ) {
+
 			$this->tabs = $this->get_tabs();
 
 			ksort( $this->tabs );
 
-			$tabs_structured = array();
+			$tabs_structed = array();
 			foreach ( $this->tabs as $k => $arr ) {
+
 				foreach ( $arr as $id => $info ) {
-					if ( ! empty( $args['tab'] ) && $id !== $args['tab'] ) {
+
+					if ( ! empty( $args['tab'] ) && $id != $args['tab'] ) {
 						continue;
 					}
 
 					$output = $this->get_tab_fields( $id, $args );
 
 					if ( ! empty( $output ) ) {
-						$tabs_structured[ $id ] = $info;
+						$tabs_structed[ $id ] = $info;
 					}
+
 				}
+
 			}
-			$this->tabs = $tabs_structured;
+			$this->tabs = $tabs_structed;
 		}
 
+
 		/**
-		 * Get all Account tabs.
+		 * Get all Account tabs
 		 *
 		 * @return array
 		 */
-		public function get_tabs() {
-			$tabs                 = array();
+		function get_tabs() {
+			$tabs = array();
 			$tabs[100]['general'] = array(
-				'icon'         => 'um-faicon-user',
-				'title'        => __( 'Account', 'ultimate-member' ),
-				'submit_title' => __( 'Update Account', 'ultimate-member' ),
+				'icon'          => 'um-faicon-user',
+				'title'         => __( 'Account', 'ultimate-member' ),
+				'submit_title'  => __( 'Update Account', 'ultimate-member' ),
 			);
 
 			$tabs[200]['password'] = array(
-				'icon'         => 'um-faicon-asterisk',
-				'title'        => __( 'Change Password', 'ultimate-member' ),
-				'submit_title' => __( 'Update Password', 'ultimate-member' ),
+				'icon'          => 'um-faicon-asterisk',
+				'title'         => __( 'Change Password', 'ultimate-member' ),
+				'submit_title'  => __( 'Update Password', 'ultimate-member' ),
 			);
 
 			$tabs[300]['privacy'] = array(
-				'icon'         => 'um-faicon-lock',
-				'title'        => __( 'Privacy', 'ultimate-member' ),
-				'submit_title' => __( 'Update Privacy', 'ultimate-member' ),
+				'icon'          => 'um-faicon-lock',
+				'title'         => __( 'Privacy', 'ultimate-member' ),
+				'submit_title'  => __( 'Update Privacy', 'ultimate-member' ),
 			);
 
-			// Init here, but default account tab content is empty, so it's hidden.
-			// Init required here for the using inside the extensions where is possible to disable email notification.
-			// Default Ultimate Member core notifications cannot be disabled on the user's side.
 			$tabs[400]['notifications'] = array(
-				'icon'         => 'um-faicon-envelope',
-				'title'        => __( 'Notifications', 'ultimate-member' ),
-				'submit_title' => __( 'Update Notifications', 'ultimate-member' ),
+				'icon'          => 'um-faicon-envelope',
+				'title'         => __( 'Notifications', 'ultimate-member' ),
+				'submit_title'  => __( 'Update Notifications', 'ultimate-member' ),
 			);
 
-			// If user cannot delete profile hide delete tab.
+			//if user cannot delete profile hide delete tab
 			if ( um_user( 'can_delete_profile' ) || um_user( 'can_delete_everyone' ) ) {
+
 				$tabs[99999]['delete'] = array(
-					'icon'         => 'um-faicon-trash-o',
-					'title'        => __( 'Delete Account', 'ultimate-member' ),
-					'submit_title' => __( 'Delete Account', 'ultimate-member' ),
+					'icon'          => 'um-faicon-trash-o',
+					'title'         => __( 'Delete Account', 'ultimate-member' ),
+					'submit_title'  => __( 'Delete Account', 'ultimate-member' ),
 				);
+
 			}
 
 			/**
@@ -143,6 +150,7 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 			return apply_filters( 'um_account_page_default_tabs_hook', $tabs );
 		}
 
+
 		/**
 		 * Account Shortcode
 		 *
@@ -151,73 +159,47 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 		 * @return false|string
 		 * @throws \Exception
 		 */
-		public function ultimatemember_account( $args = array() ) {
+		function ultimatemember_account( $args = array() ) {
 			if ( ! is_user_logged_in() ) {
 				return '';
 			}
 
 			um_fetch_user( get_current_user_id() );
 
-			/** There is possible to use 'shortcode_atts_ultimatemember_account' filter for getting customized $args. This filter is documented in wp-includes/shortcodes.php "shortcode_atts_{$shortcode}" */
-			$args = shortcode_atts(
-				array(
-					'template' => 'account',
-					'mode'     => 'account',
-					'form_id'  => 'um_account_id',
-					'tab'      => '',
-				),
-				$args,
-				'ultimatemember_account'
+			ob_start();
+
+			$defaults = array(
+				'template'  => 'account',
+				'mode'      => 'account',
+				'form_id'   => 'um_account_id',
 			);
+			$args = wp_parse_args( $args, $defaults );
 
 			/**
-			 * Filters Account shortcode arguments.
+			 * UM hook
 			 *
-			 * @since 1.3.x
-			 * @hook  um_account_shortcode_args_filter
-			 * @deprecated 2.6.9
-			 *
-			 * @param {array} $args Shortcode arguments.
-			 *
-			 * @return {array} Shortcode arguments.
-			 *
-			 * @example <caption>Change Account arguments.</caption>
+			 * @type filter
+			 * @title um_account_shortcode_args_filter
+			 * @description Account Shortcode Arguments
+			 * @input_vars
+			 * [{"var":"$args","type":"array","desc":"Shortcode Arguments"}]
+			 * @change_log
+			 * ["Since: 2.0"]
+			 * @usage add_filter( 'um_account_shortcode_args_filter', 'function_name', 10, 1 );
+			 * @example
+			 * <?php
+			 * add_filter( 'um_account_shortcode_args_filter', 'my_account_shortcode_args', 10, 1 );
 			 * function my_account_shortcode_args( $args ) {
-			 *     $args['tab'] = 'password';
+			 *     // your code here
 			 *     return $args;
 			 * }
-			 * add_filter( 'um_account_shortcode_args_filter', 'my_account_shortcode_args' );
+			 * ?>
 			 */
-			$args = apply_filters_deprecated( 'um_account_shortcode_args_filter', array( $args ), '2.6.9', 'shortcode_atts_ultimatemember_account' );
-
-			$account_hash = md5( wp_json_encode( $args ) );
-
-			/**
-			 * Filters variable for enable singleton shortcode loading on the same page.
-			 * Note: Set it to `false` if you don't need to render the same form twice or more on the same page.
-			 *
-			 * @since 2.6.9
-			 *
-			 * @hook  um_ultimatemember_account_shortcode_disable_singleton
-			 *
-			 * @param {bool}  $disable Disabled singleton. By default, it's `true`.
-			 * @param {array} $args    Shortcode arguments.
-			 *
-			 * @return {bool} Disabled singleton or not.
-			 *
-			 * @example <caption>Turn off ability to use ultimatemember_account shortcode twice.</caption>
-			 * add_filter( 'um_ultimatemember_account_shortcode_disable_singleton', '__return_false' );
-			 */
-			$disable_singleton_shortcode = apply_filters( 'um_ultimatemember_account_shortcode_disable_singleton', true, $args );
-			if ( false === $disable_singleton_shortcode && in_array( $account_hash, $this->account_exist, true ) ) {
-				return '';
-			}
-
-			ob_start();
+			$args = apply_filters( 'um_account_shortcode_args_filter', $args );
 
 			if ( ! empty( $args['tab'] ) ) {
 
-				if ( 'account' === $args['tab'] ) {
+				if ( $args['tab'] == 'account' ) {
 					$args['tab'] = 'general';
 				}
 
@@ -231,60 +213,101 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 							<form method="post" action="">
 								<?php
 								/**
-								 * Fires for render account form hidden fields.
+								 * UM hook
 								 *
-								 * @since 1.3.x
-								 * @hook um_account_page_hidden_fields
-								 *
-								 * @param {array} $args Account shortcode arguments.
-								 *
-								 * @example <caption>Make some action before account tab loading.</caption>
+								 * @type action
+								 * @title um_account_page_hidden_fields
+								 * @description Make some action before account tab loading
+								 * @input_vars
+								 * [{"var":"$args","type":"array","desc":"Account Page Arguments"}]
+								 * @change_log
+								 * ["Since: 2.0"]
+								 * @usage add_action( 'um_before_template_part', 'function_name', 10, 1 );
+								 * @example
+								 * <?php
+								 * add_action( 'um_account_page_hidden_fields', 'my_account_page_hidden_fields', 10, 1 );
 								 * function my_account_page_hidden_fields( $args ) {
 								 *     // your code here
 								 * }
-								 * add_action( 'um_account_page_hidden_fields', 'my_account_page_hidden_fields' );
+								 * ?>
 								 */
 								do_action( 'um_account_page_hidden_fields', $args );
 
-								$this->render_account_tab( $args['tab'], $this->tabs[ $args['tab'] ], $args );
-								?>
+								$this->render_account_tab( $args['tab'], $this->tabs[ $args['tab'] ], $args );  ?>
 							</form>
 						</div>
 					</div>
-					<?php
-				}
+				<?php }
+
 			} else {
 
 				$this->init_tabs( $args );
 
-				/**
-				 * Filters Account shortcode default tab.
-				 *
-				 * @since 2.0
-				 * @hook  um_change_default_tab
-				 *
-				 * @param {string} $tab  Current account tab.
-				 * @param {array}  $args Shortcode arguments.
-				 *
-				 * @return {string} Current account tab.
-				 *
-				 * @example <caption>Change Account default tab to Password.</caption>
-				 * function my_um_change_default_tab( $tab, $args ) {
-				 *     $tab = 'password';
-				 *     return $tab;
-				 * }
-				 * add_filter( 'um_change_default_tab', 'my_um_change_default_tab, 10, 2 );
-				 */
 				$this->current_tab = apply_filters( 'um_change_default_tab', $this->current_tab, $args );
 
-				/** This filter is documented in includes/core/class-shortcodes.php */
+				/**
+				 * UM hook
+				 *
+				 * @type action
+				 * @title um_pre_{$mode}_shortcode
+				 * @description Make some action before account tabs loading
+				 * @input_vars
+				 * [{"var":"$args","type":"array","desc":"Account Page Arguments"}]
+				 * @change_log
+				 * ["Since: 2.0"]
+				 * @usage add_action( 'um_pre_{$mode}_shortcode', 'function_name', 10, 1 );
+				 * @example
+				 * <?php
+				 * add_action( 'um_pre_{$mode}_shortcode', 'my_pre_account_shortcode', 10, 1 );
+				 * function my_pre_account_shortcode( $args ) {
+				 *     // your code here
+				 * }
+				 * ?>
+				 */
 				do_action( "um_pre_{$args['mode']}_shortcode", $args );
-				/** This filter is documented in includes/core/class-shortcodes.php */
+				/**
+				 * UM hook
+				 *
+				 * @type action
+				 * @title um_before_form_is_loaded
+				 * @description Make some action before account tabs loading
+				 * @input_vars
+				 * [{"var":"$args","type":"array","desc":"Account Page Arguments"}]
+				 * @change_log
+				 * ["Since: 2.0"]
+				 * @usage add_action( 'um_before_form_is_loaded', 'function_name', 10, 1 );
+				 * @example
+				 * <?php
+				 * add_action( 'um_before_form_is_loaded', 'my_before_form_is_loaded', 10, 1 );
+				 * function my_before_form_is_loaded( $args ) {
+				 *     // your code here
+				 * }
+				 * ?>
+				 */
 				do_action( 'um_before_form_is_loaded', $args );
-				/** This filter is documented in includes/core/class-shortcodes.php */
+				/**
+				 * UM hook
+				 *
+				 * @type action
+				 * @title um_before_{$mode}_form_is_loaded
+				 * @description Make some action before account tabs loading
+				 * @input_vars
+				 * [{"var":"$args","type":"array","desc":"Account Page Arguments"}]
+				 * @change_log
+				 * ["Since: 2.0"]
+				 * @usage add_action( 'um_before_{$mode}_form_is_loaded', 'function_name', 10, 1 );
+				 * @example
+				 * <?php
+				 * add_action( 'um_before_{$mode}_form_is_loaded', 'my_before_account_form_is_loaded', 10, 1 );
+				 * function my_before_account_form_is_loaded( $args ) {
+				 *     // your code here
+				 * }
+				 * ?>
+				 */
 				do_action( "um_before_{$args['mode']}_form_is_loaded", $args );
 
 				UM()->shortcodes()->template_load( $args['template'], $args );
+
 			}
 
 			if ( ! is_admin() && ! defined( 'DOING_AJAX' ) ) {
@@ -294,8 +317,6 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 			$output = ob_get_clean();
 
 			$this->account_fields_hash();
-
-			$this->account_exist[] = $account_hash;
 
 			return $output;
 		}
@@ -312,127 +333,119 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 		/**
 		 * Restrict access to Account page
 		 */
-		public function account_page_restrict() {
+		function account_page_restrict() {
+
 			if ( um_is_core_page( 'account' ) ) {
 
-				// Redirect to the login page for not logged-in users.
+				//redirect to login for not logged in users
 				if ( ! is_user_logged_in() ) {
 					$redirect_to = add_query_arg(
 						'redirect_to',
-						urlencode_deep( um_get_core_page( 'account' ) ),
+						urlencode_deep( um_get_core_page( 'account' ) ) ,
 						um_get_core_page( 'login' )
 					);
 
-					wp_safe_redirect( $redirect_to );
-					exit;
+					exit( wp_redirect( $redirect_to ) );
 				}
 
-				// Set data for fields.
-				UM()->fields()->set_mode    = 'account';
-				UM()->fields()->editing     = true;
-				UM()->fields()->global_args = array(
-					'mode' => 'account',
-				);
+
+				//set data for fields
+				UM()->fields()->set_mode = 'account';
+				UM()->fields()->editing = true;
 
 				if ( get_query_var( 'um_tab' ) ) {
 					$this->current_tab = get_query_var( 'um_tab' );
 				}
+
 			}
 		}
 
+
 		/**
-		 * Process the submission of account details
+		 * Submit Account handler
 		 */
-		public function account_submit() {
-			if ( ! um_submitting_account_page() ) {
-				return;
-			}
+		function account_submit() {
 
-			$formdata = wp_unslash( $_POST );
+			if ( um_submitting_account_page() ) {
 
-			// Don't un-slash passwords in manner of WordPress native password field.
-			$fields_map = array(
-				'user_password',
-				'confirm_user_password',
-				'current_user_password',
-				'single_user_password',
-			);
-			$formdata   = UM()->form()::ignore_formdata_unslash( $formdata, $fields_map );
+				UM()->form()->post_form = $_POST;
 
-			UM()->form()->post_form = $formdata;
-
-			/**
-			 * UM hook
-			 *
-			 * @type action
-			 * @title um_submit_account_errors_hook
-			 * @description Validate process on account submit
-			 * @input_vars
-			 * [{"var":"$submitted","type":"array","desc":"Account Page Submitted data"}]
-			 * @change_log
-			 * ["Since: 2.0"]
-			 * @usage add_action( 'um_submit_account_errors_hook', 'function_name', 10, 1 );
-			 * @example
-			 * <?php
-			 * add_action( 'um_submit_account_errors_hook', 'my_submit_account_errors', 10, 1 );
-			 * function my_submit_account_errors( $submitted ) {
-			 *     // your code here
-			 * }
-			 * ?>
-			 */
-			do_action( 'um_submit_account_errors_hook', UM()->form()->post_form );
-
-			if ( um_is_core_page( 'account' ) && get_query_var( 'um_tab' ) ) {
-				$this->current_tab = get_query_var( 'um_tab' );
-			} else {
-				$this->current_tab = UM()->form()->post_form['_um_account_tab'];
-			}
-
-			$this->current_tab = sanitize_key( $this->current_tab );
-
-			if ( ! isset( UM()->form()->errors ) ) {
 				/**
 				 * UM hook
 				 *
 				 * @type action
-				 * @title um_submit_account_details
-				 * @description On success account submit
+				 * @title um_submit_account_errors_hook
+				 * @description Validate process on account submit
 				 * @input_vars
 				 * [{"var":"$submitted","type":"array","desc":"Account Page Submitted data"}]
 				 * @change_log
 				 * ["Since: 2.0"]
-				 * @usage add_action( 'um_submit_account_details', 'function_name', 10, 1 );
+				 * @usage add_action( 'um_submit_account_errors_hook', 'function_name', 10, 1 );
 				 * @example
 				 * <?php
-				 * add_action( 'um_submit_account_details', 'my_submit_account_details', 10, 1 );
-				 * function my_submit_account_details( $submitted ) {
+				 * add_action( 'um_submit_account_errors_hook', 'my_submit_account_errors', 10, 1 );
+				 * function my_submit_account_errors( $submitted ) {
 				 *     // your code here
 				 * }
 				 * ?>
 				 */
-				do_action( 'um_submit_account_details', UM()->form()->post_form );
+				do_action( 'um_submit_account_errors_hook', UM()->form()->post_form );
 
-			} elseif ( UM()->form()->has_error( 'um_account_security' ) ) {
-				$url = '';
-				if ( um_is_core_page( 'account' ) ) {
-
-					$url = UM()->account()->tab_link( $this->current_tab );
-
-					$url = add_query_arg( 'err', 'account', $url );
-
-					if ( function_exists( 'icl_get_current_language' ) ) {
-						if ( icl_get_current_language() != icl_get_default_language() ) {
-							$url = UM()->permalinks()->get_current_url( true );
-							$url = add_query_arg( 'err', 'account', $url );
-
-							exit( wp_redirect( $url ) );
-						}
-					}
+				if ( um_is_core_page( 'account' ) && get_query_var( 'um_tab' ) ) {
+					$this->current_tab = get_query_var( 'um_tab' );
+				} else {
+					$this->current_tab = UM()->form()->post_form['_um_account_tab'];
 				}
 
-				exit( wp_redirect( $url ) );
+				$this->current_tab = sanitize_key( $this->current_tab );
+
+				if ( ! isset( UM()->form()->errors ) ) {
+					/**
+					 * UM hook
+					 *
+					 * @type action
+					 * @title um_submit_account_details
+					 * @description On success account submit
+					 * @input_vars
+					 * [{"var":"$submitted","type":"array","desc":"Account Page Submitted data"}]
+					 * @change_log
+					 * ["Since: 2.0"]
+					 * @usage add_action( 'um_submit_account_details', 'function_name', 10, 1 );
+					 * @example
+					 * <?php
+					 * add_action( 'um_submit_account_details', 'my_submit_account_details', 10, 1 );
+					 * function my_submit_account_details( $submitted ) {
+					 *     // your code here
+					 * }
+					 * ?>
+					 */
+					do_action( 'um_submit_account_details', UM()->form()->post_form );
+
+				} elseif ( UM()->form()->has_error( 'um_account_security' ) ) {
+					$url = '';
+					if ( um_is_core_page( 'account' ) ) {
+
+						$url = UM()->account()->tab_link( $this->current_tab );
+
+						$url = add_query_arg( 'err', 'account', $url );
+
+						if ( function_exists( 'icl_get_current_language' ) ) {
+							if ( icl_get_current_language() != icl_get_default_language() ) {
+								$url = UM()->permalinks()->get_current_url( true );
+								$url = add_query_arg( 'err', 'account', $url );
+
+								exit( wp_redirect( $url ) );
+							}
+						}
+					}
+
+					exit( wp_redirect( $url ) );
+				}
+
 			}
+
 		}
+
 
 		/**
 		 * Filter account fields
@@ -459,7 +472,7 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 		 */
 		function tab_link( $id ) {
 
-			if ( UM()->is_permalinks ) {
+			if ( get_option( 'permalink_structure' ) ) {
 
 				$url = trailingslashit( untrailingslashit( um_get_core_page( 'account' ) ) );
 				$url = $url . $id . '/';
@@ -570,9 +583,9 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 		function get_tab_fields( $id, $shortcode_args ) {
 			$output = null;
 
-			UM()->fields()->set_id   = absint( $id );
+			UM()->fields()->set_id = $id;
 			UM()->fields()->set_mode = 'account';
-			UM()->fields()->editing  = true;
+			UM()->fields()->editing = true;
 
 			if ( ! empty( $this->tab_output[ $id ]['content'] ) && ! empty( $this->tab_output[ $id ]['hash'] ) &&
 			     $this->tab_output[ $id ]['hash'] == md5( json_encode( $shortcode_args ) ) ) {
@@ -583,7 +596,7 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 
 				case 'privacy':
 
-					$args = 'profile_privacy,profile_noindex,hide_in_members,um_show_last_login';
+					$args = 'profile_privacy,profile_noindex,hide_in_members';
 					/**
 					 * UM hook
 					 *
@@ -613,9 +626,6 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 					$this->init_displayed_fields( $fields, $id );
 
 					foreach ( $fields as $key => $data ) {
-						if ( ! empty( $shortcode_args['is_block'] ) ) {
-							$data['is_block'] = true;
-						}
 						$output .= UM()->fields()->edit_field( $key, $data );
 					}
 					break;
@@ -656,9 +666,6 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 					$this->init_displayed_fields( $fields, $id );
 
 					foreach ( $fields as $key => $data ) {
-						if ( ! empty( $shortcode_args['is_block'] ) ) {
-							$data['is_block'] = true;
-						}
 						$output .= UM()->fields()->edit_field( $key, $data );
 					}
 
@@ -676,8 +683,8 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 						$args = 'user_login,user_email';
 					}
 
-					if ( ! UM()->options()->get( 'account_email' ) ) {
-						$args = str_replace( ',user_email', '', $args );
+					if ( ! UM()->options()->get( 'account_email' ) && ! um_user( 'can_edit_everyone' ) ) {
+						$args = str_replace(',user_email','', $args );
 					}
 
 					if ( $this->current_password_is_required( $id ) ) {
@@ -713,9 +720,6 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 					$this->init_displayed_fields( $fields, $id );
 
 					foreach ( $fields as $key => $data ) {
-						if ( ! empty( $shortcode_args['is_block'] ) ) {
-							$data['is_block'] = true;
-						}
 						$output .= UM()->fields()->edit_field( $key, $data );
 					}
 
@@ -754,9 +758,6 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 					$this->init_displayed_fields( $fields, $id );
 
 					foreach ( $fields as $key => $data ) {
-						if ( ! empty( $shortcode_args['is_block'] ) ) {
-							$data['is_block'] = true;
-						}
 						$output .= UM()->fields()->edit_field( $key, $data );
 					}
 
@@ -787,6 +788,7 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 					 */
 					$output = apply_filters( "um_account_content_hook_{$id}", $output, $shortcode_args );
 					break;
+
 			}
 
 			$this->tab_output[ $id ] = array( 'content' => $output, 'hash' => md5( json_encode( $shortcode_args ) ) );
@@ -910,11 +912,11 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 				$classes .= ' um-in-admin';
 			}
 
-			if ( true === UM()->fields()->editing ) {
+			if ( UM()->fields()->editing == true ) {
 				$classes .= ' um-editing';
 			}
 
-			if ( true === UM()->fields()->viewing ) {
+			if ( UM()->fields()->viewing == true ) {
 				$classes .= ' um-viewing';
 			}
 
@@ -942,14 +944,15 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 			return $classes;
 		}
 
+
 		/**
-		 * Checks account actions require current password.
+		 * Checks account actions require current password
 		 *
-		 * @param string $tab_key
+		 * @param $tab_key
 		 *
 		 * @return bool
 		 */
-		public function current_password_is_required( $tab_key ) {
+		function current_password_is_required( $tab_key ) {
 			$is_required = true;
 
 			switch ( $tab_key ) {
@@ -957,22 +960,17 @@ if ( ! class_exists( 'um\core\Account' ) ) {
 					$is_required = UM()->options()->get( 'account_general_password' );
 					break;
 				case 'delete':
+					break;
 				case 'password':
+					break;
 				case 'privacy_erase_data':
 				case 'privacy_download_data':
 					break;
 			}
 
-			return apply_filters( "um_account_{$tab_key}_require_current", $is_required );
-		}
+			$is_required = apply_filters( "um_account_{$tab_key}_require_current", $is_required );
 
-		/**
-		 * Check the conditional hook for getting notifications tab data.
-		 *
-		 * @return bool
-		 */
-		public function is_notifications_tab_visible() {
-			return apply_filters( 'um_account_notifications_tab_enabled', false );
+			return $is_required;
 		}
 	}
 }

@@ -56,11 +56,7 @@ registerBlockType('wordpress-popular-posts/widget', {
             type: 'string',
             default: 'post'
         },
-        pid: /* Deprecated */ {
-            type: 'string',
-            default: ''
-        },
-        exclude: {
+        pid: {
             type: 'string',
             default: ''
         },
@@ -125,10 +121,6 @@ registerBlockType('wordpress-popular-posts/widget', {
             type: 'string',
             default: ''
         },
-        rating: {
-            type: 'boolean',
-            default: false
-        },
         /* stats tag settings */
         stats_comments: {
             type: 'boolean',
@@ -181,7 +173,7 @@ registerBlockType('wordpress-popular-posts/widget', {
         },
         post_html: {
             type: 'string',
-            default: '<li class="{current_class}">{thumb} {title} <span class="wpp-meta post-stats">{stats}</span></li>'
+            default: '<li>{thumb} {title} <span class="wpp-meta post-stats">{stats}</span></li>'
         },
         theme: {
             type: 'string',

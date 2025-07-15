@@ -22,14 +22,9 @@ use TypeError;
 class Service
 {
     public $batchPath;
-    /**
-     * Only used in getBatch
-     */
     public $rootUrl;
-    public $rootUrlTemplate;
     public $version;
     public $servicePath;
-    public $serviceName;
     public $availableScopes;
     public $resource;
     private $client;
@@ -62,6 +57,6 @@ class Service
      */
     public function createBatch()
     {
-        return new \WPMailSMTP\Vendor\Google\Http\Batch($this->client, \false, $this->rootUrlTemplate ?? $this->rootUrl, $this->batchPath);
+        return new \WPMailSMTP\Vendor\Google\Http\Batch($this->client, \false, $this->rootUrl, $this->batchPath);
     }
 }

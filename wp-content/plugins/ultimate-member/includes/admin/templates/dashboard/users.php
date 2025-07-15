@@ -1,74 +1,93 @@
-<?php
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-?>
-<table id="um-users-overview-table">
-	<tr>
-		<td>
-			<span>
-				<a class="count" href="<?php echo esc_url( admin_url( 'users.php' ) ); ?>">
-					<?php echo esc_html( UM()->query()->count_users() ); ?>
-				</a>
+<?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
+
+
+<div class="table">
+
+	<table>
+		<tr class="first">
+			<td class="first b">
 				<a href="<?php echo esc_url( admin_url( 'users.php' ) ); ?>">
-					<?php esc_html_e( 'Users', 'ultimate-member' ); ?>
+					<?php echo UM()->query()->count_users(); ?>
 				</a>
-			</span>
-		</td>
-		<td>
-			<span>
-				<a class="count" href="<?php echo esc_url( admin_url( 'users.php?um_user_status=awaiting_admin_review' ) ); ?>">
-					<?php echo esc_html( UM()->query()->count_users_by_status( 'awaiting_admin_review' ) ); ?>
+			</td>
+			<td class="t">
+				<a href="<?php echo esc_url( admin_url( 'users.php' ) ); ?>">
+					<?php _e( 'Users', 'ultimate-member' ); ?>
 				</a>
-				<a href="<?php echo esc_url( admin_url( 'users.php?um_user_status=awaiting_admin_review' ) ); ?>" class="warning">
-					<?php esc_html_e( 'Pending Review', 'ultimate-member' ); ?>
+			</td>
+		</tr>
+
+		<tr>
+			<td class="first b">
+				<a href="<?php echo esc_url( admin_url( 'users.php?um_status=approved' ) ); ?>">
+					<?php echo UM()->query()->count_users_by_status( 'approved' ); ?>
 				</a>
-			</span>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<span>
-				<a class="count" href="<?php echo esc_url( admin_url( 'users.php?um_user_status=approved' ) ); ?>">
-					<?php echo esc_html( UM()->query()->count_users_by_status( 'approved' ) ); ?>
+			</td>
+			<td class="t">
+				<a href="<?php echo esc_url( admin_url( 'users.php?um_status=approved' ) ); ?>">
+					<?php _e( 'Approved', 'ultimate-member' ); ?>
 				</a>
-				<a href="<?php echo esc_url( admin_url( 'users.php?um_user_status=approved' ) ); ?>">
-					<?php esc_html_e( 'Approved', 'ultimate-member' ); ?>
+			</td>
+		</tr>
+
+		<tr>
+			<td class="first b">
+				<a href="<?php echo esc_url( admin_url( 'users.php?um_status=rejected' ) ); ?>">
+					<?php echo UM()->query()->count_users_by_status( 'rejected' ); ?>
 				</a>
-			</span>
-		</td>
-		<td>
-			<span>
-				<a class="count" href="<?php echo esc_url( admin_url( 'users.php?um_user_status=awaiting_email_confirmation' ) ); ?>">
-					<?php echo esc_html( UM()->query()->count_users_by_status( 'awaiting_email_confirmation' ) ); ?>
+			</td>
+			<td class="t">
+				<a href="<?php echo esc_url( admin_url( 'users.php?um_status=rejected' ) ); ?>">
+					<?php _e( 'Rejected', 'ultimate-member' ); ?>
 				</a>
-				<a href="<?php echo esc_url( admin_url( 'users.php?um_user_status=awaiting_email_confirmation' ) ); ?>" class="warning">
-					<?php esc_html_e( 'Awaiting Email Confirmation', 'ultimate-member' ); ?>
+			</td>
+		</tr>
+	</table>
+
+</div>
+
+<div class="table table_right">
+
+	<table>
+		<tr class="first">
+			<td class="b">
+				<a href="<?php echo esc_url( admin_url( 'users.php?um_status=awaiting_admin_review' ) ); ?>">
+					<?php echo UM()->query()->count_users_by_status( 'awaiting_admin_review' ); ?>
 				</a>
-			</span>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<span>
-				<a class="count" href="<?php echo esc_url( admin_url( 'users.php?um_user_status=rejected' ) ); ?>">
-					<?php echo esc_html( UM()->query()->count_users_by_status( 'rejected' ) ); ?>
+			</td>
+			<td class="last t">
+				<a href="<?php echo esc_url( admin_url( 'users.php?um_status=awaiting_admin_review' ) ); ?>" class="warning">
+					<?php _e( 'Pending Review', 'ultimate-member' ); ?>
 				</a>
-				<a href="<?php echo esc_url( admin_url( 'users.php?um_user_status=rejected' ) ); ?>">
-					<?php esc_html_e( 'Rejected', 'ultimate-member' ); ?>
+			</td>
+		</tr>
+
+		<tr>
+			<td class="b">
+				<a href="<?php echo esc_url( admin_url( 'users.php?um_status=awaiting_email_confirmation' ) ); ?>">
+					<?php echo UM()->query()->count_users_by_status( 'awaiting_email_confirmation' ); ?>
 				</a>
-			</span>
-		</td>
-		<td>
-			<span>
-				<a class="count" href="<?php echo esc_url( admin_url( 'users.php?um_user_status=inactive' ) ); ?>">
-					<?php echo esc_html( UM()->query()->count_users_by_status( 'inactive' ) ); ?>
+			</td>
+			<td class="last t">
+				<a href="<?php echo esc_url( admin_url( 'users.php?um_status=awaiting_email_confirmation' ) ); ?>" class="warning">
+					<?php _e( 'Awaiting E-mail Confirmation', 'ultimate-member' ); ?>
 				</a>
-				<a href="<?php echo esc_url( admin_url( 'users.php?um_user_status=inactive' ) ); ?>">
-					<?php esc_html_e( 'Inactive', 'ultimate-member' ); ?>
+			</td>
+		</tr>
+
+		<tr>
+			<td class="first b">
+				<a href="<?php echo esc_url( admin_url( 'users.php?um_status=inactive' ) ); ?>">
+					<?php echo UM()->query()->count_users_by_status( 'inactive' ); ?>
 				</a>
-			</span>
-		</td>
-	</tr>
-</table>
-<div class="clear"></div>
+			</td>
+			<td class="t">
+				<a href="<?php echo esc_url( admin_url( 'users.php?um_status=inactive' ) ); ?>">
+					<?php _e( 'Inactive', 'ultimate-member' ); ?>
+				</a>
+			</td>
+		</tr>
+	</table>
+
+</div>
+<div class="um-admin-clear"></div>

@@ -1,13 +1,13 @@
 <?php
 /**
  * Plugin Name: WP Mail SMTP
- * Version: 4.5.0
- * Requires at least: 5.5
- * Requires PHP: 7.4
+ * Version: 3.3.0
+ * Requires at least: 5.2
+ * Requires PHP: 5.6.20
  * Plugin URI: https://wpmailsmtp.com/
  * Description: Reconfigures the <code>wp_mail()</code> function to use Gmail/Mailgun/SendGrid/SMTP instead of the default <code>mail()</code> and creates an options page to manage the settings.
- * Author: WP Mail SMTP
- * Author URI: https://wpmailsmtp.com/
+ * Author: WPForms
+ * Author URI: https://wpforms.com/
  * Network: false
  * Text Domain: wp-mail-smtp
  * Domain Path: /assets/languages
@@ -15,7 +15,7 @@
 
 /**
  * @author    WPForms
- * @copyright WPForms, 2007-23, All Rights Reserved
+ * @copyright WPForms, 2007-21, All Rights Reserved
  * This code is released under the GPL licence version 3 or later, available here
  * https://www.gnu.org/licenses/gpl.txt
  */
@@ -124,35 +124,20 @@ if ( ! function_exists( 'wp_mail_smtp_check_pro_loading_allowed' ) ) {
 			require_once ABSPATH . '/wp-admin/includes/plugin.php';
 		}
 
-		$lite_plugin_slug = 'wp-mail-smtp/wp_mail_smtp.php';
-
 		// Search for old plugin name.
-		if ( is_plugin_active( $lite_plugin_slug ) ) {
+		if ( is_plugin_active( 'wp-mail-smtp/wp_mail_smtp.php' ) ) {
 			/*
 			 * Prevent issues of WP functions not being available for other plugins that hook into
 			 * this early deactivation. GH issue #861.
 			 */
 			require_once ABSPATH . WPINC . '/pluggable.php';
 
-			if (
-				is_multisite() &&
-				is_plugin_active_for_network( plugin_basename( __FILE__ ) ) &&
-				! is_plugin_active_for_network( $lite_plugin_slug )
-			) {
-				// Deactivate Lite plugin if Pro activated on Network level.
-				deactivate_plugins( $lite_plugin_slug );
-			} else {
-				// As Pro is loaded and Lite too - deactivate *silently* itself not to break older SMTP plugin.
-				deactivate_plugins( plugin_basename( __FILE__ ) );
+			// As Pro is loaded and Lite too - deactivate *silently* itself not to break older SMTP plugin.
+			deactivate_plugins( plugin_basename( __FILE__ ) );
 
-				if ( is_network_admin() ) {
-					add_action( 'network_admin_notices', 'wp_mail_smtp_lite_deactivation_notice' );
-				} else {
-					add_action( 'admin_notices', 'wp_mail_smtp_lite_deactivation_notice' );
-				}
+			add_action( 'admin_notices', 'wp_mail_smtp_lite_deactivation_notice' );
 
-				return true;
-			}
+			return true;
 		}
 
 		return false;
@@ -209,17 +194,6 @@ if ( ! function_exists( 'wp_mail_smtp_insecure_php_version_notice' ) ) {
 				?>
 				<br><br>
 				<?php
-
-				$doc_link = add_query_arg(
-					[
-						'utm_source'   => 'WordPress',
-						'utm_medium'   => 'Admin Notice',
-						'utm_campaign' => is_readable( rtrim( plugin_dir_path( __FILE__ ), '/\\' ) . '/src/Pro/Pro.php' ) ? 'plugin' : 'liteplugin',
-						'utm_content'  => 'Minimal Required PHP Version',
-					],
-					'https://wpmailsmtp.com/docs/supported-php-versions-for-wp-mail-smtp/'
-				);
-
 				printf(
 					wp_kses( /* translators: %s - WPMailSMTP.com docs URL with more details. */
 						__( '<strong>WP Mail SMTP plugin is disabled</strong> on your site until you fix the issue. <a href="%s" target="_blank" rel="noopener noreferrer">Read more for additional information.</a>', 'wp-mail-smtp' ),
@@ -232,7 +206,7 @@ if ( ! function_exists( 'wp_mail_smtp_insecure_php_version_notice' ) ) {
 							'strong' => array(),
 						)
 					),
-					esc_url( $doc_link )
+					'https://wpmailsmtp.com/docs/supported-php-versions-for-wp-mail-smtp/'
 				);
 				?>
 			</p>
@@ -248,35 +222,15 @@ if ( ! function_exists( 'wp_mail_smtp_insecure_php_version_notice' ) ) {
 }
 
 if ( ! defined( 'WPMS_PLUGIN_VER' ) ) {
-	/**
-	 * Plugin version.
-	 *
-	 * @since 0.11.1
-	 */
-	define( 'WPMS_PLUGIN_VER', '4.5.0' );
+	define( 'WPMS_PLUGIN_VER', '3.3.0' );
 }
 if ( ! defined( 'WPMS_PHP_VER' ) ) {
-	/**
-	 * Minimum supported PHP version.
-	 *
-	 * @since 1.0.0
-	 */
-	define( 'WPMS_PHP_VER', '7.4' );
+	define( 'WPMS_PHP_VER', '5.6.20' );
 }
 if ( ! defined( 'WPMS_WP_VER' ) ) {
-	/**
-	 * Minimum supported WordPress version.
-	 *
-	 * @since 3.3.0
-	 */
-	define( 'WPMS_WP_VER', '5.5' );
+	define( 'WPMS_WP_VER', '5.2' );
 }
 if ( ! defined( 'WPMS_PLUGIN_FILE' ) ) {
-	/**
-	 * Plugin main file path.
-	 *
-	 * @since 2.1.2
-	 */
 	define( 'WPMS_PLUGIN_FILE', __FILE__ );
 }
 

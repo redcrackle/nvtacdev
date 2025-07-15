@@ -431,9 +431,6 @@ jq( function() {
 
 		/* Load more updates at the end of the page */
 		if ( target.parent().hasClass('load-more') ) {
-			var loadMoreLink = new URL( jq( target ).prop( 'href' ) ),
-			    offsetLower = parseInt( loadMoreLink.searchParams.get( 'offset_lower' ), 10 ) || 0;
-
 			if ( bp_ajax_request ) {
 				bp_ajax_request.abort();
 			}
@@ -451,7 +448,6 @@ jq( function() {
 				action: 'activity_get_older_updates',
 				'cookie': bp_get_cookies(),
 				'page': oldest_page,
-				'offset_lower': offsetLower,
 				'exclude_just_posted': just_posted.join(',')
 			};
 
@@ -1755,7 +1751,6 @@ jq( function() {
 		}
 
 		data.bp_activity_last_recorded = activity_last_recorded;
-		data.bp_heartbeat = bp_get_cookies() || encodeURIComponent( jq.param( { 'bp-activity-scope': null } ) );
 
 		last_recorded_search = bp_get_querystring('s');
 

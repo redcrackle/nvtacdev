@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -11,9 +10,8 @@ declare (strict_types=1);
  */
 namespace WPMailSMTP\Vendor\Monolog\Formatter;
 
-use WPMailSMTP\Vendor\Monolog\DateTimeImmutable;
+use Exception;
 use WPMailSMTP\Vendor\Monolog\Utils;
-use Throwable;
 /**
  * Normalizes incoming records to remove objects/resources so it's easier to dump to various targets
  *
@@ -21,36 +19,27 @@ use Throwable;
  */
 class NormalizerFormatter implements \WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface
 {
-    public const SIMPLE_DATE = "Y-m-d\\TH:i:sP";
-    /** @var string */
+    const SIMPLE_DATE = "Y-m-d H:i:s";
     protected $dateFormat;
-    /** @var int */
-    protected $maxNormalizeDepth = 9;
-    /** @var int */
-    protected $maxNormalizeItemCount = 1000;
-    /** @var int */
-    private $jsonEncodeOptions = \WPMailSMTP\Vendor\Monolog\Utils::DEFAULT_JSON_FLAGS;
     /**
-     * @param string|null $dateFormat The format of the timestamp: one supported by DateTime::format
+     * @param string $dateFormat The format of the timestamp: one supported by DateTime::format
      */
-    public function __construct(?string $dateFormat = null)
+    public function __construct($dateFormat = null)
     {
-        $this->dateFormat = null === $dateFormat ? static::SIMPLE_DATE : $dateFormat;
+        $this->dateFormat = $dateFormat ?: static::SIMPLE_DATE;
         if (!\function_exists('json_encode')) {
             throw new \RuntimeException('PHP\'s json extension is required to use Monolog\'s NormalizerFormatter');
         }
     }
     /**
-     * {@inheritDoc}
-     *
-     * @param mixed[] $record
+     * {@inheritdoc}
      */
     public function format(array $record)
     {
         return $this->normalize($record);
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function formatBatch(array $records)
     {
@@ -59,59 +48,10 @@ class NormalizerFormatter implements \WPMailSMTP\Vendor\Monolog\Formatter\Format
         }
         return $records;
     }
-    public function getDateFormat() : string
+    protected function normalize($data, $depth = 0)
     {
-        return $this->dateFormat;
-    }
-    public function setDateFormat(string $dateFormat) : self
-    {
-        $this->dateFormat = $dateFormat;
-        return $this;
-    }
-    /**
-     * The maximum number of normalization levels to go through
-     */
-    public function getMaxNormalizeDepth() : int
-    {
-        return $this->maxNormalizeDepth;
-    }
-    public function setMaxNormalizeDepth(int $maxNormalizeDepth) : self
-    {
-        $this->maxNormalizeDepth = $maxNormalizeDepth;
-        return $this;
-    }
-    /**
-     * The maximum number of items to normalize per level
-     */
-    public function getMaxNormalizeItemCount() : int
-    {
-        return $this->maxNormalizeItemCount;
-    }
-    public function setMaxNormalizeItemCount(int $maxNormalizeItemCount) : self
-    {
-        $this->maxNormalizeItemCount = $maxNormalizeItemCount;
-        return $this;
-    }
-    /**
-     * Enables `json_encode` pretty print.
-     */
-    public function setJsonPrettyPrint(bool $enable) : self
-    {
-        if ($enable) {
-            $this->jsonEncodeOptions |= \JSON_PRETTY_PRINT;
-        } else {
-            $this->jsonEncodeOptions &= ~\JSON_PRETTY_PRINT;
-        }
-        return $this;
-    }
-    /**
-     * @param  mixed                $data
-     * @return null|scalar|array<array|scalar|null>
-     */
-    protected function normalize($data, int $depth = 0)
-    {
-        if ($depth > $this->maxNormalizeDepth) {
-            return 'Over ' . $this->maxNormalizeDepth . ' levels deep, aborting normalization';
+        if ($depth > 9) {
+            return 'Over 9 levels deep, aborting normalization';
         }
         if (null === $data || \is_scalar($data)) {
             if (\is_float($data)) {
@@ -125,57 +65,46 @@ class NormalizerFormatter implements \WPMailSMTP\Vendor\Monolog\Formatter\Format
             return $data;
         }
         if (\is_array($data)) {
-            $normalized = [];
+            $normalized = array();
             $count = 1;
             foreach ($data as $key => $value) {
-                if ($count++ > $this->maxNormalizeItemCount) {
-                    $normalized['...'] = 'Over ' . $this->maxNormalizeItemCount . ' items (' . \count($data) . ' total), aborting normalization';
+                if ($count++ > 1000) {
+                    $normalized['...'] = 'Over 1000 items (' . \count($data) . ' total), aborting normalization';
                     break;
                 }
                 $normalized[$key] = $this->normalize($value, $depth + 1);
             }
             return $normalized;
         }
-        if ($data instanceof \DateTimeInterface) {
-            return $this->formatDate($data);
+        if ($data instanceof \DateTime) {
+            return $data->format($this->dateFormat);
         }
         if (\is_object($data)) {
-            if ($data instanceof \Throwable) {
-                return $this->normalizeException($data, $depth);
+            // TODO 2.0 only check for Throwable
+            if ($data instanceof \Exception || \PHP_VERSION_ID > 70000 && $data instanceof \Throwable) {
+                return $this->normalizeException($data);
             }
-            if ($data instanceof \JsonSerializable) {
-                /** @var null|scalar|array<array|scalar|null> $value */
-                $value = $data->jsonSerialize();
-            } elseif (\get_class($data) === '__PHP_Incomplete_Class') {
-                $accessor = new \ArrayObject($data);
-                $value = (string) $accessor['__PHP_Incomplete_Class_Name'];
-            } elseif (\method_exists($data, '__toString')) {
-                /** @var string $value */
+            // non-serializable objects that implement __toString stringified
+            if (\method_exists($data, '__toString') && !$data instanceof \JsonSerializable) {
                 $value = $data->__toString();
             } else {
-                // the rest is normalized by json encoding and decoding it
-                /** @var null|scalar|array<array|scalar|null> $value */
-                $value = \json_decode($this->toJson($data, \true), \true);
+                // the rest is json-serialized in some way
+                $value = $this->toJson($data, \true);
             }
-            return [\WPMailSMTP\Vendor\Monolog\Utils::getClass($data) => $value];
+            return \sprintf("[object] (%s: %s)", \WPMailSMTP\Vendor\Monolog\Utils::getClass($data), $value);
         }
         if (\is_resource($data)) {
-            return \sprintf('[resource(%s)]', \get_resource_type($data));
+            return \sprintf('[resource] (%s)', \get_resource_type($data));
         }
         return '[unknown(' . \gettype($data) . ')]';
     }
-    /**
-     * @return mixed[]
-     */
-    protected function normalizeException(\Throwable $e, int $depth = 0)
+    protected function normalizeException($e)
     {
-        if ($depth > $this->maxNormalizeDepth) {
-            return ['Over ' . $this->maxNormalizeDepth . ' levels deep, aborting normalization'];
+        // TODO 2.0 only check for Throwable
+        if (!$e instanceof \Exception && !$e instanceof \Throwable) {
+            throw new \InvalidArgumentException('Exception/Throwable expected, got ' . \gettype($e) . ' / ' . \WPMailSMTP\Vendor\Monolog\Utils::getClass($e));
         }
-        if ($e instanceof \JsonSerializable) {
-            return (array) $e->jsonSerialize();
-        }
-        $data = ['class' => \WPMailSMTP\Vendor\Monolog\Utils::getClass($e), 'message' => $e->getMessage(), 'code' => (int) $e->getCode(), 'file' => $e->getFile() . ':' . $e->getLine()];
+        $data = array('class' => \WPMailSMTP\Vendor\Monolog\Utils::getClass($e), 'message' => $e->getMessage(), 'code' => (int) $e->getCode(), 'file' => $e->getFile() . ':' . $e->getLine());
         if ($e instanceof \SoapFault) {
             if (isset($e->faultcode)) {
                 $data['faultcode'] = $e->faultcode;
@@ -198,7 +127,7 @@ class NormalizerFormatter implements \WPMailSMTP\Vendor\Monolog\Formatter\Format
             }
         }
         if ($previous = $e->getPrevious()) {
-            $data['previous'] = $this->normalizeException($previous, $depth + 1);
+            $data['previous'] = $this->normalizeException($previous);
         }
         return $data;
     }
@@ -206,33 +135,12 @@ class NormalizerFormatter implements \WPMailSMTP\Vendor\Monolog\Formatter\Format
      * Return the JSON representation of a value
      *
      * @param  mixed             $data
+     * @param  bool              $ignoreErrors
      * @throws \RuntimeException if encoding fails and errors are not ignored
-     * @return string            if encoding fails and ignoreErrors is true 'null' is returned
-     */
-    protected function toJson($data, bool $ignoreErrors = \false) : string
-    {
-        return \WPMailSMTP\Vendor\Monolog\Utils::jsonEncode($data, $this->jsonEncodeOptions, $ignoreErrors);
-    }
-    /**
      * @return string
      */
-    protected function formatDate(\DateTimeInterface $date)
+    protected function toJson($data, $ignoreErrors = \false)
     {
-        // in case the date format isn't custom then we defer to the custom DateTimeImmutable
-        // formatting logic, which will pick the right format based on whether useMicroseconds is on
-        if ($this->dateFormat === self::SIMPLE_DATE && $date instanceof \WPMailSMTP\Vendor\Monolog\DateTimeImmutable) {
-            return (string) $date;
-        }
-        return $date->format($this->dateFormat);
-    }
-    public function addJsonEncodeOption(int $option) : self
-    {
-        $this->jsonEncodeOptions |= $option;
-        return $this;
-    }
-    public function removeJsonEncodeOption(int $option) : self
-    {
-        $this->jsonEncodeOptions &= ~$option;
-        return $this;
+        return \WPMailSMTP\Vendor\Monolog\Utils::jsonEncode($data, null, $ignoreErrors);
     }
 }

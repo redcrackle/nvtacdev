@@ -168,6 +168,7 @@ if ( '' !== DYNAMIC_OUTPUT_BUFFER_TAG ) {
 		} else { // called via the wpsc_cachedata filter. We only get here in cached pages in wp-cache-phase1.php.
 			return str_replace( DYNAMIC_OUTPUT_BUFFER_TAG, $text, $cachedata );
 		}
+
 	}
 	add_cacheaction( 'wpsc_cachedata', 'dynamic_output_buffer_test' );
 

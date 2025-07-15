@@ -1,16 +1,4 @@
-<?php
-/**
- * Template for the taxonomy restricted message
- *
- * This template can be overridden by copying it to your-theme/ultimate-member/restricted-taxonomy.php
- *
- * Call: function taxonomy_message()
- *
- * @version 2.6.1
- */
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+<?php if ( ! defined( 'ABSPATH' ) ) exit;
 
 get_header(); ?>
 

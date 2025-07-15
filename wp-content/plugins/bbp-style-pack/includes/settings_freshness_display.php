@@ -1,9 +1,5 @@
 <?php
 
-// Exit if accessed directly
-defined( 'ABSPATH' ) || exit;
-
-
 //freshness display style settings page
 
 function bsp_style_settings_freshness () {
@@ -13,16 +9,15 @@ function bsp_style_settings_freshness () {
 	//test if this is the first time accessing the settings, and if so set $check = 1
 	$check = (!empty($bsp_style_settings_freshness) ? 0 : 1);
 	?> 
-	<form method="post" action="options.php">
+	<Form method="post" action="options.php">
 	<?php wp_nonce_field( 'style-settings_freshness', 'style-settings-nonce' ) ?>
 	<?php settings_fields( 'bsp_style_settings_freshness' );
-        bsp_clear_cache();
 	?>
 	<table class="form-table">
 		<tr valign="top">
 			<th colspan="2">
 				<h3>
-					<?php esc_html_e ('Freshness Display' , 'bbp-style-pack' ) ; ?>
+					<?php _e ('Freshness Display' , 'bbp-style-pack' ) ; ?>
 				</h3>
 		</tr>
 	</table>
@@ -30,17 +25,17 @@ function bsp_style_settings_freshness () {
 		<tr>
 			<td>
 				<p>
-					<?php esc_html_e('This section allows you to amend freshness', 'bbp-style-pack'); ?>
+					<?php _e('This section allows you to amend freshness', 'bbp-style-pack'); ?>
 				</p>
 			</td>
 			<td>	
-				<?php echo '<img src="' . esc_url(plugins_url( 'images/freshness_display.JPG',dirname(__FILE__) ) ) . '" > '; ?>
+				<?php echo '<img src="' . plugins_url( 'images/freshness_display.JPG',dirname(__FILE__)  ) . '" > '; ?>
 			</td>
 		</tr>
 	</table>
 	<!-- save the options -->
 	<p class="submit">
-		<input type="submit" class="button-primary" value="<?php esc_html_e( 'Save changes', 'bbp-style-pack' ); ?>" />
+		<input type="submit" class="button-primary" value="<?php _e( 'Save changes', 'bbp-style-pack' ); ?>" />
 	</p>
 			
 	<table class="form-table">
@@ -48,7 +43,7 @@ function bsp_style_settings_freshness () {
 	<!-- checkbox to activate  -->
 		<tr valign="top">  
 			<th>
-				<?php esc_html_e('Activate Freshness display', 'bbp-style-pack'); ?>
+				<?php _e('Activate Freshness display', 'bbp-style-pack'); ?>
 			</th>
 			<td>
 				<?php $item = (!empty( $bsp_style_settings_freshness['activate'] ) ?  $bsp_style_settings_freshness['activate'] : '');
@@ -59,78 +54,78 @@ function bsp_style_settings_freshness () {
 <!-------------------------------Heading---------------------------------------->
 		<tr valign="top">
 			<th>
-				1. <?php esc_html_e('Heading Name', 'bbp-style-pack'); ?>
+				1. <?php _e('Heading Name', 'bbp-style-pack'); ?>
 			</th>
 			<td colspan="2">
 				<?php 
 				$item1 = (!empty ($bsp_style_settings_freshness['heading_name'] ) ? $bsp_style_settings_freshness['heading_name']  : '' ) ?>
 				<input id="bsp_style_settings_freshness[heading_name]" class="large-text" name="bsp_style_settings_freshness[heading_name]" type="text" value="<?php echo esc_html( $item1 ) ;?>" /><br/>
-				<label class="description" for="bsp_settings[heading_label]"><?php esc_html_e( 'Default : Freshness - if you wish to change enter the heading description eg "Last Post", "Last updated", "Freshness" "Last activity" etc.', 'bbp-style-pack' ); ?></label><br/>
+				<label class="description" for="bsp_settings[heading_label]"><?php _e( 'Default : Freshness - if you wish to change enter the heading description eg "Last Post", "Last updated", "Freshness" "Last activity" etc.', 'bbp-style-pack' ); ?></label><br/>
 			</td>
 		</tr>
 
 		<tr>
 			<th style="width:250px">
-				2. <?php esc_html_e('Topic Title', 'bbp-style-pack'); ?> 
+				2. <?php _e('Topic Title', 'bbp-style-pack'); ?> 
 			</th>
 			<td>
 				<?php
 				$item =  'bsp_style_settings_freshness[show_title]' ;
 				$item1 = (!empty($bsp_style_settings_freshness['show_title']) ? $bsp_style_settings_freshness['show_title'] : '');
-				echo '<input name="'.esc_html($item).'" id="'.esc_html($item).'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
-				esc_html_e('Click to show Title on forums pages', 'bbp-style-pack');
+				echo '<input name="'.$item.'" id="'.$item.'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
+				_e('Click to show Title on forums pages', 'bbp-style-pack');
 				?>
 			</td>
 		</tr>
 		
 		<tr>
 			<th>
-				3. <?php esc_html_e('Topic Freshness', 'bbp-style-pack'); ?>
+				3. <?php _e('Topic Freshness', 'bbp-style-pack'); ?>
 			</th>
 			<td>
 				<?php
 				$item =  'bsp_style_settings_freshness[show_date]' ;
 				$item1 = (!empty($bsp_style_settings_freshness['show_date']) ? $bsp_style_settings_freshness['show_date'] : '');
 				if ($check == 1) $item1 = 1 ;
-				echo '<input name="'.esc_html($item).'" id="'.esc_html($item).'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
-				esc_html_e('Click to show Freshness (see 6. below for format)', 'bbp-style-pack');
+				echo '<input name="'.$item.'" id="'.$item.'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
+				_e('Click to show Freshness (see 6. below for format)', 'bbp-style-pack');
 				?>
 			</td>
 		</tr>
 		
 		<tr>
 			<th>
-				4.<?php esc_html_e('Topic Author name', 'bbp-style-pack'); ?>
+				4.<?php _e('Topic Author name', 'bbp-style-pack'); ?>
 			</th>
 			<td>
 				<?php
 				$item =  'bsp_style_settings_freshness[show_name]' ;
 				$item1 = (!empty($bsp_style_settings_freshness['show_name']) ? $bsp_style_settings_freshness['show_name'] : '');
 				if ($check == 1) $item1 = 1 ;
-				echo '<input name="'.esc_html($item).'" id="'.esc_html($item).'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
-				esc_html_e('Click to show Author name', 'bbp-style-pack');
+				echo '<input name="'.$item.'" id="'.$item.'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
+				_e('Click to show Author name', 'bbp-style-pack');
 				?>
 			</td>
 		</tr>
 		
 		<tr>
 			<th>
-				5.<?php esc_html_e('Topic Author avatar', 'bbp-style-pack'); ?> 
+				5.<?php _e('Topic Author avatar', 'bbp-style-pack'); ?> 
 			</th>
 			<td>
 				<?php
 				$item =  'bsp_style_settings_freshness[show_avatar]' ;
 				$item1 = (!empty($bsp_style_settings_freshness['show_avatar']) ? $bsp_style_settings_freshness['show_avatar'] : '');
 				if ($check == 1) $item1 = 1 ;
-				echo '<input name="'.esc_html($item).'" id="'.esc_html($item).'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
-				esc_html_e('Click to show author avatar', 'bbp-style-pack');
+				echo '<input name="'.$item.'" id="'.$item.'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
+				_e('Click to show author avatar', 'bbp-style-pack');
 				?>
 			</td>
 		</tr>
 		
 		<tr>
 			<th>
-				6. <?php esc_html_e('Freshness format', 'bbp-style-pack'); ?> 
+				6. <?php _e('Freshness format', 'bbp-style-pack'); ?> 
 			</th>
 			<td>
 				<code> 4 days, 5 hours ago</code>
@@ -141,7 +136,7 @@ function bsp_style_settings_freshness () {
 			<td>
 				<code> 4 days, 5 hours ago</code>
 				<br/>
-				<?php esc_html_e('then after x days', 'bbp-style-pack'); ?>
+				<?php _e('then after x days', 'bbp-style-pack'); ?>
 				<br/>
 				<code> 18 February 2021 at 4:49 pm</code>
 			</td>
@@ -154,25 +149,23 @@ function bsp_style_settings_freshness () {
 				<?php
 				$item0='bsp_style_settings_freshness[date_format]' ;
 				$value0 = (!empty($bsp_style_settings_freshness['date_format']) ? $bsp_style_settings_freshness['date_format'] : 1) ; 
-				echo '<input name="'.esc_html($item0).'" id="'.esc_html($value0).'" type="radio" value="1" class="code"  ' . checked( 1,$value0, false ) . ' />' ;
-				esc_html_e ('Click to show time since last post' , 'bbp-style-pack' ) ;?>
+				echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="1" class="code"  ' . checked( 1,$value0, false ) . ' />' ;
+				_e ('Click to show time since last post' , 'bbp-style-pack' ) ;?>
 				<br/>
 					<label class="description">
-						<i>
-						<?php esc_html_e( 'Default' , 'bbp-style-pack' ); ?>
-						</i>
+						<?php _e( '<i>Default</i>' , 'bbp-style-pack' ); ?>
 					</label>
 			
 			</td>
 			<td style="width:250px;vertical-align:top">
 				<?php
-				echo '<input name="'.esc_html($item0).'" id="'.esc_html($value0).'" type="radio" value="2" class="code"  ' . checked( 2,$value0, false ) . ' />' ;
-				esc_html_e ('Click to show date of last post' , 'bbp-style-pack' ) ;?>
+				echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="2" class="code"  ' . checked( 2,$value0, false ) . ' />' ;
+				_e ('Click to show date of last post' , 'bbp-style-pack' ) ;?>
 			</td>
 			<td style="vertical-align:top">
 				<?php
-				echo '<input name="'.esc_html($item0).'" id="'.esc_html($value0).'" type="radio" value="3" class="code"  ' . checked( 3,$value0, false ) . ' />' ;
-				esc_html_e ('Click to show Hybrid' , 'bbp-style-pack' ) ;?>
+				echo '<input name="'.$item0.'" id="'.$value0.'" type="radio" value="3" class="code"  ' . checked( 3,$value0, false ) . ' />' ;
+				_e ('Click to show Hybrid' , 'bbp-style-pack' ) ;?>
 			</td>
 		</tr>
 		
@@ -187,14 +180,12 @@ function bsp_style_settings_freshness () {
 				<?php
 				$item_freshness='bsp_style_settings_freshness[freshness_format]' ;
 				$value_freshness = (!empty($bsp_style_settings_freshness['freshness_format']) ? $bsp_style_settings_freshness['freshness_format'] : 0) ; 
-				echo '<input name="'.esc_html($item_freshness).'" id="'.esc_html($value_freshness).'" type="radio" value="0" class="code"  ' . checked( 0,$value_freshness, false ) . ' />' ;
-				esc_html_e ('Click to show full Freshness' , 'bbp-style-pack' ) ;?>
+				echo '<input name="'.$item_freshness.'" id="'.$value_freshness.'" type="radio" value="0" class="code"  ' . checked( 0,$value_freshness, false ) . ' />' ;
+				_e ('Click to show full Freshness' , 'bbp-style-pack' ) ;?>
 				<br/>
 					<label class="description">
-						<i>
-						<?php esc_html_e( 'Default' , 'bbp-style-pack' ); ?>
-						</i>
-						<?php esc_html_e( 'e.g' , 'bbp-style-pack' ); ?>
+						<?php _e( '<i>Default</i>' , 'bbp-style-pack' ); ?>
+						<?php _e( 'e.g' , 'bbp-style-pack' ); ?>
 						<code> 4 days, 5 hours ago</code>
 					</label>
 			
@@ -203,17 +194,17 @@ function bsp_style_settings_freshness () {
 				<?php
 				$name =  'bsp_style_settings_freshness[date_order]' ;
 				$item = (!empty($bsp_style_settings_freshness['date_order']) ? $bsp_style_settings_freshness['date_order'] : '0');
-				echo '<input name="'.esc_html($name).'" id="'.esc_html($item).'" type="radio" value="0" class="code"  ' . checked( 0,$item, false ) . ' />' ;
-				esc_html_e ('Date First' , 'bbp-style-pack' ) ;?>
+				echo '<input name="'.$name.'" id="'.$item.'" type="radio" value="0" class="code"  ' . checked( 0,$item, false ) . ' />' ;
+				_e ('Date First' , 'bbp-style-pack' ) ;?>
 			
 			</td>
 			<td>
 				<?php 
-				esc_html_e('Number of days back to change to date format', 'bbp-style-pack'); 
+				_e('Number of days back to change to date format', 'bbp-style-pack'); 
 				$item1 = (!empty ($bsp_style_settings_freshness['hybrid_days_back'] ) ? $bsp_style_settings_freshness['hybrid_days_back']  : '7' ) ?>
 				<input id="bsp_style_settings_freshness[hybrid_days_back]" class="small-text" name="bsp_style_settings_freshness[hybrid_days_back]" type="text" value="<?php echo esc_html( $item1 ) ;?>" /><br/>
 					<label class="description" for="bsp_style_settings_freshness[date_separator]">
-						<?php esc_html_e( 'Enter the number of days', 'bbp-style-pack' ); ?>
+						<?php _e( 'Enter the number of days', 'bbp-style-pack' ); ?>
 					</label>
 					<br/>
 			</td>
@@ -225,19 +216,19 @@ function bsp_style_settings_freshness () {
 			<td style="width:250px;vertical-align:top">
 				<?php
 				
-				echo '<input name="'.esc_html($item_freshness).'" id="'.esc_html($value_freshness).'" type="radio" value="1" class="code"  ' . checked( 1,$value_freshness, false ) . ' />' ;
-				esc_html_e ('Click to show shortened Freshness' , 'bbp-style-pack' ) ;?>
+				echo '<input name="'.$item_freshness.'" id="'.$value_freshness.'" type="radio" value="1" class="code"  ' . checked( 1,$value_freshness, false ) . ' />' ;
+				_e ('Click to show shortened Freshness' , 'bbp-style-pack' ) ;?>
 				<br/>
-				<?php esc_html_e( 'e.g' , 'bbp-style-pack' ); ?>
+				<?php _e( 'e.g' , 'bbp-style-pack' ); ?>
 				<code> 4 days ago </code>
 			</td>
 			<td>
 				<?php
-				echo '<input name="'.esc_html($name).'" id="'.esc_html($item).'" type="radio" value="1" class="code"  ' . checked( 1,$item, false ) . ' />' ;
-				esc_html_e ('Time First' , 'bbp-style-pack' ) ;?>
+				echo '<input name="'.$name.'" id="'.$item.'" type="radio" value="1" class="code"  ' . checked( 1,$item, false ) . ' />' ;
+				_e ('Time First' , 'bbp-style-pack' ) ;?>
 			</td>
 			<td>
-			<?php esc_html_e ('The freshness and date and time display will be as set in the previous two columns' , 'bbp-style-pack' ) ;?>
+			<?php _e ('The freshness and date and time display will be as set in the previous two columns' , 'bbp-style-pack' ) ;?>
 			</td>
 		</tr>
 		
@@ -248,11 +239,11 @@ function bsp_style_settings_freshness () {
 			</td>
 			<td>
 				<?php 
-				esc_html_e('Separator', 'bbp-style-pack'); 
+				_e('Separator', 'bbp-style-pack'); 
 				$item1 = (!empty ($bsp_style_settings_freshness['date_separator'] ) ? $bsp_style_settings_freshness['date_separator']  : '' ) ?>
 				<input id="bsp_style_settings_freshness[date_separator]" class="large-text" name="bsp_style_settings_freshness[date_separator]" type="text" value="<?php echo esc_html( $item1 ) ;?>" /><br/>
 					<label class="description" for="bsp_style_settings_freshness[date_separator]">
-						<?php esc_html_e( 'eg " at " "," ":" - do not forget to include any spaces needed', 'bbp-style-pack' ); ?>
+						<?php _e( 'eg " at " "," ":" - do not forget to include any spaces needed', 'bbp-style-pack' ); ?>
 					</label>
 					<br/>
 			</td>
@@ -264,7 +255,7 @@ function bsp_style_settings_freshness () {
 			</td>
 			<td>
 			<th scope="row">
-				<?php esc_html_e('Date Format', 'bbp-style-pack') ?>
+				<?php _e('Date Format') ?>
 			</th>
 			<td>
 			</td>
@@ -274,7 +265,7 @@ function bsp_style_settings_freshness () {
 			<fieldset>
 				<legend class="screen-reader-text">
 					<span>
-						<?php esc_html_e('Date Format' , 'bbp-style-pack') ?>
+						<?php _e('Date Format' , 'bbp-style-pack') ?>
 					</span>
 				</legend>
 				
@@ -286,7 +277,7 @@ function bsp_style_settings_freshness () {
 			<td>
 				<?php
 				//Filters the default date formats.
-				$date_formats = array_unique( apply_filters( 'date_formats', array( __( 'F j, Y', 'bbp-style-pack' ), 'Y-m-d', 'm/d/Y', 'd/m/Y' ) ) );
+				$date_formats = array_unique( apply_filters( 'date_formats', array( __( 'F j, Y' ), 'Y-m-d', 'm/d/Y', 'd/m/Y' ) ) );
 				$custom = true;
 	
 				$date = (!empty($bsp_style_settings_freshness['bsp_date_format']) ? $bsp_style_settings_freshness['bsp_date_format'] : '');
@@ -295,7 +286,7 @@ function bsp_style_settings_freshness () {
 					$date = (!empty($bsp_style_settings_freshness['bsp_date_format_custom']) ? $bsp_style_settings_freshness['bsp_date_format_custom'] : '');
 				}
 				foreach ( $date_formats as $format ) {
-					echo "\t<label><input type='radio' name=".esc_html($name)." value='" . esc_attr( $format ) . "'";
+					echo "\t<label><input type='radio' name=".$name." value='" . esc_attr( $format ) . "'";
 						if ( $date == esc_attr($format) ) { // checked() uses "==" rather than "==="
 							echo " checked='checked'";
 							$custom = false;
@@ -305,8 +296,8 @@ function bsp_style_settings_freshness () {
 				
 				echo '<label><input type="radio" name="bsp_style_settings_freshness[bsp_date_format]" id="date_format_custom_radio" value="custom"';
 				if ($custom == true) echo " checked='checked'";
-					echo '/> <span class="date-time-text date-time-custom-text">' . __( 'Custom:', 'bbp-style-pack'  ) . '<span class="screen-reader-text"> ' . __( 'enter a custom date format in the following field', 'bbp-style-pack'  ) . '</span></label>' .
-					'<label for="date_format_custom" class="screen-reader-text">' . __( 'Custom date format:', 'bbp-style-pack'  ) . '</label>' .
+					echo '/> <span class="date-time-text date-time-custom-text">' . __( 'Custom:' ) . '<span class="screen-reader-text"> ' . __( 'enter a custom date format in the following field' ) . '</span></label>' .
+					'<label for="date_format_custom" class="screen-reader-text">' . __( 'Custom date format:' ) . '</label>' .
 					'<input type="text" name="bsp_style_settings_freshness[bsp_date_format_custom]" id="date_format_custom" value="' . $date . '" class="medium-text" /></span>' .
 					"<span class='spinner'></span>\n";
 				?>
@@ -320,7 +311,7 @@ function bsp_style_settings_freshness () {
 			</td>
 			<td>
 			<th scope="row">
-				<?php esc_html_e('Time Format', 'bbp-style-pack') ?>
+				<?php _e('Time Format', 'bbp-style-pack') ?>
 			</th>
 		</tr>
 		
@@ -333,12 +324,12 @@ function bsp_style_settings_freshness () {
 				<fieldset>
 					<legend class="screen-reader-text">
 						<span>
-							<?php esc_html_e('Time Format', 'bbp-style-pack' ) ?>
+							<?php _e('Time Format') ?>
 						</span>
 					</legend>
 				<?php
 				//Filters the default time formats.
-				$time_formats = array_unique( apply_filters( 'time_formats', array( __( 'g:i a', 'bbp-style-pack' ), 'g:i A', 'H:i' ) ) );
+				$time_formats = array_unique( apply_filters( 'time_formats', array( __( 'g:i a' ), 'g:i A', 'H:i' ) ) );
 
 				$custom = true;
 	
@@ -359,13 +350,13 @@ function bsp_style_settings_freshness () {
 
 				echo '<label><input type="radio" name="bsp_style_settings_freshness[bsp_time_format]" id="time_format_custom_radio" value="custom"';
 				if ($custom == true) echo " checked='checked'";
-				echo '/> <span class="date-time-text date-time-custom-text">' . __( 'Custom:', 'bbp-style-pack'  ) . '<span class="screen-reader-text"> ' . __( 'enter a custom time format in the following field', 'bbp-style-pack'  ) . '</span></label>' .
-				'<label for="time_format_custom" class="screen-reader-text">' . __( 'Custom time format:', 'bbp-style-pack'  ) . '</label>' .
+				echo '/> <span class="date-time-text date-time-custom-text">' . __( 'Custom:' ) . '<span class="screen-reader-text"> ' . __( 'enter a custom time format in the following field' ) . '</span></label>' .
+				'<label for="time_format_custom" class="screen-reader-text">' . __( 'Custom time format:' ) . '</label>' .
 				'<input type="text" name="bsp_style_settings_freshness[bsp_time_format_custom]" value="' . $time . '" class="medium-text" /></span>' .
 				"<span class='spinner'></span>\n";
 
-				echo "\t<p class='date-time-doc'>" . __('<a href="https://wordpress.org/support/article/formatting-date-and-time/" target="_blank">', 'bbp-style-pack' );
-				esc_html_e('Documentation on date and time formatting', 'bbp-style-pack');
+				echo "\t<p class='date-time-doc'>" . __('<a href="https://wordpress.org/support/article/formatting-date-and-time/" target="_blank">');
+				_e('Documentation on date and time formatting', 'bbp-style-pack');
 				echo '</a>.'.'</p>';
 				?>
 			</fieldset>
@@ -374,14 +365,14 @@ function bsp_style_settings_freshness () {
 		<?php if ( (get_locale() != 'en_GB' && get_locale() != 'en_US') && $bsp_bbpress_version == '2.6' ) { ?>
 		<tr>
 			<th>
-				7.<?php esc_html_e('Freshness Translation', 'bbp-style-pack'); ?> 
+				7.<?php _e('Freshness Translation', 'bbp-style-pack'); ?> 
 			</th>
 			</tr>
 			<tr>
 			<td colspan=2>
-			<?php 	esc_html_e ('In bbpress 2.6.x the date freshness format has changed.' , 'bbp-style-pack') ;
-				esc_html_e ('<br>If your translation has not been updated this will still display in English' , 'bbp-style-pack') ;
-				esc_html_e ('<br>You can enter your language translations here', 'bbp-style-pack') ; 
+			<?php 	_e ('In bbpress 2.6.x the date freshness format has changed.' , 'bbp-style-pack') ;
+				_e ('<br>If your translation has not been updated this will still display in English' , 'bbp-style-pack') ;
+				_e ('<br>You can enter your language translations here', 'bbp-style-pack') ; 
 			?>
 			</td>
 			
@@ -532,9 +523,14 @@ function bsp_style_settings_freshness () {
 					
 <!-- save the options -->
 	<p class="submit">
-		<input type="submit" class="button-primary" value="<?php esc_html_e( 'Save changes', 'bbp-style-pack' ); ?>" />
+		<input type="submit" class="button-primary" value="<?php _e( 'Save changes', 'bbp-style-pack' ); ?>" />
 	</p>
 </form>
+		
+</div><!--end sf-wrap-->
+
+</div><!--end wrap-->
+	
 	 
 <?php
 }

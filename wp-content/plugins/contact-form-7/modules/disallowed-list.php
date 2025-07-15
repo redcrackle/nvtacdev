@@ -32,7 +32,6 @@ function wpcf7_disallowed_list( $spam, $submission ) {
 			$reason = __( "Disallowed words are used.", 'contact-form-7' );
 		} else {
 			$reason = sprintf(
-				/* translators: %s: comma separated list of disallowed words */
 				__( "Disallowed words (%s) are used.", 'contact-form-7' ),
 				implode( ', ', (array) $word )
 			);

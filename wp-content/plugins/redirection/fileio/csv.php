@@ -14,7 +14,7 @@ class Red_Csv_File extends Red_FileIO {
 	}
 
 	public function get_data( array $items, array $groups ) {
-		$lines = [ implode( ',', array( 'source', 'target', 'regex', 'code', 'type', 'hits', 'title', 'status' ) ) ];
+		$lines = [ implode( ',', array( 'source', 'target', 'regex', 'code', 'type', 'match', 'hits', 'title', 'status' ) ) ];
 
 		foreach ( $items as $line ) {
 			$lines[] = $this->item_as_csv( $line );
@@ -60,7 +60,11 @@ class Red_Csv_File extends Red_FileIO {
 	}
 
 	public function load( $group, $filename, $data ) {
+		ini_set( 'auto_detect_line_endings', true );
+
 		$file = fopen( $filename, 'r' );
+
+		ini_set( 'auto_detect_line_endings', false );
 
 		if ( $file ) {
 			$separators = [
@@ -86,15 +90,11 @@ class Red_Csv_File extends Red_FileIO {
 		global $wpdb;
 
 		$count = 0;
-		$group = Red_Group::get( $group_id );
-		if ( ! $group ) {
-			return 0;
-		}
 
 		while ( ( $csv = fgetcsv( $file, 5000, $separator ) ) ) {
-			$item = $this->csv_as_item( $csv, $group );
+			$item = $this->csv_as_item( $csv, $group_id );
 
-			if ( $item && $this->item_is_valid( $item ) ) {
+			if ( $item ) {
 				$created = Red_Item::create( $item );
 
 				// The query log can use up all the memory
@@ -107,18 +107,6 @@ class Red_Csv_File extends Red_FileIO {
 		}
 
 		return $count;
-	}
-
-	private function item_is_valid( array $csv ) {
-		if ( strlen( $csv['url'] ) === 0 ) {
-			return false;
-		}
-
-		if ( $csv['action_data']['url'] === $csv['url'] ) {
-			return false;
-		}
-
-		return true;
 	}
 
 	private function get_valid_code( $code ) {
@@ -137,7 +125,7 @@ class Red_Csv_File extends Red_FileIO {
 		return 'url';
 	}
 
-	public function csv_as_item( $csv, Red_Group $group ) {
+	public function csv_as_item( $csv, $group ) {
 		if ( count( $csv ) > 1 && $csv[ self::CSV_SOURCE ] !== 'source' && $csv[ self::CSV_TARGET ] !== 'target' ) {
 			$code = isset( $csv[ self::CSV_CODE ] ) ? $this->get_valid_code( $csv[ self::CSV_CODE ] ) : 301;
 
@@ -145,11 +133,10 @@ class Red_Csv_File extends Red_FileIO {
 				'url'         => trim( $csv[ self::CSV_SOURCE ] ),
 				'action_data' => array( 'url' => trim( $csv[ self::CSV_TARGET ] ) ),
 				'regex'       => isset( $csv[ self::CSV_REGEX ] ) ? $this->parse_regex( $csv[ self::CSV_REGEX ] ) : $this->is_regex( $csv[ self::CSV_SOURCE ] ),
-				'group_id'    => $group->get_id(),
+				'group_id'    => $group,
 				'match_type'  => 'url',
 				'action_type' => $this->get_action_type( $code ),
 				'action_code' => $code,
-				'status'      => $group->is_enabled() ? 'enabled' : 'disabled',
 			);
 		}
 

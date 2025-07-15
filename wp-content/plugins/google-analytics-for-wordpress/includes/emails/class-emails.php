@@ -110,11 +110,10 @@ class MonsterInsights_WP_Emails {
 	/**
 	 * Set a property.
 	 *
-	 * @param string $key Object property key.
-	 * @param mixed $value Object property value.
-	 *
 	 * @since 7.10.5
 	 *
+	 * @param string $key   Object property key.
+	 * @param mixed  $value Object property value.
 	 */
 	public function __set( $key, $value ) {
 		$this->$key = $value;
@@ -123,9 +122,9 @@ class MonsterInsights_WP_Emails {
 	/**
 	 * Get the email from name.
 	 *
-	 * @return string The email from name
 	 * @since 7.10.5
 	 *
+	 * @return string The email from name
 	 */
 	public function get_from_name() {
 
@@ -141,9 +140,9 @@ class MonsterInsights_WP_Emails {
 	/**
 	 * Get the email from address.
 	 *
-	 * @return string The email from address.
 	 * @since 7.10.5
 	 *
+	 * @return string The email from address.
 	 */
 	public function get_from_address() {
 
@@ -159,9 +158,9 @@ class MonsterInsights_WP_Emails {
 	/**
 	 * Get the email reply-to.
 	 *
-	 * @return string The email reply-to address.
 	 * @since 7.10.5
 	 *
+	 * @return string The email reply-to address.
 	 */
 	public function get_reply_to() {
 
@@ -180,9 +179,9 @@ class MonsterInsights_WP_Emails {
 	/**
 	 * Get the email carbon copy addresses.
 	 *
-	 * @return string The email reply-to address.
 	 * @since 7.10.5
 	 *
+	 * @return string The email reply-to address.
 	 */
 	public function get_cc() {
 
@@ -207,9 +206,9 @@ class MonsterInsights_WP_Emails {
 	/**
 	 * Get the email content type.
 	 *
-	 * @return string The email content type.
 	 * @since 7.10.5
 	 *
+	 * @return string The email content type.
 	 */
 	public function get_content_type() {
 
@@ -225,9 +224,9 @@ class MonsterInsights_WP_Emails {
 	/**
 	 * Get the email headers.
 	 *
-	 * @return string The email headers.
 	 * @since 7.10.5
 	 *
+	 * @return string The email headers.
 	 */
 	public function get_headers() {
 
@@ -274,12 +273,12 @@ class MonsterInsights_WP_Emails {
 	/**
 	 * Set header/footer/body/style arguments to use in a template.
 	 *
-	 * @param array $args Arguments to set.
-	 * @param bool $merge Merge the arguments with existing once or replace.
-	 *
-	 * @return MI_WP_Emails
 	 * @since 7.10.5
 	 *
+	 * @param array $args  Arguments to set.
+	 * @param bool  $merge Merge the arguments with existing once or replace.
+	 *
+	 * @return MI_WP_Emails
 	 */
 	public function set_args( $args, $merge = true ) {
 
@@ -308,11 +307,11 @@ class MonsterInsights_WP_Emails {
 	/**
 	 * Get header/footer/body arguments
 	 *
+	 * @since 7.10.5
+	 *
 	 * @param string $type Header/footer/body.
 	 *
 	 * @return array
-	 * @since 7.10.5
-	 *
 	 */
 	public function get_args( $type ) {
 		if ( ! empty( $type ) ) {
@@ -325,24 +324,24 @@ class MonsterInsights_WP_Emails {
 	/**
 	 * Build the email.
 	 *
+	 * @since 7.10.5
+	 *
 	 * @param string $message The email message.
 	 *
 	 * @return string
-	 * @since 7.10.5
-	 *
 	 */
-	public function build_email( $message = null ) {
+	public function build_email( $message=null ) {
 		// process plain text email
 		if ( false === $this->html ) {
-			$body    = $this->get_template_part( 'body', $this->get_template(), true );
-			$body    = wp_strip_all_tags( $body );
-			$message = str_replace( '{email}', $message, $body );
+			$body 		= $this->get_template_part( 'body', $this->get_template(), true );
+			$body 	 	= wp_strip_all_tags( $body );
+			$message 	= str_replace( '{email}', $message, $body );
 
 			return apply_filters( 'monsterinsights_email_message', $message, $this );
 		}
 
 		// process html email template
-		$email_parts           = array();
+		$email_parts = array();
 		$email_parts['header'] = $this->get_template_part( 'header', $this->get_template(), true );
 
 		// Hooks into the email header.
@@ -358,10 +357,12 @@ class MonsterInsights_WP_Emails {
 		// Hooks into the email footer.
 		do_action( 'monsterinsights_email_footer', $email_parts['footer'] );
 
-		$body    = implode( $email_parts );
+
+		$body 	 = implode( $email_parts );
 		$message = $this->process_tag( $message, false );
-		$message = $message ? nl2br( $message ) : '';
+		$message = nl2br( $message );
 		$message = str_replace( '{email}', $message, $body );
+		//$message = make_clickable( $message );
 
 		return apply_filters( 'monsterinsights_email_message', $message, $this );
 	}
@@ -369,16 +370,16 @@ class MonsterInsights_WP_Emails {
 	/**
 	 * Send the email.
 	 *
+	 * @since 7.10.5
+	 *
 	 * @param string $to The To address.
 	 * @param string $subject The subject line of the email.
 	 * @param string $message The body of the email.
-	 * @param array $attachments Attachments to the email.
+	 * @param array  $attachments Attachments to the email.
 	 *
 	 * @return bool
-	 * @since 7.10.5
-	 *
 	 */
-	public function send( $to, $subject, $message = null, $attachments = array() ) {
+	public function send( $to, $subject, $message=null, $attachments = array() ) {
 
 		if ( ! did_action( 'init' ) && ! did_action( 'admin_init' ) ) {
 			_doing_it_wrong( __FUNCTION__, esc_html__( 'You cannot send emails with MI_WP_Emails() until init/admin_init has been reached.', 'google-analytics-for-wordpress' ), null );
@@ -392,7 +393,7 @@ class MonsterInsights_WP_Emails {
 		}
 
 		// Don't send if email address is invalid.
-		if ( is_string( $to ) && ! is_email( $to ) ) {
+		if ( ! is_email( $to ) ) {
 			return false;
 		}
 
@@ -416,13 +417,11 @@ class MonsterInsights_WP_Emails {
 			$this
 		);
 
-		$build = $this->build_email( $data['message'] );
-
 		// Let's do this.
 		$sent = wp_mail(
 			$data['to'],
 			monsterinsights_decode_string( $this->process_tag( $data['subject'] ) ),
-			$build,
+			$this->build_email( $data['message'] ),
 			$data['headers'],
 			$data['attachments']
 		);
@@ -460,13 +459,13 @@ class MonsterInsights_WP_Emails {
 	/**
 	 * Process a smart tag.
 	 *
-	 * @param string $string String that may contain tags.
-	 * @param bool $sanitize Toggle to maybe sanitize.
-	 * @param bool $linebreaks Toggle to process linebreaks.
-	 *
-	 * @return string
 	 * @since 7.10.5
 	 *
+	 * @param string $string     String that may contain tags.
+	 * @param bool   $sanitize   Toggle to maybe sanitize.
+	 * @param bool   $linebreaks Toggle to process linebreaks.
+	 *
+	 * @return string
 	 */
 	public function process_tag( $string = '', $sanitize = true, $linebreaks = false ) {
 
@@ -488,9 +487,9 @@ class MonsterInsights_WP_Emails {
 	/**
 	 * Email kill switch if needed.
 	 *
-	 * @return bool
 	 * @since 7.10.5
 	 *
+	 * @return bool
 	 */
 	public function is_email_disabled() {
 		return (bool) apply_filters( 'monsterinsights_disable_all_emails', false, $this );
@@ -499,9 +498,9 @@ class MonsterInsights_WP_Emails {
 	/**
 	 * Get the enabled email template.
 	 *
-	 * @return string When filtering return 'default' to switch to text/plain email.
 	 * @since 7.10.5
 	 *
+	 * @return string When filtering return 'default' to switch to text/plain email.
 	 */
 	public function get_template() {
 
@@ -511,19 +510,19 @@ class MonsterInsights_WP_Emails {
 			$this->template = 'default';
 		}
 
-		return apply_filters( 'monsterinsights_email_template', $this->template );
+		return apply_filters( 'monsterinsights_email_template', $this->template);
 	}
 
 	/**
 	 * Retrieves a template content.
 	 *
-	 * @param string $slug Template file slug.
-	 * @param string $name Optional. Default null.
-	 * @param bool $load Maybe load.
-	 *
-	 * @return string
 	 * @since 7.10.5
 	 *
+	 * @param string $slug Template file slug.
+	 * @param string $name Optional. Default null.
+	 * @param bool   $load Maybe load.
+	 *
+	 * @return string
 	 */
 	public function get_template_part( $slug, $name = null, $load = true ) {
 
@@ -548,18 +547,17 @@ class MonsterInsights_WP_Emails {
 	/**
 	 * Like $this->include_html, but returns the HTML instead of including.
 	 *
-	 * @param string $template_name Template name.
-	 * @param array $args Arguments.
-	 * @param bool $extract Extract arguments.
-	 *
-	 * @return string
 	 * @since 7.10.5
 	 *
+	 * @param string $template_name Template name.
+	 * @param array  $args          Arguments.
+	 * @param bool   $extract       Extract arguments.
+	 *
+	 * @return string
 	 */
 	public static function get_html( $template_name, $args = array(), $extract = false ) {
 		ob_start();
 		self::include_html( $template_name, $args, $extract );
-
 		return ob_get_clean();
 	}
 
@@ -567,13 +565,13 @@ class MonsterInsights_WP_Emails {
 	 * Include a template.
 	 * Uses 'require' if $args are passed or 'load_template' if not.
 	 *
-	 * @param string $template_name Template name.
-	 * @param array $args Arguments.
-	 * @param bool $extract Extract arguments.
-	 *
-	 * @throws \RuntimeException If extract() tries to modify the scope.
 	 * @since 7.10.5
 	 *
+	 * @param string $template_name Template name.
+	 * @param array  $args          Arguments.
+	 * @param bool   $extract       Extract arguments.
+	 *
+	 * @throws \RuntimeException If extract() tries to modify the scope.
 	 */
 	public static function include_html( $template_name, $args = array(), $extract = false ) {
 
@@ -590,7 +588,6 @@ class MonsterInsights_WP_Emails {
 		// Load template WP way if no arguments were passed.
 		if ( empty( $args ) ) {
 			load_template( $located, false );
-
 			return;
 		}
 
@@ -606,17 +603,17 @@ class MonsterInsights_WP_Emails {
 			}
 		}
 
-		require $located; // phpcs:ignore
+		require $located;
 	}
 
 	/**
 	 * Locate a template and return the path for inclusion.
 	 *
+	 * @since 7.10.5
+	 *
 	 * @param string $template_name Template name.
 	 *
 	 * @return string
-	 * @since 7.10.5
-	 *
 	 */
 	public static function locate_template( $template_name ) {
 
@@ -643,9 +640,9 @@ class MonsterInsights_WP_Emails {
 	/**
 	 * Return a list of paths to check for template locations
 	 *
-	 * @return array
 	 * @since 7.10.5
 	 *
+	 * @return array
 	 */
 	public static function get_theme_template_paths() {
 
@@ -655,8 +652,6 @@ class MonsterInsights_WP_Emails {
 			1   => trailingslashit( get_stylesheet_directory() ) . $template_dir,
 			10  => trailingslashit( get_template_directory() ) . $template_dir,
 			100 => trailingslashit( MONSTERINSIGHTS_PLUGIN_DIR ) . 'includes/emails/templates',
-			200 => trailingslashit( MONSTERINSIGHTS_PLUGIN_DIR ) . 'pro/includes/emails/templates',
-			300 => trailingslashit( MONSTERINSIGHTS_PLUGIN_DIR ) . 'lite/includes/emails/templates',
 		);
 
 		$file_paths = apply_filters( 'monsterinsights_email_template_paths', $file_paths );

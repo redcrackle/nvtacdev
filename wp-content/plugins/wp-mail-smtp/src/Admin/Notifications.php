@@ -2,8 +2,8 @@
 
 namespace WPMailSMTP\Admin;
 
-use WPMailSMTP\Helpers\Helpers;
 use WPMailSMTP\Options;
+use WPMailSMTP\Tasks\Tasks;
 use WPMailSMTP\WP;
 
 /**
@@ -20,7 +20,7 @@ class Notifications {
 	 *
 	 * @var string
 	 */
-	const SOURCE_URL = 'https://wpmailsmtpapi.com/feeds/v1/notifications';
+	const SOURCE_URL = 'https://plugin.wpmailsmtp.com/wp-content/notifications.json';
 
 	/**
 	 * The WP option key for storing the notification options.
@@ -59,19 +59,8 @@ class Notifications {
 
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		add_action( 'wp_mail_smtp_admin_pages_before_content', [ $this, 'output' ] );
+		add_action( 'wp_mail_smtp_admin_notifications_update', [ $this, 'update' ] );
 		add_action( 'wp_ajax_wp_mail_smtp_notification_dismiss', [ $this, 'dismiss' ] );
-	}
-
-	/**
-	 * Check if notifications are enabled.
-	 *
-	 * @since 4.3.0
-	 *
-	 * @return bool
-	 */
-	public function is_enabled() {
-
-		return ! Options::init()->get( 'general', 'am_notifications_hidden' );
 	}
 
 	/**
@@ -86,8 +75,8 @@ class Notifications {
 		$access = false;
 
 		if (
-			current_user_can( wp_mail_smtp()->get_capability_manage_options() ) &&
-			$this->is_enabled()
+			current_user_can( 'manage_options' ) &&
+			! Options::init()->get( 'general', 'am_notifications_hidden' )
 		) {
 			$access = true;
 		}
@@ -131,14 +120,7 @@ class Notifications {
 	 */
 	protected function fetch_feed() {
 
-		$feed_url = self::SOURCE_URL . '/' . wp_mail_smtp()->get_license_type();
-
-		$response = wp_remote_get(
-			$feed_url,
-			[
-				'user-agent' => Helpers::get_default_user_agent(),
-			]
-		);
+		$response = wp_remote_get( self::SOURCE_URL );
 
 		if ( is_wp_error( $response ) ) {
 			return [];
@@ -244,7 +226,6 @@ class Notifications {
 	 * Get notification data.
 	 *
 	 * @since 2.3.0
-	 * @since 3.9.0 Make the AS a recurring task.
 	 *
 	 * @return array
 	 */
@@ -255,29 +236,23 @@ class Notifications {
 		}
 
 		$option = $this->get_option();
+
+		// Update notifications using async task.
+		if ( empty( $option['update'] ) || time() > $option['update'] + DAY_IN_SECONDS ) {
+			if ( empty( Tasks::is_scheduled( 'wp_mail_smtp_admin_notifications_update' ) ) ) {
+
+				wp_mail_smtp()->get_tasks()
+					->create( 'wp_mail_smtp_admin_notifications_update' )
+					->async()
+					->params()
+					->register();
+			}
+		}
+
 		$events = ! empty( $option['events'] ) ? $this->verify_active( $option['events'] ) : [];
 		$feed   = ! empty( $option['feed'] ) ? $this->verify_active( $option['feed'] ) : [];
 
 		return array_merge( $events, $feed );
-	}
-
-	/**
-	 * Get the update notifications interval.
-	 *
-	 * @since 3.9.0
-	 *
-	 * @return int
-	 */
-	public function get_notification_update_task_interval() {
-
-		/**
-		 * Filters the interval for the notifications update task.
-		 *
-		 * @since 3.9.0
-		 *
-		 * @param int $interval The interval in seconds. Default to a day (in seconds).
-		 */
-		return (int) apply_filters( 'wp_mail_smtp_admin_notifications_get_notification_update_task_interval', DAY_IN_SECONDS );
 	}
 
 	/**
@@ -337,14 +312,8 @@ class Notifications {
 	 */
 	public function update() {
 
+		$feed   = $this->fetch_feed();
 		$option = $this->get_option();
-
-		// Bail if feed was updated less than an interval ago.
-		if ( time() - (int) $option['update'] < $this->get_notification_update_task_interval() ) {
-			return;
-		}
-
-		$feed = $this->fetch_feed();
 
 		update_option(
 			self::OPTION_KEY,
@@ -423,11 +392,6 @@ class Notifications {
 				'target' => [],
 				'rel'    => [],
 			],
-			'br'     => [],
-			'p'      => [
-				'id'    => [],
-				'class' => [],
-			],
 		];
 
 		foreach ( $notifications as $notification ) {
@@ -454,11 +418,11 @@ class Notifications {
 			$notifications_html .= sprintf(
 				'<div class="wp-mail-smtp-notifications-message%5$s" data-message-id="%4$s">
 					<h3 class="wp-mail-smtp-notifications-title">%1$s</h3>
-					<div class="wp-mail-smtp-notifications-content">%2$s</div>
+					<p class="wp-mail-smtp-notifications-content">%2$s</p>
 					%3$s
 				</div>',
 				! empty( $notification['title'] ) ? sanitize_text_field( $notification['title'] ) : '',
-				! empty( $notification['content'] ) ? wp_kses( wpautop( $notification['content'] ), $content_allowed_tags ) : '',
+				! empty( $notification['content'] ) ? wp_kses( $notification['content'], $content_allowed_tags ) : '',
 				$buttons_html,
 				! empty( $notification['id'] ) ? esc_attr( sanitize_text_field( $notification['id'] ) ) : 0,
 				$current_class
@@ -516,7 +480,7 @@ class Notifications {
 		check_ajax_referer( 'wp-mail-smtp-admin', 'nonce' );
 
 		// Check for access and required param.
-		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_options() ) || empty( $_POST['id'] ) ) {
+		if ( ! current_user_can( 'manage_options' ) || empty( $_POST['id'] ) ) {
 			wp_send_json_error();
 		}
 

@@ -1,4 +1,3 @@
-<div class="wpsc-card">
 <?php
 echo '<a name="trackingparameters"></a><fieldset class="options"><h4>' . __( 'Tracking Parameters', 'wp-super-cache' ) . '</h4>';
 echo '<form name="edit_tracking_parameters" action="' . esc_url_raw( add_query_arg( 'tab', 'settings', $admin_url ) . '#trackingparameters' ) . '" method="post">';
@@ -12,5 +11,3 @@ echo "<p><label><input type='checkbox' name='wpsc_ignore_tracking_parameters' va
 echo '<div class="submit"><input class="button-primary" type="submit" ' . SUBMITDISABLED . 'value="' . __( 'Save', 'wp-super-cache' ) . '" /></div>';
 wp_nonce_field('wp-cache');
 echo "</form>\n";
-?>
-</div>

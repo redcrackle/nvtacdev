@@ -1,26 +1,21 @@
 <?php
 
-// Exit if accessed directly
-defined( 'ABSPATH' ) || exit;
-
-
 //forum style settings page
 
 function bsp_style_settings_la () {
 	global $bsp_style_settings_la ;
 	?>
-	<form method="post" action="options.php">
+	<Form method="post" action="options.php">
 	<?php wp_nonce_field( 'style-settings_la', 'style-settings-nonce' ) ?>
 	<?php settings_fields( 'bsp_style_settings_la' );
 	//create a style.css on entry and on saving
-	generate_style_css();
-        bsp_clear_cache();
+	generate_style_css() ;
 	?>
 	<table class="form-table">
 		<tr valign="top">
 			<th colspan="2">
 				<h3>
-					<?php esc_html_e ('Latest Activity Widget styling' , 'bbp-style-pack' ) ; ?>
+					<?php _e ('Latest Activity Widget styling' , 'bbp-style-pack' ) ; ?>
 				</h3>
 		</tr>
 	</table>
@@ -28,31 +23,31 @@ function bsp_style_settings_la () {
 		<tr>
 			<td>
 				<p>
-					<?php esc_html_e('This section allows you to amend styles.', 'bbp-style-pack'); ?>
+					<?php _e('This section allows you to amend styles.', 'bbp-style-pack'); ?>
 				</p>
 				<p>
-					<?php esc_html_e('You only need to enter those styles and elements within a style that you wish to alter', 'bbp-style-pack'); ?>
+					<?php _e('You only need to enter those styles and elements within a style that you wish to alter', 'bbp-style-pack'); ?>
 				</p>
 			</td>
 			
 			<td>	
 				<?php
 				//show style image
-				echo '<img src="' . esc_url(plugins_url( 'images/la-widget.PNG',dirname(__FILE__) ) ) . '" > '; 
+				echo '<img src="' . plugins_url( 'images/la-widget.PNG',dirname(__FILE__)  ) . '" > '; 
 				?>
 			</td>
 		</tr>
 	</table>
 	<!-- save the options -->
 	<p class="submit">
-		<input type="submit" class="button-primary" value="<?php esc_html_e( 'Save changes', 'bbp-style-pack' ); ?>" />
+		<input type="submit" class="button-primary" value="<?php _e( 'Save changes', 'bbp-style-pack' ); ?>" />
 	</p>
 	<table class="form-table">
 	
 	<!--Font - Widget title  ------------------------------------------------------------------->
 		<tr>
 			<?php 
-			$name = 'Widget Title' ;
+			$name = __('Widget Title') ;
 			$name0 = __('Widget Title', 'bbp-style-pack') ;
 			$name1 = __('Size', 'bbp-style-pack') ;
 			$name2 = __('Color', 'bbp-style-pack') ;
@@ -72,15 +67,15 @@ function bsp_style_settings_la () {
 			$value4 = (!empty($bsp_style_settings_la[$name.$area4]) ? $bsp_style_settings_la[$name.$area4]  : '') ;
 			?>
 			<th>
-				<?php echo '1. '.esc_html($name0) ?>
+				<?php echo '1. '.$name0 ?>
 			</th>
 			<td>
-				<?php echo esc_html($name1) ; ?>
+				<?php echo $name1 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>			
@@ -90,12 +85,12 @@ function bsp_style_settings_la () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name2) ; ?>
+				<?php echo $name2 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item2).'" class="bsp-color-picker" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item2.'" class="bsp-color-picker" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value- see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value- see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -105,12 +100,12 @@ function bsp_style_settings_la () {
 			<td>
 			</td>
 			<td> 
-				<?php echo esc_html($name3) ; ?> 
+				<?php echo $name3 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item3).'" class="large-text" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -120,10 +115,10 @@ function bsp_style_settings_la () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name4) ; ?> 
+				<?php echo $name4 ; ?> 
 			</td>
 			<td>
-				<select name="<?php echo esc_html($item4) ; ?>">
+				<select name="<?php echo $item4 ; ?>">
 					<?php echo '<option value="'.esc_html( $value4).'">'.esc_html( $value4 ) ; ?> 
 					<option value="Normal">Normal</option>
 					<option value="Italic">Italic</option>
@@ -137,7 +132,7 @@ function bsp_style_settings_la () {
 	<!--Font - Topic/reply title  ------------------------------------------------------------------->
 		<tr>
 			<?php 
-			$name = 'Topic Title' ;
+			$name = __('Topic Title') ;
 			$name0 = __('Topic/Reply Title', 'bbp-style-pack') ;
 			$name1 = __('Size', 'bbp-style-pack') ;
 			$name3 = __('Font', 'bbp-style-pack') ;
@@ -154,15 +149,15 @@ function bsp_style_settings_la () {
 			?>
 			
 			<th>
-				<?php echo '2. '.esc_html($name0) ?>
+				<?php echo '2. '.$name0 ?>
 			</th>
 			<td> 
-				<?php echo esc_html($name1) ; ?> 
+				<?php echo $name1 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -172,12 +167,12 @@ function bsp_style_settings_la () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name3) ; ?> 
+				<?php echo $name3 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item3).'" class="large-text" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -187,10 +182,10 @@ function bsp_style_settings_la () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name4) ; ?>
+				<?php echo $name4 ; ?>
 			</td>
 			<td>
-				<select name="<?php echo esc_html($item4) ; ?>">
+				<select name="<?php echo $item4 ; ?>">
 					<?php echo '<option value="'.esc_html( $value4).'">'.esc_html( $value4 ) ; ?> 
 					<option value="Normal">Normal</option>
 					<option value="Italic">Italic</option>
@@ -225,15 +220,15 @@ function bsp_style_settings_la () {
 			?>
 			
 			<th>
-				<?php echo '3. '.esc_html($name0) ?>
+				<?php echo '3. '.$name0 ?>
 			</th>
 			<td>
-				<?php echo esc_html($name1) ; ?>
+				<?php echo $name1 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -243,12 +238,12 @@ function bsp_style_settings_la () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name2) ; ?>
+				<?php echo $name2 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item2).'" class="bsp-color-picker" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item2.'" class="bsp-color-picker" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value- see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value- see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -258,12 +253,12 @@ function bsp_style_settings_la () {
 			<td>
 			</td>
 			<td> 
-				<?php echo esc_html($name3) ; ?>
+				<?php echo $name3 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item3).'" class="large-text" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -273,10 +268,10 @@ function bsp_style_settings_la () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name4) ; ?>
+				<?php echo $name4 ; ?>
 			</td>
 			<td>
-				<select name="<?php echo esc_html($item4) ; ?>">
+				<select name="<?php echo $item4 ; ?>">
 					<?php echo '<option value="'.esc_html( $value4).'">'.esc_html( $value4 ) ; ?> 
 					<option value="Normal">Normal</option>
 					<option value="Italic">Italic</option>
@@ -306,15 +301,15 @@ function bsp_style_settings_la () {
 			?>
 			
 			<th>
-				<?php echo '4. '.esc_html($name0) ?>
+				<?php echo '4. '.$name0 ?>
 			</th>
 			<td> 
-				<?php echo esc_html($name1) ; ?>
+				<?php echo $name1 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -324,12 +319,12 @@ function bsp_style_settings_la () {
 			<td>
 			</td>
 			<td>
-			<?php echo esc_html($name3) ; ?> 
+			<?php echo $name3 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item3).'" class="large-text" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -339,10 +334,10 @@ function bsp_style_settings_la () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name4) ; ?> 
+				<?php echo $name4 ; ?> 
 			</td>
 			<td>
-				<select name="<?php echo esc_html($item4) ; ?>">
+				<select name="<?php echo $item4 ; ?>">
 					<?php echo '<option value="'.esc_html( $value4).'">'.esc_html( $value4 ) ; ?> 
 					<option value="Normal">Normal</option>
 					<option value="Italic">Italic</option>
@@ -376,15 +371,15 @@ function bsp_style_settings_la () {
 			?>
 			
 			<th>
-				<?php echo '5. '.esc_html($name0) ?>
+				<?php echo '5. '.$name0 ?>
 			</th>
 			<td> 
-				<?php echo esc_html($name1) ; ?>
+				<?php echo $name1 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -394,27 +389,12 @@ function bsp_style_settings_la () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name2) ; ?> 
+				<?php echo $name2 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item2).'" class="bsp-color-picker" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item2.'" class="bsp-color-picker" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value- see help for further info', 'bbp-style-pack' ); ?>
-				</label>
-				<br/>
-			</td>
-		</tr>
-		
-		<tr>
-			<td>
-			</td>
-			<td> 
-				<?php echo esc_html($name3) ; ?> 
-			</td>
-			<td>
-				<?php echo '<input id="'.esc_html($item3).'" class="large-text" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
-				<label class="description">
-					<?php esc_html_e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value- see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -424,10 +404,25 @@ function bsp_style_settings_la () {
 			<td>
 			</td>
 			<td> 
-				<?php echo esc_html($name4) ; ?> 
+				<?php echo $name3 ; ?> 
 			</td>
 			<td>
-				<select name="<?php echo esc_html($item4) ; ?>">
+				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
+				<label class="description">
+					<?php _e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
+				</label>
+				<br/>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+			</td>
+			<td> 
+				<?php echo $name4 ; ?> 
+			</td>
+			<td>
+				<select name="<?php echo $item4 ; ?>">
 					<?php echo '<option value="'.esc_html( $value4).'">'.esc_html( $value4 ) ; ?> 
 					<option value="Normal">Normal</option>
 					<option value="Italic">Italic</option>
@@ -457,15 +452,15 @@ function bsp_style_settings_la () {
 			?>
 			
 			<th>
-				<?php echo '6. '.esc_html($name0) ?>
+				<?php echo '6. '.$name0 ?>
 			</th>
 			<td>
-				<?php echo esc_html($name1) ; ?>
+				<?php echo $name1 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -475,12 +470,12 @@ function bsp_style_settings_la () {
 			<td>
 			</td>
 			<td> 
-				<?php echo esc_html($name3) ; ?> 
+				<?php echo $name3 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item3).'" class="large-text" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -490,10 +485,10 @@ function bsp_style_settings_la () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name4) ; ?> 
+				<?php echo $name4 ; ?> 
 			</td>
 			<td>
-				<select name="<?php echo esc_html($item4) ; ?>">
+				<select name="<?php echo $item4 ; ?>">
 					<?php echo '<option value="'.esc_html( $value4).'">'.esc_html( $value4 ) ; ?> 
 					<option value="Normal">Normal</option>
 					<option value="Italic">Italic</option>
@@ -523,15 +518,15 @@ function bsp_style_settings_la () {
 			?>
 			
 			<th>
-				<?php echo '7. '.esc_html($name0) ?>
+				<?php echo '7. '.$name0 ?>
 			</th>
 			<td>
-				<?php echo esc_html($name1) ; ?> 
+				<?php echo $name1 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="bsp-color-picker" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="bsp-color-picker" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value- see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value- see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -541,12 +536,12 @@ function bsp_style_settings_la () {
 			<td>
 			</td>
 			<td> 
-				<?php echo esc_html($name2) ; ?> 
+				<?php echo $name2 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item2).'" class="bsp-color-picker" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item2.'" class="bsp-color-picker" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value- see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value- see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -556,12 +551,12 @@ function bsp_style_settings_la () {
 			<td>
 			</td>
 			<td>
-			<?php echo esc_html($name3) ; ?> 
+			<?php echo $name3 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item3).'" class="bsp-color-picker" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item3.'" class="bsp-color-picker" name="'.$item3.'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value- see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value- see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -579,15 +574,15 @@ function bsp_style_settings_la () {
 			?>
 			
 			<th>
-				<?php echo '8. '.esc_html($name0) ?>
+				<?php echo '8. '.$name0 ?>
 			</th>
 			<td>
-				<?php echo esc_html($name1) ; ?>
+				<?php echo $name1 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Default 14px ', 'bbp-style-pack' ); ?>
+					<?php _e( 'Default 14px ', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -600,10 +595,13 @@ function bsp_style_settings_la () {
 	</table>
 	<!-- save the options -->
 	<p class="submit">
-		<input type="submit" class="button-primary" value="<?php esc_html_e( 'Save changes', 'bbp-style-pack' ); ?>" />
+		<input type="submit" class="button-primary" value="<?php _e( 'Save changes', 'bbp-style-pack' ); ?>" />
 	</p>
 </form>
- 
+</div><!--end sf-wrap-->
+</div><!--end wrap-->
+	
+	 
 <?php
 }
 		

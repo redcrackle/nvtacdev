@@ -37,7 +37,7 @@ class BP_XProfile_Field_Type_WordPress_Biography extends BP_XProfile_Field_Type_
 		 *
 		 * @since 8.0.0
 		 *
-		 * @param BP_XProfile_Field_Type_WordPress_Biography $field_type Current instance of the field type class.
+		 * @param BP_XProfile_Field_Type_WordPress_Biography $this Instance of the field type object.
 		 */
 		do_action( 'bp_xprofile_field_type_wordpress_biography', $this );
 	}
@@ -118,16 +118,13 @@ class BP_XProfile_Field_Type_WordPress_Biography extends BP_XProfile_Field_Type_
 				'rows' => 5,
 			)
 		);
-
-		// phpcs:disable WordPress.Security.EscapeOutput
 		?>
 
-		<textarea <?php $this->output_edit_field_html_elements( $r ); ?>><?php
+		<textarea <?php echo $this->get_edit_field_html_elements( $r ); ?>><?php
 			echo $this->sanitize_for_output( bp_get_user_meta( $user_id, $this->wp_user_key, true ), $user_id );
 		?></textarea>
 
 		<?php
-		// phpcs:enable
 	}
 
 	/**
@@ -149,7 +146,7 @@ class BP_XProfile_Field_Type_WordPress_Biography extends BP_XProfile_Field_Type_
 		);
 		?>
 
-		<textarea <?php $this->output_edit_field_html_elements( $r ); ?>></textarea>
+		<textarea <?php echo $this->get_edit_field_html_elements( $r ); ?>></textarea>
 
 		<?php
 	}

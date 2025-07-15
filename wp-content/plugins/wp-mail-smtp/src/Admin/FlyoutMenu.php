@@ -93,20 +93,22 @@ class FlyoutMenu {
 	 */
 	private function menu_items() {
 
-		$icons_url = wp_mail_smtp()->assets_url . '/images/flyout-menu';
+		$is_pro = wp_mail_smtp()->is_pro();
+
+		$utm_campaign = $is_pro ? 'plugin' : 'liteplugin';
+		$icons_url    = wp_mail_smtp()->assets_url . '/images/flyout-menu';
 
 		$items = [
 			[
 				'title'         => esc_html__( 'Upgrade to WP Mail SMTP Pro', 'wp-mail-smtp' ),
 				'url'           => wp_mail_smtp()->get_upgrade_link( [ 'medium' => 'quick-link-menu' ] ),
 				'icon'          => $icons_url . '/star.svg',
-				'bgcolor'       => '#E27730',
-				'hover_bgcolor' => '#B85A1B',
+				'bgcolor'       => '#FF982D ',
+				'hover_bgcolor' => '#F97F00',
 			],
 			[
 				'title' => esc_html__( 'Support & Docs', 'wp-mail-smtp' ),
-				// phpcs:ignore WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound
-				'url'   => esc_url( wp_mail_smtp()->get_utm_url( 'https://wpmailsmtp.com/docs/', [ 'medium' => 'quick-link-menu', 'content' => 'Support' ] ) ),
+				'url'   => 'https://wpmailsmtp.com/docs/?utm_source=WordPress&utm_medium=quick-link-menu&utm_campaign=' . $utm_campaign . '&utm_content=Support',
 				'icon'  => $icons_url . '/life-ring.svg',
 			],
 			[
@@ -116,13 +118,12 @@ class FlyoutMenu {
 			],
 			[
 				'title' => esc_html__( 'Suggest a Feature', 'wp-mail-smtp' ),
-				// phpcs:ignore WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound
-				'url'   => esc_url( wp_mail_smtp()->get_utm_url( 'https://wpmailsmtp.com/suggest-a-feature/', [ 'medium' => 'quick-link-menu', 'content' => 'Feature' ] ) ),
+				'url'   => 'https://wpmailsmtp.com/suggest-a-feature/?utm_source=WordPress&utm_medium=quick-link-menu&utm_campaign=' . $utm_campaign . '&utm_content=Feature',
 				'icon'  => $icons_url . '/lightbulb.svg',
 			],
 		];
 
-		if ( wp_mail_smtp()->is_pro() ) {
+		if ( $is_pro ) {
 			array_shift( $items );
 		}
 

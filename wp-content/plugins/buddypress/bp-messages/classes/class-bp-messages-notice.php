@@ -17,7 +17,6 @@ defined( 'ABSPATH' ) || exit;
  *
  * @since 1.0.0
  */
-#[AllowDynamicProperties]
 class BP_Messages_Notice {
 
 	/**
@@ -74,9 +73,10 @@ class BP_Messages_Notice {
 	 *
 	 * Runs during constructor.
 	 *
-	 * @since 1.0.0
-	 *
+	 * @global BuddyPress $bp The one true BuddyPress instance.
 	 * @global wpdb $wpdb WordPress database object.
+	 *
+	 * @since 1.0.0
 	 */
 	public function populate() {
 		global $wpdb;
@@ -96,9 +96,10 @@ class BP_Messages_Notice {
 	/**
 	 * Saves a notice.
 	 *
-	 * @since 1.0.0
-	 *
+	 * @global BuddyPress $bp The one true BuddyPress instance.
 	 * @global wpdb $wpdb WordPress database object.
+	 *
+	 * @since 1.0.0
 	 *
 	 * @return bool
 	 */
@@ -117,7 +118,7 @@ class BP_Messages_Notice {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param BP_Messages_Notice $notice Current instance of the message notice item being saved. Passed by reference.
+		 * @param BP_Messages_Notice $this Current instance of the message notice item being saved. Passed by reference.
 		 */
 		do_action_ref_array( 'messages_notice_before_save', array( &$this ) );
 
@@ -145,7 +146,7 @@ class BP_Messages_Notice {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param BP_Messages_Notice $notice Current instance of the message item being saved. Passed by reference.
+		 * @param BP_Messages_Notice $this Current instance of the message item being saved. Passed by reference.
 		 */
 		do_action_ref_array( 'messages_notice_after_save', array( &$this ) );
 
@@ -179,9 +180,10 @@ class BP_Messages_Notice {
 	/**
 	 * Deletes a notice.
 	 *
-	 * @since 1.0.0
-	 *
+	 * @global BuddyPress $bp The one true BuddyPress instance.
 	 * @global wpdb $wpdb WordPress database object.
+	 *
+	 * @since 1.0.0
 	 *
 	 * @return bool
 	 */
@@ -193,7 +195,7 @@ class BP_Messages_Notice {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param BP_Messages_Notice $notice Current instance of the message notice item being deleted.
+		 * @param BP_Messages_Notice $this Current instance of the message notice item being deleted.
 		 */
 		do_action( 'messages_notice_before_delete', $this );
 
@@ -209,7 +211,7 @@ class BP_Messages_Notice {
 		 *
 		 * @since 2.8.0
 		 *
-		 * @param BP_Messages_Notice $notice Current instance of the message notice item being deleted.
+		 * @param BP_Messages_Notice $this Current instance of the message notice item being deleted.
 		 */
 		do_action( 'messages_notice_after_delete', $this );
 
@@ -223,9 +225,10 @@ class BP_Messages_Notice {
 	 *
 	 * To get all notices, pass a value of -1 to pag_num.
 	 *
-	 * @since 1.0.0
-	 *
+	 * @global BuddyPress $bp The one true BuddyPress instance.
 	 * @global wpdb $wpdb WordPress database object.
+	 *
+	 * @since 1.0.0
 	 *
 	 * @param array $args {
 	 *     Array of parameters.
@@ -274,9 +277,10 @@ class BP_Messages_Notice {
 	/**
 	 * Returns the total number of recorded notices.
 	 *
-	 * @since 1.0.0
-	 *
+	 * @global BuddyPress $bp The one true BuddyPress instance.
 	 * @global wpdb $wpdb WordPress database object.
+	 *
+	 * @since 1.0.0
 	 *
 	 * @return int
 	 */
@@ -300,9 +304,10 @@ class BP_Messages_Notice {
 	/**
 	 * Returns the active notice that should be displayed on the front end.
 	 *
-	 * @since 1.0.0
-	 *
+	 * @global BuddyPress $bp The one true BuddyPress instance.
 	 * @global wpdb $wpdb WordPress database object.
+	 *
+	 * @since 1.0.0
 	 *
 	 * @return BP_Messages_Notice
 	 */

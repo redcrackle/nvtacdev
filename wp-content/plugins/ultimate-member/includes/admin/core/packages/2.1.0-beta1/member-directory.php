@@ -10,8 +10,7 @@ if ( ! empty( $postmeta ) ) {
 		update_post_meta( $row['post_id'], '_um_hide_pm_button', $value );
 	}
 
-	$wpdb->delete(
-		$wpdb->postmeta,
+	$wpdb->delete( "{$wpdb->postmeta}",
 		array(
 			'meta_value'    => '_um_show_pm_button',
 		),

@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -21,12 +20,10 @@ class ChromePHPFormatter implements \WPMailSMTP\Vendor\Monolog\Formatter\Formatt
 {
     /**
      * Translates Monolog log levels to Wildfire levels.
-     *
-     * @var array<int, 'log'|'info'|'warn'|'error'>
      */
-    private $logLevels = [\WPMailSMTP\Vendor\Monolog\Logger::DEBUG => 'log', \WPMailSMTP\Vendor\Monolog\Logger::INFO => 'info', \WPMailSMTP\Vendor\Monolog\Logger::NOTICE => 'info', \WPMailSMTP\Vendor\Monolog\Logger::WARNING => 'warn', \WPMailSMTP\Vendor\Monolog\Logger::ERROR => 'error', \WPMailSMTP\Vendor\Monolog\Logger::CRITICAL => 'error', \WPMailSMTP\Vendor\Monolog\Logger::ALERT => 'error', \WPMailSMTP\Vendor\Monolog\Logger::EMERGENCY => 'error'];
+    private $logLevels = array(\WPMailSMTP\Vendor\Monolog\Logger::DEBUG => 'log', \WPMailSMTP\Vendor\Monolog\Logger::INFO => 'info', \WPMailSMTP\Vendor\Monolog\Logger::NOTICE => 'info', \WPMailSMTP\Vendor\Monolog\Logger::WARNING => 'warn', \WPMailSMTP\Vendor\Monolog\Logger::ERROR => 'error', \WPMailSMTP\Vendor\Monolog\Logger::CRITICAL => 'error', \WPMailSMTP\Vendor\Monolog\Logger::ALERT => 'error', \WPMailSMTP\Vendor\Monolog\Logger::EMERGENCY => 'error');
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function format(array $record)
     {
@@ -36,7 +33,7 @@ class ChromePHPFormatter implements \WPMailSMTP\Vendor\Monolog\Formatter\Formatt
             $backtrace = $record['extra']['file'] . ' : ' . $record['extra']['line'];
             unset($record['extra']['file'], $record['extra']['line']);
         }
-        $message = ['message' => $record['message']];
+        $message = array('message' => $record['message']);
         if ($record['context']) {
             $message['context'] = $record['context'];
         }
@@ -46,14 +43,11 @@ class ChromePHPFormatter implements \WPMailSMTP\Vendor\Monolog\Formatter\Formatt
         if (\count($message) === 1) {
             $message = \reset($message);
         }
-        return [$record['channel'], $message, $backtrace, $this->logLevels[$record['level']]];
+        return array($record['channel'], $message, $backtrace, $this->logLevels[$record['level']]);
     }
-    /**
-     * {@inheritDoc}
-     */
     public function formatBatch(array $records)
     {
-        $formatted = [];
+        $formatted = array();
         foreach ($records as $record) {
             $formatted[] = $this->format($record);
         }

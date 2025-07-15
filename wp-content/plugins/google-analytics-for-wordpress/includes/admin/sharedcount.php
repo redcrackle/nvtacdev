@@ -74,11 +74,8 @@ class MonsterInsights_SharedCount {
 	 * a daily cron to keep the counts fresh.
 	 */
 	public function ajax_start_indexing() {
-		check_ajax_referer( 'mi-admin-nonce', 'nonce' );
 
-		if ( ! current_user_can( 'monsterinsights_save_settings' ) ) {
-			return;
-		}
+		check_ajax_referer( 'mi-admin-nonce', 'nonce' );
 
 		if ( $this->get_api_key() ) {
 			if ( $this->start_posts_count() ) {
@@ -199,7 +196,7 @@ class MonsterInsights_SharedCount {
 			'posts_per_page'   => 100, // Don't try to load more than 500 posts at once.
 			'fields'           => 'ids', // Load just the ids.
 			'paged'            => $page,
-			'suppress_filters' => true, // phpcs:ignore -- Avoid loading additional functionality from other plugins/theme.
+			'suppress_filters' => true, // Avoid loading additional functionality from other plugins/theme.
 		);
 		$posts_query = new WP_Query( $posts_args );
 		$urls        = array();
@@ -320,7 +317,7 @@ class MonsterInsights_SharedCount {
 	 * schedule an event to try again in a minute.
 	 *
 	 * @param string $bulk_id The bulk id from the SharedCount bulk post request.
-	 * @param array $urls_as_keys An array of URLs where the keys are the URLs and the values are the post ids.
+	 * @param array  $urls_as_keys An array of URLs where the keys are the URLs and the values are the post ids.
 	 */
 	public function grab_and_store_bulk_by_id( $bulk_id, $urls_as_keys ) {
 		$bulk_data = $this->get_bulk_data( $bulk_id );
@@ -385,7 +382,7 @@ class MonsterInsights_SharedCount {
 	 * Save the post counts response to the post meta.
 	 * The total value is saved separately for querying.
 	 *
-	 * @param int $post_id The post id to save to.
+	 * @param int   $post_id The post id to save to.
 	 * @param array $values The array of values received from the SharedCount API.
 	 *
 	 * @see MonsterInsights_SharedCount::get_counts_by_url()
@@ -423,7 +420,7 @@ class MonsterInsights_SharedCount {
 	 * If the bulk request is not completed we need to schedule it to try again later.
 	 *
 	 * @param string $bulk_id The bulk id from the SharedCount bulk post request.
-	 * @param array $urls_as_keys An array of URLs where the keys are the URLs and the values are the post ids.
+	 * @param array  $urls_as_keys An array of URLs where the keys are the URLs and the values are the post ids.
 	 *
 	 * @see MonsterInsights_SharedCount::post_bulk_urls()
 	 * @see MonsterInsights_SharedCount::grab_and_store_bulk_by_id()
@@ -595,12 +592,6 @@ class MonsterInsights_SharedCount {
 	 * Get the index progress with ajax.
 	 */
 	public function ajax_get_index_progress() {
-		check_ajax_referer( 'mi-admin-nonce', 'nonce' );
-
-		if ( ! current_user_can( 'monsterinsights_save_settings' ) ) {
-			return;
-		}
-
 		wp_send_json( array(
 			'progress' => self::get_index_progress_percent(),
 		) );

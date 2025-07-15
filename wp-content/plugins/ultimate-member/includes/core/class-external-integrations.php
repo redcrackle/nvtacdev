@@ -31,8 +31,7 @@ if ( ! class_exists( 'um\core\External_Integrations' ) ) {
 			add_action( 'um_access_fix_external_post_content', array( &$this, 'forumwp_fix' ), 11 );
 			add_action( 'um_access_fix_external_post_content', array( &$this, 'woocommerce_fix' ), 12 );
 
-			add_filter( 'um_external_profile_url', array( &$this, 'um_localize_profile_url' ), 10, 2 );
-			add_filter( 'um_get_current_page_url', array( &$this, 'um_localize_profile_nav_url' ), 10, 2 );
+			add_filter( 'um_localize_permalink_filter', array( &$this, 'um_localize_permalink_filter' ), 10, 2 );
 			add_filter( 'icl_ls_languages', array( &$this, 'um_core_page_wpml_permalink' ), 10, 1 );
 
 			// Integration for the "Transposh Translation Filter" plugin
@@ -51,6 +50,7 @@ if ( ! class_exists( 'um\core\External_Integrations' ) ) {
 		 * UM filter - Restore original arguments on translated page
 		 *
 		 * @description Restore original arguments on load shortcode if they are missed in the WPML translation
+		 * @hook um_pre_args_setup
 		 *
 		 * @global \SitePress $sitepress
 		 * @param array $args
@@ -81,6 +81,7 @@ if ( ! class_exists( 'um\core\External_Integrations' ) ) {
 		 * Integration for the "Transposh Translation Filter" plugin
 		 *
 		 * @description Fix issue "404 Not Found" on profile page
+		 * @hook template_redirect
 		 * @see http://transposh.org/
 		 *
 		 * @global transposh_plugin $my_transposh_plugin
@@ -174,109 +175,75 @@ if ( ! class_exists( 'um\core\External_Integrations' ) ) {
 			return $single_template;
 		}
 
+
 		/**
-		 * Change user profile URL for WPML compatibility.
+		 * @param $profile_url
+		 * @param $page_id
 		 *
-		 * @see  \um\core\Permalinks::profile_permalink()
-		 *
-		 * @param bool|string $profile_url Profile URL.
-		 * @param string      $slug        Profile slug.
-		 *
-		 * @return string
+		 * @return bool|false|string
 		 */
-		public function um_localize_profile_url( $profile_url, $slug ) {
-			if ( ! $this->is_wpml_active() ) {
+		function um_localize_permalink_filter( $profile_url, $page_id ) {
+
+			if ( ! $this->is_wpml_active() )
 				return $profile_url;
-			}
 
-			$page_id      = UM()->config()->permalinks['user'];
-			$lang_post_id = apply_filters( 'wpml_object_id', $page_id, 'page', true );
+			/*if ( function_exists( 'icl_get_current_language' ) && icl_get_current_language() != icl_get_default_language() ) {
+				if ( get_the_ID() > 0 && get_post_meta( get_the_ID(), '_um_wpml_user', true ) == 1 ) {
+					$profile_url = get_permalink( get_the_ID() );
+				}
+			}*/
 
-			if ( $lang_post_id && $lang_post_id !== $page_id ) {
-				$user_page_url = get_permalink( $lang_post_id );
+			// WPML compatibility
+			if ( function_exists( 'icl_object_id' ) ) {
+				$language_code = ICL_LANGUAGE_CODE;
+				$lang_post_id = icl_object_id( $page_id , 'page', true, $language_code );
 
-				if ( UM()->is_permalinks ) {
-					if ( false === strpos( $user_page_url, '?' ) ) {
-						$profile_url = trailingslashit( $user_page_url ) . trailingslashit( $slug );
-					} else {
-						$profile_url = str_replace( '?', trailingslashit( $slug ) . '?', $user_page_url );
-					}
+				if ( $lang_post_id != 0 ) {
+					$profile_url = get_permalink( $lang_post_id );
 				} else {
-					$profile_url = add_query_arg( 'um_user', strtolower( $slug ), $user_page_url );
+					// No page found, it's most likely the homepage
+					global $sitepress;
+					$profile_url = $sitepress->language_url( $language_code );
 				}
 			}
 
 			return $profile_url;
 		}
 
-		/**
-		 * Change current URL for WPML compatibility.
-		 *
-		 * Note: It's used for User Profile nav links fix
-		 *
-		 * @see  \um\core\Permalinks::get_current_url()
-		 *
-		 * @param string $page_url        Current URL.
-		 * @param bool   $no_query_params Ignore $_GET attributes in URL. "true" == ignore.
-		 *
-		 * @return string
-		 */
-		public function um_localize_profile_nav_url( $page_url, $no_query_params ) {
-			if ( ! $this->is_wpml_active() ) {
-				return $page_url;
-			}
-
-			if ( false === $no_query_params ) {
-				return $page_url;
-			}
-
-			if ( ! empty( $_GET['lang'] ) ) {
-				$page_url = add_query_arg( 'lang', sanitize_key( $_GET['lang'] ), $page_url );
-			}
-
-			return $page_url;
-		}
 
 		/**
-		 * Filters the displayed languages of the WPML language switcher.
+		 * @param $array
 		 *
-		 * @see  https://wpml.org/wpml-hook/icl_ls_languages/
-		 *
-		 * @param array $array Collection of active languages to display in the language switcher.
-		 *
-		 * @return array
+		 * @return mixed
 		 */
-		public function um_core_page_wpml_permalink( $array ) {
-			if ( $this->is_wpml_active() && um_is_core_page( 'user' ) && is_array( $array ) ) {
-				global $sitepress;
+		function um_core_page_wpml_permalink( $array ) {
 
-				$current_language = wpml_get_current_language();
-				$slug             = strtolower( UM()->user()->get_profile_slug( um_profile_id() ) );
+			if ( ! $this->is_wpml_active() )
+				return $array;
 
-				foreach ( $array as $lang_code => $arr ) {
-					$sitepress->switch_lang( $lang_code );
+			global $sitepress;
+			if( ! um_is_core_page("user") ) return $array;
+			if( ! defined("ICL_LANGUAGE_CODE") ) return $array;
+			if( ! function_exists('icl_object_id') ) return $array;
 
-					$lang_post_id  = apply_filters( 'wpml_object_id', UM()->config()->permalinks['user'], 'page', true );
-					$user_page_url = get_permalink( $lang_post_id );
+			// Permalink base
+			$permalink_base = UM()->options()->get( 'permalink_base' );
 
-					if ( UM()->is_permalinks ) {
-						if ( false === strpos( $user_page_url, '?' ) ) {
-							$profile_url = trailingslashit( $user_page_url ) . trailingslashit( $slug );
-						} else {
-							$profile_url = str_replace( '?', trailingslashit( $slug ) . '?', $user_page_url );
-						}
-					} else {
-						$profile_url = add_query_arg( 'um_user', strtolower( $slug ), $user_page_url );
-					}
+			// Get user slug
+			$profile_slug = strtolower( get_user_meta( um_profile_id(), "um_user_profile_url_slug_{$permalink_base}", true ) );
+			$current_language = ICL_LANGUAGE_CODE;
+			foreach ( $array as $lang_code => $arr ) {
+				$sitepress->switch_lang( $lang_code );
+				$user_page = um_get_core_page( "user" );
 
-					$array[ $lang_code ]['url'] = $profile_url;
-				}
-
-				$sitepress->switch_lang( $current_language );
+				$array[ $lang_code ]['url'] = "{$user_page}{$profile_slug}/";
 			}
+
+			$sitepress->switch_lang( $current_language );
 
 			return $array;
 		}
+
 
 		/**
 		 * Check if WPML is active
@@ -455,7 +422,7 @@ if ( ! class_exists( 'um\core\External_Integrations' ) ) {
 
 			//if there isn't template at theme folder get template file from plugin dir
 			if ( ! $template ) {
-				$path = ! empty( UM()->mail()->path_by_slug[ $template_name ] ) ? UM()->mail()->path_by_slug[ $template_name ] : UM_PATH . 'templates/email';
+				$path = ! empty( UM()->mail()->path_by_slug[ $template_name ] ) ? UM()->mail()->path_by_slug[ $template_name ] : um_path . 'templates/email';
 				$template = trailingslashit( $path ) . $template_name . '.php';
 			}
 
@@ -604,7 +571,7 @@ if ( ! class_exists( 'um\core\External_Integrations' ) ) {
 		 */
 		function render_status_icon( $link, $text, $img ) {
 
-			$icon_html = '<a href="' . esc_url( $link ) . '" title="' . esc_attr( $text ) . '">';
+			$icon_html = '<a href="' . $link . '" title="' . $text . '">';
 			$icon_html .= '<img style="padding:1px;margin:2px;" border="0" src="'
 			              . ICL_PLUGIN_URL . '/res/img/'
 			              . $img . '" alt="'

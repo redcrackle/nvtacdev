@@ -1,31 +1,26 @@
 <?php
 
-// Exit if accessed directly
-defined( 'ABSPATH' ) || exit;
-
-
 //topic/repy styling tab
 
 function bsp_style_settings_t () {
 	global $bsp_style_settings_t ;
 	global $bsp_bbpress_version ;
 	?>
-	<form method="post" action="options.php">
+	<Form method="post" action="options.php">
 	<?php wp_nonce_field( 'style-settings-t', 'style-settings-nonce' ) ?>
 	<?php settings_fields( 'bsp_style_settings_t' );
 	//create a style.css on entry and on saving
-	generate_style_css();
+	generate_style_css() ;
 	//and for this tab, a js delete file if needed
 	if (!empty ($bsp_style_settings_t['participant_trash_topic_confirm'])|| !empty ($bsp_style_settings_t['participant_trash_reply_confirm'] ) ){
-		generate_delete_js();
+		generate_delete_js() ;
 	}
-        bsp_clear_cache();
 	?>
 	<table class="form-table">
 		<tr valign="top">
 			<th colspan="2">
 				<h3>
-					<?php esc_html_e ('Topic/Reply Display' , 'bbp-style-pack' ) ; ?>
+					<?php _e ('Topic/Reply Display' , 'bbp-style-pack' ) ; ?>
 				</h3>
 		</tr>
 	</table>
@@ -34,22 +29,22 @@ function bsp_style_settings_t () {
 		<tr>
 			<td>
 				<p>
-					<?php esc_html_e('This section allows you to amend the topic/reply section.', 'bbp-style-pack'); ?>
+					<?php _e('This section allows you to amend the topic/reply section.', 'bbp-style-pack'); ?>
 				</p>
 				<p>
-					<?php esc_html_e('You only need to enter those styles and elements within a style that you wish to alter', 'bbp-style-pack'); ?>
+					<?php _e('You only need to enter those styles and elements within a style that you wish to alter', 'bbp-style-pack'); ?>
 				</p>
 			</td>
 			<td>	
 				<?php
 				//show style image
-				echo '<img src="' . esc_url(plugins_url( 'images/topic.JPG',dirname(__FILE__))  ) . '" > '; ?>
+				echo '<img src="' . plugins_url( 'images/topic.JPG',dirname(__FILE__)  ) . '" > '; ?>
 			</td>
 		</tr>
 	</table>
 	<!-- save the options -->
 	<p class="submit">
-		<input type="submit" class="button-primary" value="<?php esc_html_e( 'Save changes', 'bbp-style-pack' ); ?>" />
+		<input type="submit" class="button-primary" value="<?php _e( 'Save changes', 'bbp-style-pack' ); ?>" />
 	</p>
 	<table class="form-table">
 	
@@ -69,19 +64,16 @@ function bsp_style_settings_t () {
 			$value2 = (!empty($bsp_style_settings_t[$name.$area2]) ? $bsp_style_settings_t[$name.$area2]  : '#fbfbfb') ;
 			?>
 			<th>
-				<?php echo '1. '.esc_html($name0) ?>
+				<?php echo '1. '.$name0 ?>
 			</th>
-			<td style="vertical-align: top;">
-				<?php echo esc_html($name1) ; ?>
+			<td>
+				<?php echo $name1 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="bsp-color-picker" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="bsp-color-picker" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 					<label class="description">
-						<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
-                                                <p>
-                                                <?php esc_html_e( ' bbPress Default: ', 'bbp-style-pack' ); ?>
-                                                <?php esc_html_e( '#fff', 'bbp-style-pack' ); ?>
-                                                </p>
+						<?php _e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
+						<?php _e (' ')._e ('Default', 'bbp-style-pack' )._e(' #fff') ; ?>
 					</label><br/>
 			</td>
 		</tr>
@@ -89,17 +81,14 @@ function bsp_style_settings_t () {
 		<tr>
 			<td>
 			</td>
-			<td style="vertical-align: top;"> 
+			<td> 
 				<?php echo $name2 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item2).'" class="bsp-color-picker" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item2.'" class="bsp-color-picker" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
-                                        <p>
-                                        <?php esc_html_e( ' bbPress Default: ', 'bbp-style-pack' ); ?>
-                                        <?php esc_html_e( '#fbfbfb', 'bbp-style-pack' ); ?>
-                                        </p>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
+					<?php _e (' ')._e ('Default', 'bbp-style-pack' )._e(' #fbfbfb') ; ?>
 				</label><br/>
 			</td>
 		</tr>
@@ -115,19 +104,16 @@ function bsp_style_settings_t () {
 			$value1 = (!empty($bsp_style_settings_t[$name.$area1]) ? $bsp_style_settings_t[$name.$area1]  : '#f4f4f4') ;
 			?>
 			<th>
-				<?php echo '2. '.esc_html($name0) ?>
+				<?php echo '2. '.$name0 ?>
 			</th>
-			<td style="vertical-align: top;"> 
-				<?php echo esc_html($name1) ; ?>
+			<td>
+				<?php echo $name1 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="bsp-color-picker" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="bsp-color-picker" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
-                                        <p>
-                                        <?php esc_html_e( ' bbPress Default: ', 'bbp-style-pack' ); ?>
-                                        <?php esc_html_e( '#f4f4f4', 'bbp-style-pack' ); ?>
-                                        </p>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
+					<?php _e (' ')._e ('Default', 'bbp-style-pack' )._e(' #f4f4f4') ; ?>
 				</label><br/>
 			</td>
 		</tr>
@@ -147,19 +133,16 @@ function bsp_style_settings_t () {
 			$value2 = (!empty($bsp_style_settings_t[$name.$area2]) ? $bsp_style_settings_t[$name.$area2]  : '#fee') ;
 			?>
 			<th>
-				<?php echo '3. '.esc_html($name0) ?>
+				<?php echo '3. '.$name0 ?>
 			</th>
-			<td style="vertical-align: top;"> 
-				<?php echo esc_html($name1) ; ?>
+			<td> 
+				<?php echo $name1 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="bsp-color-picker" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="bsp-color-picker" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
-                                        <p>
-                                        <?php esc_html_e( ' bbPress Default: ', 'bbp-style-pack' ); ?>
-                                        <?php esc_html_e( '#fdd', 'bbp-style-pack' ); ?>
-                                        </p>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
+					<?php _e (' ')._e ('Default', 'bbp-style-pack' )._e(' #fdd') ; ?>
 				</label><br/>
 			</td>
 		</tr>
@@ -167,17 +150,14 @@ function bsp_style_settings_t () {
 		<tr>
 			<td>
 			</td>
-			<td style="vertical-align: top;"> 
-				<?php echo esc_html($name2) ; ?> 
+			<td>
+				<?php echo $name2 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item2).'" class="bsp-color-picker" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item2.'" class="bsp-color-picker" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
-                                        <p>
-                                        <?php esc_html_e( ' bbPress Default: ', 'bbp-style-pack' ); ?>
-                                        <?php esc_html_e( '#fee', 'bbp-style-pack' ); ?>
-                                        </p>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
+				<?php _e (' ')._e ('Default', 'bbp-style-pack' )._e(' #fee') ; ?>
 				</label><br/>
 			</td>
 		</tr>
@@ -193,19 +173,16 @@ function bsp_style_settings_t () {
 			$value1 = (!empty($bsp_style_settings_t[$name.$area1]) ? $bsp_style_settings_t[$name.$area1]  : '#fdd') ;
 			?>
 			<th>
-				<?php echo '4. '.esc_html($name0) ?>
+				<?php echo '4. '.$name0 ?>
 			</th>
-			<td style="vertical-align: top;">
+			<td>
 				<?php echo $name1 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="bsp-color-picker" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="bsp-color-picker" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
-                                        <p>
-                                        <?php esc_html_e( ' bbPress Default: ', 'bbp-style-pack' ); ?>
-                                        <?php esc_html_e( '#ccc', 'bbp-style-pack' ); ?>
-                                        </p>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
+					<?php _e (' ')._e ('Default', 'bbp-style-pack' )._e(' #ccc') ; ?>
 				</label><br/>
 			</td>
 		</tr>
@@ -233,15 +210,15 @@ function bsp_style_settings_t () {
 			$value4 = (!empty($bsp_style_settings_t[$name.$area4]) ? $bsp_style_settings_t[$name.$area4]  : '') ;
 			?>
 			<th>
-				<?php echo '5. '.esc_html($name0) ?>
+				<?php echo '5. '.$name0 ?>
 			</th>
 			<td>
-				<?php echo esc_html($name1) ; ?>
+				<?php echo $name1 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
 				</label><br/>
 			</td>
 		</tr>
@@ -250,12 +227,12 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name2) ; ?>
+				<?php echo $name2 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item2).'" class="bsp-color-picker" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item2.'" class="bsp-color-picker" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
 				</label><br/>
 			</td>
 		</tr>
@@ -264,12 +241,12 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name3) ; ?>
+				<?php echo $name3 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item3).'" class="large-text" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
 					</label>
 					<br/>
 			</td>
@@ -279,10 +256,10 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name4) ; ?> 
+				<?php echo $name4 ; ?> 
 			</td>
 			<td>
-				<select name="<?php echo esc_html($item4) ; ?>">
+				<select name="<?php echo $item4 ; ?>">
 					<?php echo '<option value="'.esc_html( $value4).'">'.esc_html( $value4) ; ?> 
 					<option value="Normal">Normal</option>
 					<option value="Italic">Italic</option>
@@ -316,15 +293,15 @@ function bsp_style_settings_t () {
 			$value4 = (!empty($bsp_style_settings_t[$name.$area4]) ? $bsp_style_settings_t[$name.$area4]  : '') ;
 			?>
 			<th>
-				<?php echo '6. '.esc_html($name0) ?>
+				<?php echo '6. '.$name0 ?>
 			</th>
 			<td>
-				<?php echo esc_html($name1) ; ?>
+				<?php echo $name1 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -334,12 +311,12 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name2); ?>
+				<?php echo $name2; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item2).'" class="bsp-color-picker" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item2.'" class="bsp-color-picker" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
 				</label>
 				<br/>
 			</td>
@@ -349,12 +326,12 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td> 
-				<?php echo esc_html($name3) ; ?>
+				<?php echo $name3 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item3).'" class="large-text" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -364,10 +341,10 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name4) ; ?>
+				<?php echo $name4 ; ?>
 			</td>
 			<td>
-				<select name="<?php echo esc_html($item4) ; ?>">
+				<select name="<?php echo $item4 ; ?>">
 					<?php echo '<option value="'.esc_html( $value4).'">'.esc_html( $value4 ) ; ?> 
 					<option value="Normal">Normal</option>
 					<option value="Italic">Italic</option>
@@ -396,15 +373,15 @@ function bsp_style_settings_t () {
 			$value4 = (!empty($bsp_style_settings_t[$name.$area4]) ? $bsp_style_settings_t[$name.$area4]  : '') ;
 			?>
 			<th>
-				<?php echo '7. '.esc_html($name0) ?>
+				<?php echo '7. '.$name0 ?>
 			</th>
 			<td>
-				<?php echo esc_html($name1) ; ?> 
+				<?php echo $name1 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -414,12 +391,12 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name3) ; ?>
+				<?php echo $name3 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item3).'" class="large-text" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -429,7 +406,7 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name4) ; ?>
+				<?php echo $name4 ; ?>
 			</td>
 			<td>
 				<select name="<?php echo $item4 ; ?>">
@@ -461,15 +438,15 @@ function bsp_style_settings_t () {
 			$value4 = (!empty($bsp_style_settings_t[$name.$area4]) ? $bsp_style_settings_t[$name.$area4]  : '') ;
 			?>
 			<th>
-				<?php echo '8. '.esc_html($name0) ?>
+				<?php echo '8. '.$name0 ?>
 			</th>
 			<td>
-				<?php echo esc_html($name1) ; ?>
+				<?php echo $name1 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -479,12 +456,12 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name3) ; ?>
+				<?php echo $name3 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item3).'" class="large-text" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -494,10 +471,10 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name4) ; ?> 
+				<?php echo $name4 ; ?> 
 			</td>
 			<td>
-				<select name="<?php echo esc_html($item4) ; ?>">
+				<select name="<?php echo $item4 ; ?>">
 					<?php echo '<option value="'.esc_html( $value4).'">'.esc_html( $value4 ) ; ?> 
 					<option value="Normal">Normal</option>
 					<option value="Italic">Italic</option>
@@ -530,22 +507,22 @@ function bsp_style_settings_t () {
 			$value4 = (!empty($bsp_style_settings_t[$name.$area4]) ? $bsp_style_settings_t[$name.$area4]  : '') ;
 			?>
 			<th>
-				<?php echo '9. '.esc_html($name0) ?>
+				<?php echo '9. '.$name0 ?>
 			</th>
 			<td colspan=2>
-				<?php esc_html_e( 'NOTE : You can also style Author roles and it\'s position more fully using the \'Forum Roles\' Tab', 'bbp-style-pack' ); ?>
+				<?php _e( 'NOTE : You can also style Author roles and it\'s position more fully using the \'Forum Roles\' Tab', 'bbp-style-pack' ); ?>
 			</td>
 		</tr>
 		<tr>
 			<td>
 			</td>
 			<td> 
-				<?php echo esc_html($name1) ; ?>
+				<?php echo $name1 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -555,12 +532,12 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name2) ; ?> 
+				<?php echo $name2 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item2).'" class="bsp-color-picker" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item2.'" class="bsp-color-picker" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
 				</label>
 				<br/>
 			</td>
@@ -570,12 +547,12 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name3) ; ?> 
+				<?php echo $name3 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item3).'" class="large-text" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -585,10 +562,10 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name4) ; ?>
+				<?php echo $name4 ; ?>
 			</td>
 			<td>
-				<select name="<?php echo esc_html($item4) ; ?>">
+				<select name="<?php echo $item4 ; ?>">
 					<?php echo '<option value="'.esc_html( $value4).'">'.esc_html( $value4 ) ; ?> 
 					<option value="Normal">Normal</option>
 					<option value="Italic">Italic</option>
@@ -621,15 +598,15 @@ function bsp_style_settings_t () {
 			$value4 = (!empty($bsp_style_settings_t[$name.$area4]) ? $bsp_style_settings_t[$name.$area4]  : '') ;
 			?>
 			<th>
-				<?php echo '10. '.esc_html($name0) ?>
+				<?php echo '10. '.$name0 ?>
 			</th>
 			<td> 
-				<?php echo esc_html($name1) ; ?> 
+				<?php echo $name1 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -639,12 +616,12 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name2) ; ?> 
+				<?php echo $name2 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item2).'" class="bsp-color-picker" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item2.'" class="bsp-color-picker" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
 				</label>
 				<br/>
 			</td>
@@ -654,12 +631,12 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name3) ; ?> 
+				<?php echo $name3 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item3).'" class="large-text" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -669,7 +646,7 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name4) ; ?>
+				<?php echo $name4 ; ?>
 			</td>
 			<td>
 				<select name="<?php echo $item4 ; ?>">
@@ -705,15 +682,15 @@ function bsp_style_settings_t () {
 			$value4 = (!empty($bsp_style_settings_t[$name.$area4]) ? $bsp_style_settings_t[$name.$area4]  : '') ;
 			?>
 			<th>
-				<?php echo '11. '.esc_html($name0) ?>
+				<?php echo '11. '.$name0 ?>
 			</th>
 			<td> 
-				<?php echo esc_html($name1) ; ?> 
+				<?php echo $name1 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -722,12 +699,12 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name2) ; ?> 
+				<?php echo $name2 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item2).'" class="bsp-color-picker" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item2.'" class="bsp-color-picker" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
 				</label>
 				<br/>
 			</td>
@@ -737,12 +714,12 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td> 
-				<?php echo esc_html($name3) ; ?> 
+				<?php echo $name3 ; ?> 
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item3).'" class="large-text" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -752,10 +729,10 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name4) ; ?>
+				<?php echo $name4 ; ?>
 			</td>
 			<td>
-				<select name="<?php echo esc_html($item4) ; ?>">
+				<select name="<?php echo $item4 ; ?>">
 					<?php echo '<option value="'.esc_html( $value4).'">'.esc_html( $value4 ) ; ?> 
 					<option value="Normal">Normal</option>
 					<option value="Italic">Italic</option>
@@ -774,12 +751,12 @@ function bsp_style_settings_t () {
 			$value1 = (!empty($bsp_style_settings_t[$name.$area1]) ? $bsp_style_settings_t[$name.$area1]  : 'all') ;
 			?>
 			<th>
-				<?php echo '12. '.esc_html($name0) ?>
+				<?php echo '12. '.$name0 ?>
 			</th>
 			<td colspan = 2>
-				<?php echo '<input id="'.esc_html($item1).'" class="small-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<p>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="small-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<p>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Type "all" to show all revisions, "none" to hide all revisions, or a number to show the last n revisions eg "1" to just show the last revision.', 'bbp-style-pack' ); ?>
+					<?php _e( 'Type "all" to show all revisions, "none" to hide all revisions, or a number to show the last n revisions eg "1" to just show the last revision.', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -808,11 +785,11 @@ function bsp_style_settings_t () {
 			$value4 = (!empty($bsp_style_settings_t[$name.$area4]) ? $bsp_style_settings_t[$name.$area4]  : '') ;
 			?>
 			<th>
-			<?php echo '13. '.esc_html($name0) ?>
+			<?php echo '13. '.$name0 ?>
 			</th>
 			<!-- checkbox to activate  -->
 			<td>
-				<?php esc_html_e('Activate @mentions Description', 'bbp-style-pack'); ?>
+				<?php _e('Activate @mentions Description', 'bbp-style-pack'); ?>
 			</td>
 			<td>
 				<?php 
@@ -824,11 +801,11 @@ function bsp_style_settings_t () {
 		<tr valign="top">
 			<td colspan=3>
 				<label class="description" for="bsp_settings_t[mentionsactivate]">
-					<?php esc_html_e( 'NOTES ', 'bbp-style-pack' ); ?>
+					<?php _e( 'NOTES ', 'bbp-style-pack' ); ?>
 					<br/>
-					<?php esc_html_e( '1. This ONLY adds the @mention description shown above for the user.  @mentions is available with Buddypress or by using the <a href = "https://wordpress.org/plugins/bbp-mentions-email-notifications/" target="_blank"> bbp-mentions-email-notifications</a> plugin, and either will need to be activated for this to be useful !', 'bbp-style-pack' ); ?>
+					<?php _e( '1. This ONLY adds the @mention description shown above for the user.  @mentions is available with Buddypress or by using the <a href = "https://wordpress.org/plugins/bbp-mentions-email-notifications/" target="_blank"> bbp-mentions-email-notifications</a> plugin, and either will need to be activated for this to be useful !', 'bbp-style-pack' ); ?>
 					<br/>
-					<?php esc_html_e( '2. This will show the user\'s \'nicename\' which may be different from the display name shown above it. Users can amend their display names in their profile settings or the admin may decide this. Whilst for most sites this is not an issue, you will want to consider whether showing their nicename which is formed from their login name may compromise privacy or reveal information. ', 'bbp-style-pack' ); ?>
+					<?php _e( '2. This will show the user\'s \'nicename\' which may be different from the display name shown above it. Users can amend their display names in their profile settings or the admin may decide this. Whilst for most sites this is not an issue, you will want to consider whether showing their nicename which is formed from their login name may compromise privacy or reveal information. ', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -837,14 +814,14 @@ function bsp_style_settings_t () {
 		<tr valign="top">
 			<td>
 			</td>
-			<td><?php esc_html_e('Priority', 'bbp-style-pack'); ?>
+			<td><?php _e('Priority', 'bbp-style-pack'); ?>
 			</td>
 			<td>
 				<?php 
 				$item_priority = (!empty ($bsp_style_settings_t['mentions_priority'] ) ? $bsp_style_settings_t['mentions_priority']  : '' ) ?>
 				<input id="bsp_style_settings_t[mentions_priority]" class="small-text" name="bsp_style_settings_t[mentions_priority]" type="text" value="<?php echo esc_html( $item_priority ) ;?>" /><br/>
 					<label class="description" for="bsp_settings_t[mentions_priority]">
-						<?php esc_html_e( 'Default : 10  Leave blank unless you want to alter. Explanation: If you have multiple items displaying under the author from say other plugins, then you can use this to change the display order - lower numbers equal higher priority', 'bbp-style-pack' ); ?>
+						<?php _e( 'Default : 10  Leave blank unless you want to alter. Explanation: If you have multiple items displaying under the author from say other plugins, then you can use this to change the display order - lower numbers equal higher priority', 'bbp-style-pack' ); ?>
 						</label>
 						<br/>
 			</td>
@@ -854,12 +831,12 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name1) ; ?>
+				<?php echo $name1 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Default 12px - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -869,12 +846,12 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td> 
-				<?php echo esc_html($name2) ; ?>
+				<?php echo $name2 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item2).'" class="bsp-color-picker" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item2.'" class="bsp-color-picker" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
+					<?php _e( 'Click to set color - You can select from palette or enter hex value - see help for further info', 'bbp-style-pack') ; ?>
 				</label>
 				<br/>
 			</td>
@@ -884,12 +861,12 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td> 
-				<?php echo esc_html($name3) ; ?>
+				<?php echo $name3 ; ?>
 			</td>
 			<td>
-				<?php echo '<input id="'.esc_html($item3).'" class="large-text" name="'.esc_html($item3).'" type="text" value="'.esc_html( $value3).'"<br>' ; ?> 
+				<?php echo '<input id="'.$item3.'" class="large-text" name="'.$item3.'" type="text" value="'.esc_html( $value3).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
+					<?php _e( 'Enter Font eg Arial - see help for further info', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -899,7 +876,7 @@ function bsp_style_settings_t () {
 			<td>
 			</td>
 			<td>
-				<?php echo esc_html($name4) ; ?> 
+				<?php echo $name4 ; ?> 
 			</td>
 			<td>
 				<select name="<?php echo $item4 ; ?>">
@@ -922,18 +899,18 @@ function bsp_style_settings_t () {
 			$value1 = (!empty($bsp_style_settings_t[$name.$area1]) ? $bsp_style_settings_t[$name.$area1]  : '') ;
 			?>
 			<th>
-			<?php echo '14. '.esc_html($name0) ?>
+			<?php echo '14. '.$name0 ?>
 			</th>
 			<!-- checkbox to activate  -->
 			<td>
-				<?php esc_html_e('Show Anonymous Email addresses', 'bbp-style-pack'); ?>
+				<?php _e('Show Anonymous Email addresses', 'bbp-style-pack'); ?>
 			</td>
 			<td>
 				<?php 
 				$item = (!empty( $bsp_style_settings_t['anon_emailShow'] ) ?  $bsp_style_settings_t['anon_emailShow'] : 0);
 				echo '<input name="bsp_style_settings_t[anon_emailShow]" id="bsp_style_settings_t[anon_emailShow]" type="checkbox" value="1" class="code" ' . checked( 1,$item, false ) . ' />' ; ?>
 				<label class="description">
-					<?php esc_html_e( 'If you allow unregistered users to post, this will show the email address they entered in the topic/reply form to KEYMASTERS only ', 'bbp-style-pack' ); ?>
+					<?php _e( 'If you allow unregistered users to post, this will show the email address they entered in the topic/reply form to KEYMASTERS only ', 'bbp-style-pack' ); ?>
 				</label>
 				<br/>
 			</td>
@@ -941,42 +918,42 @@ function bsp_style_settings_t () {
 <!--15. ------------------------------------------------------------------->			
 		<tr>
 			<th>
-				15.<?php esc_html_e('Hide Author Name', 'bbp-style-pack'); ?>
+				15.<?php _e('Hide Author Name', 'bbp-style-pack'); ?>
 			</th>
 			<td>
 				<?php
 				$item =  'bsp_style_settings_t[hide_name]' ;
 				$item1 = (!empty($bsp_style_settings_t['hide_name']) ? $bsp_style_settings_t['hide_name'] : '');
 				echo '<input name="'.$item.'" id="'.$item.'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
-				esc_html_e('Click to hide name', 'bbp-style-pack');
+				_e('Click to hide name', 'bbp-style-pack');
 				?>
 			</td>
 		</tr>
 <!--16.  ------------------------------------------------------------------->			
 		<tr>
 			<th>
-				16.<?php esc_html_e('Hide Author Avatar', 'bbp-style-pack'); ?> 
+				16.<?php _e('Hide Author Avatar', 'bbp-style-pack'); ?> 
 			</th>
 			<td>
 				<?php
 				$item =  'bsp_style_settings_t[hide_avatar]' ;
 				$item1 = (!empty($bsp_style_settings_t['hide_avatar']) ? $bsp_style_settings_t['hide_avatar'] : '');
 				echo '<input name="'.$item.'" id="'.$item.'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
-				esc_html_e('Click to hide avatar', 'bbp-style-pack');
+				_e('Click to hide avatar', 'bbp-style-pack');
 				?>
 			</td>
 		</tr>
 <!--17.  ------------------------------------------------------------------->		
 		<tr>
 			<th>
-				17.<?php esc_html_e('Participant Close Topics', 'bbp-style-pack'); ?> 
+				17.<?php _e('Participant Close Topics', 'bbp-style-pack'); ?> 
 			</th>
 			<td colspan=2>
 				<?php
 				$item =  'bsp_style_settings_t[participant_close_topic]' ;
 				$item1 = (!empty($bsp_style_settings_t['participant_close_topic']) ? $bsp_style_settings_t['participant_close_topic'] : '');
 				echo '<input name="'.$item.'" id="'.$item.'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
-				esc_html_e('Allow Participants to close their own topics', 'bbp-style-pack');
+				_e('Allow Participants to close their own topics', 'bbp-style-pack');
 				?>
 			</td>
 		</tr>
@@ -990,14 +967,14 @@ function bsp_style_settings_t () {
 <!--18.  ------------------------------------------------------------------->		
 		<tr>
 			<th>
-				18.<?php esc_html_e('Participant Trash Topics', 'bbp-style-pack'); ?> 
+				18.<?php _e('Participant Trash Topics', 'bbp-style-pack'); ?> 
 			</th>
 			<td colspan=2>
 				<?php
 				$item =  'bsp_style_settings_t[participant_trash_topic]' ;
 				$item1 = (!empty($bsp_style_settings_t['participant_trash_topic']) ? $bsp_style_settings_t['participant_trash_topic'] : '');
 				echo '<input name="'.$item.'" id="'.$item.'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
-				esc_html_e('Allow Participants to trash their own topics', 'bbp-style-pack');
+				_e('Allow Participants to trash their own topics', 'bbp-style-pack');
 				?>
 			</td>
 		</tr>
@@ -1010,7 +987,7 @@ function bsp_style_settings_t () {
 				$item =  'bsp_style_settings_t[participant_trash_topic_confirm]' ;
 				$item1 = (!empty($bsp_style_settings_t['participant_trash_topic_confirm']) ? $bsp_style_settings_t['participant_trash_topic_confirm'] : '');
 				echo '<input name="'.$item.'" id="'.$item.'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
-				esc_html_e('Add an \'are you sure?\' confirm message', 'bbp-style-pack');
+				_e('Add an \'are you sure?\' confirm message', 'bbp-style-pack');
 				?>
 			</td>
 		</tr>
@@ -1024,7 +1001,7 @@ function bsp_style_settings_t () {
 				$item1 = (!empty($bsp_style_settings_t['participant_trash_topic_text']) ? $bsp_style_settings_t['participant_trash_topic_text'] : 'Are you sure you want to delete this topic?');
 				echo '<input id="'.$item.'" class="large-text" name="'.$item.'" type="text" value="'.esc_html( $item1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Enter the confirm message - Default : Are you sure you want to delete this topic?', 'bbp-style-pack' ); ?>
+					<?php _e( 'Enter the confirm message - Default : Are you sure you want to delete this topic?', 'bbp-style-pack' ); ?>
 					</label>
 					<br/>
 			</td>
@@ -1033,14 +1010,14 @@ function bsp_style_settings_t () {
 <!--19.  ------------------------------------------------------------------->		
 		<tr>
 			<th>
-				19.<?php esc_html_e('Participant Trash Replies', 'bbp-style-pack'); ?> 
+				19.<?php _e('Participant Trash Replies', 'bbp-style-pack'); ?> 
 			</th>
 			<td colspan=2>
 				<?php
 				$item =  'bsp_style_settings_t[participant_trash_reply]' ;
 				$item1 = (!empty($bsp_style_settings_t['participant_trash_reply']) ? $bsp_style_settings_t['participant_trash_reply'] : '');
 				echo '<input name="'.$item.'" id="'.$item.'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
-				esc_html_e('Allow Participants to trash their own replies', 'bbp-style-pack');
+				_e('Allow Participants to trash their own replies', 'bbp-style-pack');
 				?>
 			</td>
 		</tr>
@@ -1053,7 +1030,7 @@ function bsp_style_settings_t () {
 				$item =  'bsp_style_settings_t[participant_trash_reply_confirm]' ;
 				$item1 = (!empty($bsp_style_settings_t['participant_trash_reply_confirm']) ? $bsp_style_settings_t['participant_trash_reply_confirm'] : '');
 				echo '<input name="'.$item.'" id="'.$item.'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
-				esc_html_e('Add an \'are you sure?\' confirm message', 'bbp-style-pack');
+				_e('Add an \'are you sure?\' confirm message', 'bbp-style-pack');
 				?>
 			</td>
 		</tr>
@@ -1067,7 +1044,7 @@ function bsp_style_settings_t () {
 				$item1 = (!empty($bsp_style_settings_t['participant_trash_reply_text']) ? $bsp_style_settings_t['participant_trash_reply_text'] : 'Are you sure you want to delete this reply?');
 				echo '<input id="'.$item.'" class="large-text" name="'.$item.'" type="text" value="'.esc_html( $item1 ).'"<br>' ; ?> 
 				<label class="description">
-					<?php esc_html_e( 'Enter the confirm message - Default : Are you sure you want to delete this reply?', 'bbp-style-pack' ); ?>
+					<?php _e( 'Enter the confirm message - Default : Are you sure you want to delete this reply?', 'bbp-style-pack' ); ?>
 					</label>
 					<br/>
 			</td>
@@ -1076,8 +1053,8 @@ function bsp_style_settings_t () {
 			
 <!--20. --Change 'you must be logged in ' message---------------------------------------------------------------------->
 		<tr>
-			<th>20. 
-				<?php esc_html_e ('Change "you must be logged in..." message' , 'bbp-style-pack' ) ; ?>
+			<th>20.. 
+				<?php _e ('Change "you must be logged in..." message' , 'bbp-style-pack' ) ; ?>
 			</th>
 		<?php 
 		$name = 'must_be_logged_in' ;
@@ -1085,8 +1062,8 @@ function bsp_style_settings_t () {
 		$value1 = (!empty($bsp_style_settings_t[$name] ) ? $bsp_style_settings_t[$name]  : '') ;
 		?>
 		<td colspan=2>
-			<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
-			<label class="description"><?php esc_html_e( 'Default "You must be logged in to reply to this topic." Enter the words you want', 'bbp-style-pack' ); ?></label><br/>
+			<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+			<label class="description"><?php _e( 'Default "You must be logged in to reply to this topic." Enter the words you want', 'bbp-style-pack' ); ?></label><br/>
 			</td>
 			</tr>
 			
@@ -1095,7 +1072,7 @@ function bsp_style_settings_t () {
 	
 		<tr>
 			<th>21. 
-				<?php esc_html_e ('Add login link' , 'bbp-style-pack' ) ; ?>
+				<?php _e ('Add login link' , 'bbp-style-pack' ) ; ?>
 			</th>
 			<?php
 			$name = 'add_login' ;
@@ -1110,8 +1087,8 @@ function bsp_style_settings_t () {
 			?>
 			<td>
 			<?php
-			echo '<input name="'.esc_html($item1).'" id="'.esc_html($item1).'" type="checkbox" value="1" class="code" ' . checked( 1,$value1, false ) . ' />';
-			esc_html_e ('Click to activate' , 'bbp-style-pack' ) ;
+			echo '<input name="'.$item1.'" id="'.$item1.'" type="checkbox" value="1" class="code" ' . checked( 1,$value1, false ) . ' />';
+			_e ('Click to activate' , 'bbp-style-pack' ) ;
   			?>
 		</td>
 		<?php
@@ -1120,7 +1097,7 @@ function bsp_style_settings_t () {
 		?>
 		<td colspan=2>
 		<?php
-			esc_html_e ('In bbpress 2.6 users are shown a login form if not logged in, so this option is not available' , 'bbp-style-pack' ) ;
+			_e ('In bbpress 2.6 users are shown a login form if not logged in, so this option is not available' , 'bbp-style-pack' ) ;
 		?>
 		</td>
 		<?php
@@ -1148,22 +1125,22 @@ function bsp_style_settings_t () {
 		
 		
 		<td>
-			<?php echo esc_html($name1) ; ?>
+			<?php echo $name1 ; ?>
 		</td>
 		
 		<td colspan=2>
-			<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
-			<label class="description"><?php esc_html_e( 'Default "Login" Enter the words you want eg "log in", "sign in" etc.', 'bbp-style-pack' ); ?></label><br/>
+			<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+			<label class="description"><?php _e( 'Default "Login" Enter the words you want eg "log in", "sign in" etc.', 'bbp-style-pack' ); ?></label><br/>
 			</td>
 			</tr>
 			<tr>
 			<td>
-			<?php echo esc_html($name2) ; ?>
+			<?php echo $name2 ; ?>
 		</td>
 			
 			<td colspan=2>
-			<?php echo '<input id="'.esc_html($item2).'" class="large-text" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
-			<label class="description"><?php esc_html_e( 'You should create a wordpress page with a login shortcode such as [bbp-login] and put the full url in here e.g. http://www.mysite.com/loginpage. If left blank the default wordpress login page will be used.', 'bbp-style-pack' ); ?></label><br/>
+			<?php echo '<input id="'.$item2.'" class="large-text" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
+			<label class="description"><?php _e( 'You should create a wordpress page with a login shortcode such as [bbp-login] and put the full url in here e.g. http://www.mysite.com/loginpage. If left blank the default wordpress login page will be used.', 'bbp-style-pack' ); ?></label><br/>
 		</td>
 	</tr>
 	<?php
@@ -1176,7 +1153,7 @@ function bsp_style_settings_t () {
 
 		<tr>
 			<th>22. 
-				<?php esc_html_e ('Add register link' , 'bbp-style-pack' ) ; ?>
+				<?php _e ('Add register link' , 'bbp-style-pack' ) ; ?>
 			</th>
 			<?php
 			$name = 'add_register' ;
@@ -1190,8 +1167,8 @@ function bsp_style_settings_t () {
 			?>
 			<td>
 			<?php
-			echo '<input name="'.esc_html($item1).'" id="'.esc_html($item1).'" type="checkbox" value="1" class="code" ' . checked( 1,$value1, false ) . ' />';
-			esc_html_e ('Click to activate' , 'bbp-style-pack' ) ;
+			echo '<input name="'.$item1.'" id="'.$item1.'" type="checkbox" value="1" class="code" ' . checked( 1,$value1, false ) . ' />';
+			_e ('Click to activate' , 'bbp-style-pack' ) ;
   			?>
 		</td>
 		<?php
@@ -1200,9 +1177,9 @@ function bsp_style_settings_t () {
 		?>
 		<td colspan = 2>
 		<?php
-			esc_html_e ('In bbpress 2.6 users are shown a login form to which you can add a register link.  You can set a register option in ' , 'bbp-style-pack' ) ;
-			echo '<a href="' . site_url() . '/wp-admin/options-general.php?page=bbp-style-pack&tab=topic_index_styling">' ;
-			esc_html_e ('Topics Index Styling - item 19' , 'bbp-style-pack' ) ;
+			_e ('In bbpress 2.6 users are shown a login form to which you can add a register link.  You can set a register option in ' , 'bbp-style-pack' ) ;
+			echo '<a href="/wp-admin/options-general.php?page=bbp-style-pack&tab=topic_index_styling">' ;
+			_e ('Topics Index Styling - item 19' , 'bbp-style-pack' ) ;
 			echo '</a>' ;
 
 		?>
@@ -1234,12 +1211,12 @@ function bsp_style_settings_t () {
 		
 		
 		<td>
-			<?php echo esc_html($name1) ; ?>
+			<?php echo $name1 ; ?>
 		</td>
 		
 		<td colspan=2>
-			<?php echo '<input id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
-			<label class="description"><?php esc_html_e( 'Default "register" Enter the words you want eg "log in", "sign in" etc.', 'bbp-style-pack' ); ?></label><br/>
+			<?php echo '<input id="'.$item1.'" class="large-text" name="'.$item1.'" type="text" value="'.esc_html( $value1 ).'"<br>' ; ?> 
+			<label class="description"><?php _e( 'Default "register" Enter the words you want eg "log in", "sign in" etc.', 'bbp-style-pack' ); ?></label><br/>
 			</td>
 			</tr>
 			<tr>
@@ -1248,8 +1225,8 @@ function bsp_style_settings_t () {
 		</td>
 			
 			<td colspan=2>
-			<?php echo '<input id="'.esc_html($item2).'" class="large-text" name="'.esc_html($item2).'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
-			<label class="description"><?php esc_html_e( 'You should create a wordpress page with a register shortcode such as [bbp-register] and put the full url in here e.g. http://www.mysite.com/registerpage. If left blank the default wordpress login page will be used.', 'bbp-style-pack' ); ?></label><br/>
+			<?php echo '<input id="'.$item2.'" class="large-text" name="'.$item2.'" type="text" value="'.esc_html( $value2 ).'"<br>' ; ?> 
+			<label class="description"><?php _e( 'You should create a wordpress page with a register shortcode such as [bbp-register] and put the full url in here e.g. http://www.mysite.com/registerpage. If left blank the default wordpress login page will be used.', 'bbp-style-pack' ); ?></label><br/>
 		</td>
 	</tr>
 	<?php
@@ -1259,7 +1236,7 @@ function bsp_style_settings_t () {
 <!--23. links in new window---------------------------------------------------------------------->
 	<tr>
 			<th>23. 
-				<?php esc_html_e ('Open Links in new Window' , 'bbp-style-pack' ) ; ?>
+				<?php _e ('Open Links in new Window' , 'bbp-style-pack' ) ; ?>
 			</th>
 	<?php	
 		$item =  'bsp_style_settings_t[window_links]' ;
@@ -1267,13 +1244,11 @@ function bsp_style_settings_t () {
 	?>
 	<td colspan=2>
 				<?php
-				echo '<input name="'.$item.'" id="'.esc_html($item1).'" type="radio" value="0" class="code" ' . checked( 0,$item1, false ) . ' /> ';
-				esc_html_e ('Default' , 'bbp-style-pack' ) ; ?>
+				echo '<input name="'.$item.'" id="'.$item1.'" type="radio" value="0" class="code" ' . checked( 0,$item1, false ) . ' /> ';
+				_e ('Default' , 'bbp-style-pack' ) ; ?>
 				<br>
 				<label class="description">
-					<i>
-					<?php esc_html_e( 'Whether the links open in a new window will depend on how the author added the link' , 'bbp-style-pack' ); ?>
-					</i>
+					<?php _e( '<i>Whether the links open in a new window will depend on how the author added the link</i>' , 'bbp-style-pack' ); ?>
 				</label>
 			</td>
 		</tr>
@@ -1284,296 +1259,45 @@ function bsp_style_settings_t () {
 			
 			<td colspan=2>
 				<?php
-				echo '<input name="'.$item.'" id="'.esc_html($item1).'" type="radio" value="1" class="code" ' . checked( 1,$item1, false ) . ' /> ';
-				esc_html_e ('All Links to open in new window' , 'bbp-style-pack' ) ; ?>
+				echo '<input name="'.$item.'" id="'.$item1.'" type="radio" value="1" class="code" ' . checked( 1,$item1, false ) . ' /> ';
+				_e ('All Links to open in new window' , 'bbp-style-pack' ) ; ?>
 				<br>
 				<label class="description">
-					<i>
-					<?php esc_html_e( 'This should make all links open in a new window' , 'bbp-style-pack' ); ?>
-					</i>
+					<?php _e( '<i>This should make all links open in a new window</i>' , 'bbp-style-pack' ); ?>
 				</label>
 				
 			</td>
 		</tr>
 	
-<!--24.  ------------------------------------------------------------------->		
 		<tr>
-			<th>
-				24. <?php esc_html_e('Show Reply more/less', 'bbp-style-pack'); ?> 
-			</th>
+			<td>
+			</td>
 			
-			<td colspan=2>	
-				<?php
-				//show style image
-				echo '<img src="' . plugins_url( 'images/reply-more.png',dirname(__FILE__)  ) . '"  width="50%"> '; ?>
-			</td>
-			</tr>
-			<tr>
-			<td></td>
 			<td colspan=2>
 				<?php
-				$item =  'bsp_style_settings_t[more_less]' ;
-				$item1 = (!empty($bsp_style_settings_t['more_less']) ? $bsp_style_settings_t['more_less'] : '');
-				echo '<input name="'.$item.'" id="'.$item.'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
-				esc_html_e('Show only part of a reply when the reply is long, along with a more link to show all the reply', 'bbp-style-pack');
-				?>
-			</td>
-		</tr>
-		
-		<tr>
-			<td>
-			</td>
-			<td colspan=2>
-				<?php
-				$item =  'bsp_style_settings_t[more_less_length]' ;
-				$item1 = (!empty($bsp_style_settings_t['more_less_length']) ? $bsp_style_settings_t['more_less_length'] : '200');
-				echo '<input id="'.$item.'" class="small-text" name="'.$item.'" type="text" value="'.esc_html( $item1 ).'"<br>' ; ?> 
+				echo '<input name="'.$item.'" id="'.$item1.'" type="radio" value="2" class="code" ' . checked( 2,$item1, false ) . ' /> ';
+				_e ('External links open in new Window' , 'bbp-style-pack' ) ; ?>
+				<br>
 				<label class="description">
-					<?php esc_html_e( 'Length of text before "more", Default 200 characters', 'bbp-style-pack' ); ?>
-					</label>
-					<br/>
+					<?php _e( '<i>This should make external links open in a new window</i>' , 'bbp-style-pack' ); ?>
+				</label>
+				
 			</td>
 		</tr>
 		
-		<tr>
-			<td>
-			</td>
-			<td colspan=2>
-				<?php
-				$item =  'bsp_style_settings_t[more_text]' ;
-				$item1 = (!empty($bsp_style_settings_t['more_text']) ? $bsp_style_settings_t['more_text'] : 'More...');
-				echo '<input id="'.$item.'" class="medium-text" name="'.$item.'" type="text" value="'.esc_html( $item1 ).'"<br>' ; ?> 
-				<label class="description">
-					<?php esc_html_e( 'More... text', 'bbp-style-pack' ); ?>
-					</label>
-					<br/>
-			</td>
-		</tr>
-		
-		<tr>
-			<td>
-			</td>
-			<td colspan=2>
-				<?php
-				$item =  'bsp_style_settings_t[less_text]' ;
-				$item1 = (!empty($bsp_style_settings_t['less_text']) ? $bsp_style_settings_t['less_text'] : 'Less...');
-				echo '<input id="'.$item.'" class="medium-text" name="'.$item.'" type="text" value="'.esc_html( $item1 ).'"<br>' ; ?> 
-				<label class="description">
-					<?php esc_html_e( 'Less... text', 'bbp-style-pack' ); ?>
-					</label>
-					<br/>
-			</td>
-		</tr>
-		
-<!--25. Create New Reply Button ------------------------------------------------------------------->		
-		<tr>
-			<th>
-				25. <?php esc_html_e('Show Create New Reply button', 'bbp-style-pack'); ?> 
-			</th>
-			
-			<td colspan=2>	
-				<?php
-				//show style image
-				echo '<img src="' . plugins_url( 'images/reply_button.png',dirname(__FILE__)  ) . '"  width="50%"> '; ?>
-			</td>
-			</tr>
-			<tr>
-			<td></td>
-			<td colspan=2>
-			<?php
-			esc_html_e('This button will take any Button style settings in the \'Forum Buttons\' Tab', 'bbp-style-pack');
-			?>
-			</td>
-			</tr>
-			<tr>
-			<td></td>
-			<td colspan=2>
-				<?php
-				$item =  'bsp_style_settings_t[new_reply_activate]' ;
-				$item1 = (!empty($bsp_style_settings_t['new_reply_activate']) ? $bsp_style_settings_t['new_reply_activate'] : '');
-				echo '<input name="'.$item.'" id="'.$item.'" type="checkbox" value="1" class="code" ' . checked( 1,$item1, false ) . ' />' ;
-				esc_html_e('Activate Button', 'bbp-style-pack');
-				?>
-			</td>
-		</tr>
-		
-		<tr>
-			<td>
-			</td>
-			<td colspan=2>
-				<?php
-				$item =  'bsp_style_settings_t[new_reply_description]' ;
-				$item1 = (!empty($bsp_style_settings_t['new_reply_description']) ? $bsp_style_settings_t['new_reply_description'] : 'Create New Reply');
-				echo '<input id="'.$item.'" class="large-text" name="'.$item.'" type="text" value="'.esc_html( $item1 ).'"<br>' ; ?> 
-				<label class="description">
-					<?php esc_html_e( 'Text for button.  Allowable codes - {topic_name} {forum_name}', 'bbp-style-pack' ); ?>
-					</label>
-					<br/>
-			</td>
-		</tr>
-
-<!--26. Topic Button Styling ------------------------------------------------------------------->                
-                        <tr>	
-                                <th>
-                                        26. <?php esc_html_e('Topic Buttons Style', 'bbp-style-pack'); ?> 
-                                </th>
-                                <td colspan="2">
-                                        <?php esc_html_e('Topic favorite/subscribe links can be styled separately here. You can keep them as default bbPress links (no styling added), use the button styling specified in the "Forum Buttons" tab, or create a button class (see help further down)', 'bbp-style-pack'); ?>
-                                </td>
-                        </tr>
-                        <tr>
-                                <td style="vertical-align:top;">
-                                        <?php
-                                        $item = 'bsp_style_settings_t[topic_button_type]';
-                                        $item1 = (!empty($bsp_style_settings_t['topic_button_type']) ? $bsp_style_settings_t['topic_button_type'] : 1); 
-                                        echo '<input name="'.$item.'" id="'.$item.'" type="radio" value="1" class="code"  ' . checked( 1, $item1, false ) . ' />';
-                                        esc_html_e('No style' , 'bbp-style-pack' );
-                                        ?>
-                                        <br>
-                                        <label class="description">
-                                                <i><?php esc_html_e( '(Use the default bbPress link.)' , 'bbp-style-pack' ); ?></i>
-                                        </label>
-                                </td>
-                                <td style="vertical-align:top;">
-                                        <?php
-                                        echo '<input name="'.$item.'" id="'.$item.'" type="radio" value="2" class="code"  ' . checked( 2, $item1, false ) . ' />';
-                                        esc_html_e('Use "Forum Buttons" style' , 'bbp-style-pack' );
-                                        ?>
-                                        <br>
-                                        <label class="description">
-                                                <i><?php esc_html_e( '(Use the forum button style values from "Forum Buttons".)' , 'bbp-style-pack' ); ?></i>
-                                        </label>
-                                </td>
-                                <td style="vertical-align:top;">
-                                        <?php
-                                        echo '<input name="'.$item.'" id="'.$item.'" type="radio" value="3" class="code"  ' . checked( 3, $item1, false ) . ' />';
-                                        esc_html_e('Use Class' , 'bbp-style-pack' );
-                                        ?>
-                                        <br>
-                                        <label class="description">
-                                                <i><?php esc_html_e( '(Use a class from your theme - the button will use the style from the class below.)' , 'bbp-style-pack' ); ?></i>
-                                        </label>
-                                </td>
-                        </tr>
-                        <tr>
-                                <td>
-                                        <hr>
-                                </td>
-                        </tr>
-                        <tr>
-                                <td style="vertical-align:top;">
-                                        <?php 
-                                        $name = 'Class';
-                                        $item = 'bsp_style_settings_t[TopicButtonclass]';
-                                        $item1 = (!empty($bsp_style_settings_t['TopicButtonclass']) ? $bsp_style_settings_t['TopicButtonclass'] : ''); 
-                                        echo $name; ?>
-                                </td>
-                                <td colspan="2">
-                                        <?php echo '<input id="'.$item.'" class="large-text" name="'.$item.'" type="text" value="'.esc_html( $item1 ).'" /><br>'; ?> 
-                                        <label class="description">
-                                                <?php esc_html_e( 'If you have selected "Use Class" above,  then enter the class.', 'bbp-style-pack' ); ?><br/></br>
-                                                <?php esc_html_e( 'See "Custom CSS Suggestions" at the bottom of this page for additional help with applying your custom class.', 'bbp-style-pack' ); ?>
-                                        </label>
-                                        <br/>
-                                </td>
-                        </tr>
-                
-
-<!--27. Subscribe Button Separator ------------------------------------------------------------------->                
-                        <tr valign="top">	
-                                <th>
-                                        27. <?php esc_html_e('Subscribe Button Separator', 'bbp-style-pack'); ?> 
-                                </th>
-                                <td colspan="2">
-                                        <p>
-                                                <?php esc_html_e( 'bbPress adds a prefix to the topic subscribe link/button to separate it from the favorites link/button. You can change that prefix here.', 'bbp-style-pack' ); ?>
-                                        </p>
-                                        <br/>
-                                        <?php 
-                                        $item = (!empty( $bsp_style_settings_t['activate_topic_subscribe_button_prefix'] ) ?  $bsp_style_settings_t['activate_topic_subscribe_button_prefix'] : '');
-                                        echo '<input name="bsp_style_settings_t[activate_topic_subscribe_button_prefix]" id="bsp_style_settings_t[activate_topic_subscribe_button_prefix]" type="checkbox" value="1" class="code" ' . checked( 1, $item, false ) . ' />';
-                                        ?>
-                                        <label class="description" for="bsp_style_settings_t[activate_topic_subscribe_button_prefix]">
-                                                <?php esc_html_e( 'Check to customize the topic subscribe button prefix (specify below).', 'bbp-style-pack' ); ?>
-                                        </label>
-                                </td>
-                        </tr>
-                        <tr valign="top">
-                                <td></td>
-                                <td colspan="2">
-                                        <?php 
-                                        $item1 = ( ! empty ($bsp_style_settings_t['topic_subscribe_button_prefix'] ) ? htmlspecialchars( $bsp_style_settings_t['topic_subscribe_button_prefix'] ) : '' ); 
-                                        ?>
-                                        <input id="bsp_style_settings_t[topic_subscribe_button_prefix]" class="large-text" name="bsp_style_settings_t[topic_subscribe_button_prefix]" type="text" value="<?php echo $item1; ?>" /><br/>
-                                        <p>
-                                                <?php 
-                                                        echo sprintf(
-                                                                /* translators: %1$s and %2$s are opening/closing <a href> HTML tags */
-                                                                __( 'You can use any keyboard character(s), or any %1$sASCII HTML Name or HTML Number%2$s code(s).', 'bbp-style-pack' ),
-                                                                '<a href="https://www.ascii-code.com/" target="_blank">',
-                                                                '</a>'
-                                                        );
-                                                ?>
-                                        </p>
-                                        <label class="description" for="bsp_style_settings_t[topic_subscribe_button_prefix]">
-                                                <?php 
-                                                        echo sprintf(
-                                                                /* translators: %1$s is a string of ASCII characters and keyboard characters, %2$s shows the rendering of those characters */
-                                                                __( 'Default : %1$s (which get rendered on the front-end as "%2$s")', 'bbp-style-pack' ),
-                                                                htmlspecialchars( '&nbsp;|&nbsp;' ),
-                                                                ' | '
-                                                        );
-                                                ?>
-                                        </label>
-                                        <br/>
-                                </td>
-                        </tr>
-		
-                </table>
+</table>
 	
 					
 <!-- save the options -->
-                <p class="submit">
-                        <input type="submit" class="button-primary" value="<?php esc_html_e( 'Save changes', 'bbp-style-pack' ); ?>" />
-                </p>
-        </form>
-
-        <p>
-                <b><?php esc_html_e( 'Further Help', 'bbp-style-pack' ); ?> </b>
-        </p>
-        <p>
-                <?php esc_html_e( 'If your theme has a button style, then you can use this by entering it in the class sections above - of course if you know how to find the class !', 'bbp-style-pack' ); ?>
-        </p>
-        <p>
-                <?php esc_html_e( 'There are also many button styling websites available which will let you create a style for your buttons - just google \'button generator CSS\'.  These create CSS code and a class.  You would put the CSS code into either your theme or into the \'custom CSS\' tab of this plugin.', 'bbp-style-pack' ); ?>
-        </p>
-        <p>
-                <?php
-                        echo sprintf(
-                                /* translators: %s is a URL */
-                                __( 'So for instance if you go to %s you can create a button.  This will generate code for a class of \'btn\'.  Copy this code to the \'custom CSS\' tab of this plugin, then select \'Use Class\' above and put \'btn\' in the class box above. ', 'bbp-style-pack' ),
-                                '<a href="http://css3buttongenerator.com/" target="_blank">http://css3buttongenerator.com/</a>'
-                        ); 
-                ?>
-        </p>
-        <br/>
-        <p>
-            <b><?php esc_html_e( 'Custom CSS Suggestions:', 'bbp-style-pack' ); ?></b><br/><br/>
-                <?php esc_html_e( 'When writing your own custom styling for the custom botton class specified above in #26, it is highly recommended to target specific selectors to make sure bbPress defaults do not override your custom styling code.', 'bbp-style-pack' ); ?><br/><br/>
-                <?php 
-                        if ( !empty( $bsp_style_settings_t['TopicButtonclass'] ) ) {
-                                esc_html_e( 'Suggested selectors to target include:', 'bbp-style-pack' );
-                                echo '<br/><br/>';
-                                echo '&nbsp;&nbsp;&nbsp;&nbsp; .' . esc_html( trim( $bsp_style_settings_t['TopicButtonclass'] ) ) . '<br/>';
-                                echo '&nbsp;&nbsp;&nbsp;&nbsp; #bbpress-forums a.' . esc_html( trim( $bsp_style_settings_t['TopicButtonclass'] ) ) . '<br/>';
-                                echo '&nbsp;&nbsp;&nbsp;&nbsp; #bbpress-forums a.' . esc_html( trim( $bsp_style_settings_t['TopicButtonclass'] ) ) . ':visited<br/>';
-                                echo '&nbsp;&nbsp;&nbsp;&nbsp; #bbpress-forums a.' . esc_html( trim( $bsp_style_settings_t['TopicButtonclass'] ) ) . ':hover<br/>';
-                        }
-                        else {
-                                esc_html_e( 'Add your custom class name above to see some suggestions for CSS selectors to target.', 'bbp-style-pack' ); 
-                        }
-                ?>
-        </p>    
+	<p class="submit">
+		<input type="submit" class="button-primary" value="<?php _e( 'Save changes', 'bbp-style-pack' ); ?>" />
+	</p>
+</form>
+</div><!--end sf-wrap-->
+</div><!--end wrap-->
 	
 <?php
 }
+		
+
+	

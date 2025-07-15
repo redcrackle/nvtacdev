@@ -17,14 +17,15 @@
  */
 namespace WPMailSMTP\Vendor\Google\AuthHandler;
 
-use Exception;
+use WPMailSMTP\Vendor\GuzzleHttp\Client;
 use WPMailSMTP\Vendor\GuzzleHttp\ClientInterface;
+use Exception;
 class AuthHandlerFactory
 {
     /**
      * Builds out a default http handler for the installed version of guzzle.
      *
-     * @return Guzzle6AuthHandler|Guzzle7AuthHandler
+     * @return Guzzle5AuthHandler|Guzzle6AuthHandler|Guzzle7AuthHandler
      * @throws Exception
      */
     public static function build($cache = null, array $cacheConfig = [])
@@ -36,6 +37,8 @@ class AuthHandlerFactory
             $guzzleVersion = (int) \substr(\WPMailSMTP\Vendor\GuzzleHttp\ClientInterface::VERSION, 0, 1);
         }
         switch ($guzzleVersion) {
+            case 5:
+                return new \WPMailSMTP\Vendor\Google\AuthHandler\Guzzle5AuthHandler($cache, $cacheConfig);
             case 6:
                 return new \WPMailSMTP\Vendor\Google\AuthHandler\Guzzle6AuthHandler($cache, $cacheConfig);
             case 7:

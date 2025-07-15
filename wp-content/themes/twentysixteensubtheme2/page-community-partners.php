@@ -11,7 +11,7 @@
  * @since Twenty Sixteen 1.0
  */
 
-if(is_page('community-partners')) {
+if(is_page(community-partners)) {
 get_header('community-partners');
 }
 else {

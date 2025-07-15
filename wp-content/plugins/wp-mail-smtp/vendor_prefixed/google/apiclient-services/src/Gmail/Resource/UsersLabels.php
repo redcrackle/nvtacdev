@@ -24,7 +24,7 @@ use WPMailSMTP\Vendor\Google\Service\Gmail\ListLabelsResponse;
  * Typical usage is:
  *  <code>
  *   $gmailService = new Google\Service\Gmail(...);
- *   $labels = $gmailService->users_labels;
+ *   $labels = $gmailService->labels;
  *  </code>
  */
 class UsersLabels extends \WPMailSMTP\Vendor\Google\Service\Resource
@@ -37,7 +37,6 @@ class UsersLabels extends \WPMailSMTP\Vendor\Google\Service\Resource
      * @param Label $postBody
      * @param array $optParams Optional parameters.
      * @return Label
-     * @throws \Google\Service\Exception
      */
     public function create($userId, \WPMailSMTP\Vendor\Google\Service\Gmail\Label $postBody, $optParams = [])
     {
@@ -53,7 +52,6 @@ class UsersLabels extends \WPMailSMTP\Vendor\Google\Service\Resource
      * used to indicate the authenticated user.
      * @param string $id The ID of the label to delete.
      * @param array $optParams Optional parameters.
-     * @throws \Google\Service\Exception
      */
     public function delete($userId, $id, $optParams = [])
     {
@@ -69,7 +67,6 @@ class UsersLabels extends \WPMailSMTP\Vendor\Google\Service\Resource
      * @param string $id The ID of the label to retrieve.
      * @param array $optParams Optional parameters.
      * @return Label
-     * @throws \Google\Service\Exception
      */
     public function get($userId, $id, $optParams = [])
     {
@@ -84,7 +81,6 @@ class UsersLabels extends \WPMailSMTP\Vendor\Google\Service\Resource
      * used to indicate the authenticated user.
      * @param array $optParams Optional parameters.
      * @return ListLabelsResponse
-     * @throws \Google\Service\Exception
      */
     public function listUsersLabels($userId, $optParams = [])
     {
@@ -101,7 +97,6 @@ class UsersLabels extends \WPMailSMTP\Vendor\Google\Service\Resource
      * @param Label $postBody
      * @param array $optParams Optional parameters.
      * @return Label
-     * @throws \Google\Service\Exception
      */
     public function patch($userId, $id, \WPMailSMTP\Vendor\Google\Service\Gmail\Label $postBody, $optParams = [])
     {
@@ -118,7 +113,6 @@ class UsersLabels extends \WPMailSMTP\Vendor\Google\Service\Resource
      * @param Label $postBody
      * @param array $optParams Optional parameters.
      * @return Label
-     * @throws \Google\Service\Exception
      */
     public function update($userId, $id, \WPMailSMTP\Vendor\Google\Service\Gmail\Label $postBody, $optParams = [])
     {

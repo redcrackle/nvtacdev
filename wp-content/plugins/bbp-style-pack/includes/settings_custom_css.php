@@ -1,9 +1,5 @@
 <?php
 
-// Exit if accessed directly
-defined( 'ABSPATH' ) || exit;
-
-
 //custom css settings page
 
 function bsp_css_settings() {
@@ -13,24 +9,23 @@ function bsp_css_settings() {
 		<tr valign="top">
 			<th colspan="2">
 				<h3>
-					<?php esc_html_e ('Custom CSS' , 'bbp-style-pack' ) ; ?>
+					<?php _e ('Custom CSS' , 'bbp-style-pack' ) ; ?>
 				</h3>
 			</th>
 		</tr>	
 
 		<tr>
 			<td>
-			<?php esc_html_e ('You can add any custom css here' , 'bbp-style-pack' ) ; ?>
+			<?php _e ('You can add any custom css here' , 'bbp-style-pack' ) ; ?>
 			</td>
 		</tr>	
 				
 		<?php global $bsp_css ; ?>
-	<form method="post" action="options.php">
+	<Form method="post" action="options.php">
 		<?php wp_nonce_field( 'css', 'css-nonce' ) ?>
 		<?php settings_fields( 'bsp_css' );
 		//create a style.css on entry and on saving
-		generate_style_css();
-                bsp_clear_cache();
+		generate_style_css() ;
 		?>	
 	
 		
@@ -43,7 +38,7 @@ function bsp_css_settings() {
 				$name = __('css', 'bbp-style-pack') ;
 				$item1="bsp_css[".$name."]" ;
 				$value1 = (!empty($bsp_css[$name]) ? $bsp_css[$name] : '');
-				echo '<textarea id="'.esc_html($item1).'" class="large-text" name="'.esc_html($item1).'" rows="20" cols="40" >' ; 
+				echo '<textarea id="'.$item1.'" class="large-text" name="'.$item1.'" rows="20" cols="40" >' ; 
 				echo $value1 ; ?> 
 				</textarea>
 			</td>
@@ -53,9 +48,11 @@ function bsp_css_settings() {
 	
 <!-- save the options -->
 		<p class="submit">
-			<input type="submit" class="button-primary" value="<?php esc_html_e( 'Save changes', 'bbp-style-pack' ); ?>" />
+			<input type="submit" class="button-primary" value="<?php _e( 'Save changes', 'bbp-style-pack' ); ?>" />
 		</p>
 </form>
+</div><!--end sf-wrap-->
+</div><!--end wrap-->
 
 <?php
 }

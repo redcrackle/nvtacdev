@@ -103,13 +103,8 @@ var widgetoptsSettingsModule = {
 			$card
 				.addClass( 'widgetopts-module-type-enabled' )
 				.removeClass( 'widgetopts-module-type-disabled' );
-                
-            if( $card.hasClass('no-settings') ) {
-                var newToggleSettingsLabel = widgetopts.translation.show_description;
-            } else {
-                var newToggleSettingsLabel = widgetopts.translation.show_settings;
-            }
-			
+
+			var newToggleSettingsLabel = widgetopts.translation.show_settings;
 		} else {
 			$buttons
 				.html( widgetopts.translation.activate )
@@ -120,10 +115,10 @@ var widgetoptsSettingsModule = {
 			$card
 				.addClass( 'widgetopts-module-type-disabled' )
 				.removeClass( 'widgetopts-module-type-enabled' );
-            
+
 			var newToggleSettingsLabel = widgetopts.translation.show_description;
 		}
-        
+
 		// if( !$card.hasClass('widgetopts-module-card-no-settings') ){
 			$card.find( '.widgetopts-toggle-settings' ).html( newToggleSettingsLabel );
 		// }

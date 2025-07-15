@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -12,7 +11,6 @@ declare (strict_types=1);
 namespace WPMailSMTP\Vendor\Monolog\Handler;
 
 use WPMailSMTP\Vendor\Monolog\Logger;
-use WPMailSMTP\Vendor\Psr\Log\LogLevel;
 /**
  * Blackhole
  *
@@ -20,37 +18,24 @@ use WPMailSMTP\Vendor\Psr\Log\LogLevel;
  * to put on top of an existing stack to override it temporarily.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
- *
- * @phpstan-import-type Level from \Monolog\Logger
- * @phpstan-import-type LevelName from \Monolog\Logger
  */
-class NullHandler extends \WPMailSMTP\Vendor\Monolog\Handler\Handler
+class NullHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractHandler
 {
     /**
-     * @var int
-     */
-    private $level;
-    /**
-     * @param string|int $level The minimum logging level at which this handler will be triggered
-     *
-     * @phpstan-param Level|LevelName|LogLevel::* $level
+     * @param int $level The minimum logging level at which this handler will be triggered
      */
     public function __construct($level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG)
     {
-        $this->level = \WPMailSMTP\Vendor\Monolog\Logger::toMonologLevel($level);
+        parent::__construct($level, \false);
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function isHandling(array $record) : bool
+    public function handle(array $record)
     {
-        return $record['level'] >= $this->level;
-    }
-    /**
-     * {@inheritDoc}
-     */
-    public function handle(array $record) : bool
-    {
-        return $record['level'] >= $this->level;
+        if ($record['level'] < $this->level) {
+            return \false;
+        }
+        return \true;
     }
 }

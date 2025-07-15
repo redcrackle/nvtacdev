@@ -131,7 +131,6 @@ class LcpTemplater {
    * @return bool         Is the template a proper php file.
    */
   private static function validate_template($path, $file) {
-    $file = str_replace('../', '', $file);
     return (substr($file, -4) == '.php' ) && is_file($path . $file) &&
       is_readable($path . $file);
   }

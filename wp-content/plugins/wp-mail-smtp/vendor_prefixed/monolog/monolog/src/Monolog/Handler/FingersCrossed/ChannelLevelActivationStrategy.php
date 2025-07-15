@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -12,7 +11,6 @@ declare (strict_types=1);
 namespace WPMailSMTP\Vendor\Monolog\Handler\FingersCrossed;
 
 use WPMailSMTP\Vendor\Monolog\Logger;
-use WPMailSMTP\Vendor\Psr\Log\LogLevel;
 /**
  * Channel and Error level based monolog activation strategy. Allows to trigger activation
  * based on level per channel. e.g. trigger activation on level 'ERROR' by default, except
@@ -32,37 +30,21 @@ use WPMailSMTP\Vendor\Psr\Log\LogLevel;
  * </code>
  *
  * @author Mike Meessen <netmikey@gmail.com>
- *
- * @phpstan-import-type Record from \Monolog\Logger
- * @phpstan-import-type Level from \Monolog\Logger
- * @phpstan-import-type LevelName from \Monolog\Logger
  */
 class ChannelLevelActivationStrategy implements \WPMailSMTP\Vendor\Monolog\Handler\FingersCrossed\ActivationStrategyInterface
 {
-    /**
-     * @var Level
-     */
     private $defaultActionLevel;
-    /**
-     * @var array<string, Level>
-     */
     private $channelToActionLevel;
     /**
-     * @param int|string         $defaultActionLevel   The default action level to be used if the record's category doesn't match any
-     * @param array<string, int> $channelToActionLevel An array that maps channel names to action levels.
-     *
-     * @phpstan-param array<string, Level>        $channelToActionLevel
-     * @phpstan-param Level|LevelName|LogLevel::* $defaultActionLevel
+     * @param int   $defaultActionLevel   The default action level to be used if the record's category doesn't match any
+     * @param array $channelToActionLevel An array that maps channel names to action levels.
      */
-    public function __construct($defaultActionLevel, array $channelToActionLevel = [])
+    public function __construct($defaultActionLevel, $channelToActionLevel = array())
     {
         $this->defaultActionLevel = \WPMailSMTP\Vendor\Monolog\Logger::toMonologLevel($defaultActionLevel);
         $this->channelToActionLevel = \array_map('WPMailSMTP\\Vendor\\Monolog\\Logger::toMonologLevel', $channelToActionLevel);
     }
-    /**
-     * @phpstan-param Record $record
-     */
-    public function isHandlerActivated(array $record) : bool
+    public function isHandlerActivated(array $record)
     {
         if (isset($this->channelToActionLevel[$record['channel']])) {
             return $record['level'] >= $this->channelToActionLevel[$record['channel']];

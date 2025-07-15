@@ -37,10 +37,9 @@ function ak_admin_notify( $message = '' )
 {
     if (is_admin() && !did_action('pp_capabilities_error')) {
 	    if ( empty($message) ) {
-		    $message = esc_html__('Settings saved.');
+		    $message = esc_html__('Settings saved.', 'capsman-enhanced');
     	}
-        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-    	echo '<div id="message" class="updated fade"><p><strong>' . $message . '</strong></p></div>';
+    	echo '<div id="message" class="updated fade"><p><strong>' . esc_html($message) . '</strong></p></div>';
     }
 }
 
@@ -53,8 +52,7 @@ function ak_admin_notify( $message = '' )
 function ak_admin_error( $message )
 {
     if ( is_admin() ) {
-        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-        echo '<div id="error" class="error"><p><strong>' . $message . '</strong></p></div>';
+        echo '<div id="error" class="error"><p><strong>' . esc_html($message) . '</strong></p></div>';
     }
 
     do_action('pp_capabilities_error');

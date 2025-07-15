@@ -167,11 +167,9 @@ function um_get_redirect_url( $key ) {
  * @return string
  */
 function um_user_last_login_date( $user_id ) {
-	_deprecated_function( __FUNCTION__, '2.0.0' );
 	$value = get_user_meta( $user_id, '_um_last_login', true );
-	if ( $value ) {
+	if ($value)
 		return date_i18n( 'F d, Y', $value );
-	}
 
 	return '';
 }
@@ -218,13 +216,9 @@ function um_is_meta_value_exists( $key, $value, $return_user_id = false ) {
 		return UM()->profile()->arr_user_slugs['is_' . $return_user_id][$key];
 	}
 
-	if ( ! $return_user_id ) {
-		$count = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT COUNT(*) AS count
-				FROM {$wpdb->usermeta}
-				WHERE meta_key = %s AND
-					  meta_value = %s ",
+	if (!$return_user_id) {
+		$count = $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(*) as count FROM {$wpdb->usermeta} WHERE meta_key = %s AND meta_value = %s ",
 			$key,
 			$value
 		) );
@@ -234,16 +228,11 @@ function um_is_meta_value_exists( $key, $value, $return_user_id = false ) {
 		return $count;
 	}
 
-	$user_id = $wpdb->get_var(
-		$wpdb->prepare(
-			"SELECT user_id
-			FROM {$wpdb->usermeta}
-			WHERE meta_key = %s AND
-				  meta_value = %s",
-			$key,
-			$value
-		)
-	);
+	$user_id = $wpdb->get_var( $wpdb->prepare(
+		"SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = %s AND meta_value = %s ",
+		$key,
+		$value
+	) );
 
 	UM()->profile()->arr_user_slugs['is_' . $return_user_id][$key] = $user_id;
 

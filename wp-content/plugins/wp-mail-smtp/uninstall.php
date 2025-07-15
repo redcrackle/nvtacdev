@@ -10,11 +10,6 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-// Prevent data removal if Pro plugin is active.
-if ( is_plugin_active( 'wp-mail-smtp-pro/wp_mail_smtp.php' ) ) {
-	return;
-}
-
 // Load plugin file.
 require_once 'wp_mail_smtp.php';
 require_once dirname( __FILE__ ) . '/vendor/woocommerce/action-scheduler/action-scheduler.php';
@@ -64,7 +59,6 @@ if ( class_exists( 'ActionScheduler_QueueRunner' ) ) {
 }
 
 // WP MS uninstall process.
-//phpcs:disable WPForms.Formatting.EmptyLineAfterAssigmentVariables.AddEmptyLine, WPForms.PHP.BackSlash.UseShortSyntax
 if ( is_multisite() ) {
 	$main_site_settings = get_blog_option( get_main_site_id(), 'wp_mail_smtp', [] );
 	$network_wide       = ! empty( $main_site_settings['general']['network_wide'] );
@@ -120,13 +114,6 @@ if ( is_multisite() ) {
 			}
 		}
 
-		// Delete queue table.
-		$queue_table = \WPMailSMTP\Queue\Queue::get_table_name();
-		$wpdb->query( "DROP TABLE IF EXISTS $queue_table;" ); // phpcs:ignore WordPress.DB
-
-		// Delete all queue attachments.
-		( new \WPMailSMTP\Queue\Attachments() )->delete_attachments();
-
 		/*
 		 * Cleanup network site data for Pro plugin only.
 		 */
@@ -160,13 +147,10 @@ if ( is_multisite() ) {
 		/*
 		 * Drop all Action Scheduler data and unschedule all plugin ActionScheduler actions.
 		 */
-		( new \WPMailSMTP\Tasks\Tasks() )->remove_all();
+		( new \WPMailSMTP\Tasks\Tasks() )->cancel_all();
 
 		$meta_table = \WPMailSMTP\Tasks\Meta::get_table_name();
 		$wpdb->query( "DROP TABLE IF EXISTS $meta_table;" ); // phpcs:ignore WordPress.DB
-
-		// Delete current sub-site wp-mail-smtp uploads folder.
-		\WPMailSMTP\Uploads::delete_upload_dir();
 
 		// Restore the current network site back to the original one.
 		restore_current_blog();
@@ -212,13 +196,6 @@ if ( is_multisite() ) {
 		}
 	}
 
-	// Delete queue table.
-	$queue_table = \WPMailSMTP\Queue\Queue::get_table_name();
-	$wpdb->query( "DROP TABLE IF EXISTS $queue_table;" ); // phpcs:ignore WordPress.DB
-
-	// Delete all queue attachments.
-	( new \WPMailSMTP\Queue\Attachments() )->delete_attachments();
-
 	/*
 	 * Cleanup data for Pro plugin only.
 	 */
@@ -252,12 +229,8 @@ if ( is_multisite() ) {
 	/*
 	 * Drop all Action Scheduler data and unschedule all plugin ActionScheduler actions.
 	 */
-	( new \WPMailSMTP\Tasks\Tasks() )->remove_all();
+	( new \WPMailSMTP\Tasks\Tasks() )->cancel_all();
 
 	$meta_table = \WPMailSMTP\Tasks\Meta::get_table_name();
 	$wpdb->query( "DROP TABLE IF EXISTS $meta_table;" ); // phpcs:ignore WordPress.DB
-
-	// Delete wp-mail-smtp uploads folder.
-	\WPMailSMTP\Uploads::delete_upload_dir();
 }
-//phpcs:enable WPForms.Formatting.EmptyLineAfterAssigmentVariables.AddEmptyLine, WPForms.PHP.BackSlash.UseShortSyntax

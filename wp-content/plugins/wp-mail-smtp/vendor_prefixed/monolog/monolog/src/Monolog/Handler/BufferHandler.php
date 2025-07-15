@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -21,47 +20,40 @@ use WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface;
  * sending one per log message.
  *
  * @author Christophe Coevoet <stof@notk.org>
- *
- * @phpstan-import-type Record from \Monolog\Logger
  */
-class BufferHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractHandler implements \WPMailSMTP\Vendor\Monolog\Handler\ProcessableHandlerInterface, \WPMailSMTP\Vendor\Monolog\Handler\FormattableHandlerInterface
+class BufferHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractHandler
 {
-    use ProcessableHandlerTrait;
-    /** @var HandlerInterface */
     protected $handler;
-    /** @var int */
     protected $bufferSize = 0;
-    /** @var int */
     protected $bufferLimit;
-    /** @var bool */
     protected $flushOnOverflow;
-    /** @var Record[] */
-    protected $buffer = [];
-    /** @var bool */
+    protected $buffer = array();
     protected $initialized = \false;
     /**
      * @param HandlerInterface $handler         Handler.
      * @param int              $bufferLimit     How many entries should be buffered at most, beyond that the oldest items are removed from the buffer.
+     * @param int              $level           The minimum logging level at which this handler will be triggered
+     * @param bool             $bubble          Whether the messages that are handled can bubble up the stack or not
      * @param bool             $flushOnOverflow If true, the buffer is flushed when the max size has been reached, by default oldest entries are discarded
      */
-    public function __construct(\WPMailSMTP\Vendor\Monolog\Handler\HandlerInterface $handler, int $bufferLimit = 0, $level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG, bool $bubble = \true, bool $flushOnOverflow = \false)
+    public function __construct(\WPMailSMTP\Vendor\Monolog\Handler\HandlerInterface $handler, $bufferLimit = 0, $level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG, $bubble = \true, $flushOnOverflow = \false)
     {
         parent::__construct($level, $bubble);
         $this->handler = $handler;
-        $this->bufferLimit = $bufferLimit;
+        $this->bufferLimit = (int) $bufferLimit;
         $this->flushOnOverflow = $flushOnOverflow;
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function handle(array $record) : bool
+    public function handle(array $record)
     {
         if ($record['level'] < $this->level) {
             return \false;
         }
         if (!$this->initialized) {
             // __destructor() doesn't get called on Fatal errors
-            \register_shutdown_function([$this, 'close']);
+            \register_shutdown_function(array($this, 'close'));
             $this->initialized = \true;
         }
         if ($this->bufferLimit > 0 && $this->bufferSize === $this->bufferLimit) {
@@ -73,14 +65,15 @@ class BufferHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractHandler i
             }
         }
         if ($this->processors) {
-            /** @var Record $record */
-            $record = $this->processRecord($record);
+            foreach ($this->processors as $processor) {
+                $record = \call_user_func($processor, $record);
+            }
         }
         $this->buffer[] = $record;
         $this->bufferSize++;
         return \false === $this->bubble;
     }
-    public function flush() : void
+    public function flush()
     {
         if ($this->bufferSize === 0) {
             return;
@@ -95,49 +88,41 @@ class BufferHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractHandler i
         // GC'd until the end of the request
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function close() : void
+    public function close()
     {
         $this->flush();
-        $this->handler->close();
     }
     /**
      * Clears the buffer without flushing any messages down to the wrapped handler.
      */
-    public function clear() : void
+    public function clear()
     {
         $this->bufferSize = 0;
-        $this->buffer = [];
+        $this->buffer = array();
     }
     public function reset()
     {
         $this->flush();
         parent::reset();
-        $this->resetProcessors();
         if ($this->handler instanceof \WPMailSMTP\Vendor\Monolog\ResettableInterface) {
             $this->handler->reset();
         }
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setFormatter(\WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface $formatter) : \WPMailSMTP\Vendor\Monolog\Handler\HandlerInterface
+    public function setFormatter(\WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface $formatter)
     {
-        if ($this->handler instanceof \WPMailSMTP\Vendor\Monolog\Handler\FormattableHandlerInterface) {
-            $this->handler->setFormatter($formatter);
-            return $this;
-        }
-        throw new \UnexpectedValueException('The nested handler of type ' . \get_class($this->handler) . ' does not support formatters.');
+        $this->handler->setFormatter($formatter);
+        return $this;
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getFormatter() : \WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface
+    public function getFormatter()
     {
-        if ($this->handler instanceof \WPMailSMTP\Vendor\Monolog\Handler\FormattableHandlerInterface) {
-            return $this->handler->getFormatter();
-        }
-        throw new \UnexpectedValueException('The nested handler of type ' . \get_class($this->handler) . ' does not support formatters.');
+        return $this->handler->getFormatter();
     }
 }

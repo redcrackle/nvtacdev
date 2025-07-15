@@ -1,82 +1,76 @@
-<?php
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+<?php if ( ! defined( 'ABSPATH' ) ) exit;
+
 
 /**
- * Error processing hook for login.
+ * Error procesing hook for login
  *
- * @param $submitted_data
+ * @param $args
  */
-function um_submit_form_errors_hook_login( $submitted_data ) {
-	$user_password = $submitted_data['user_password'];
+function um_submit_form_errors_hook_login( $args ) {
+	$is_email = false;
 
-	if ( isset( $submitted_data['username'] ) && '' === $submitted_data['username'] ) {
+	$form_id = $args['form_id'];
+	$mode = $args['mode'];
+	$user_password = $args['user_password'];
+
+
+	if ( isset( $args['username'] ) && $args['username'] == '' ) {
 		UM()->form()->add_error( 'username', __( 'Please enter your username or email', 'ultimate-member' ) );
 	}
 
-	if ( isset( $submitted_data['user_login'] ) && '' === $submitted_data['user_login'] ) {
+	if ( isset( $args['user_login'] ) && $args['user_login'] == '' ) {
 		UM()->form()->add_error( 'user_login', __( 'Please enter your username', 'ultimate-member' ) );
 	}
 
-	if ( isset( $submitted_data['user_email'] ) && ( '' === $submitted_data['user_email'] || ! is_email( $submitted_data['user_email'] ) ) ) {
+	if ( isset( $args['user_email'] ) && $args['user_email'] == '' ) {
 		UM()->form()->add_error( 'user_email', __( 'Please enter your email', 'ultimate-member' ) );
 	}
 
-	if ( isset( $submitted_data['username'] ) ) {
-		$authenticate = $submitted_data['username'];
+	if ( isset( $args['username'] ) ) {
+		$authenticate = $args['username'];
 		$field = 'username';
-		if ( is_email( $submitted_data['username'] ) ) {
-			$data = get_user_by('email', $submitted_data['username'] );
-			$user_name = isset( $data->user_login ) ? $data->user_login : '';
+		if ( is_email( $args['username'] ) ) {
+			$is_email = true;
+			$data = get_user_by('email', $args['username'] );
+			$user_name = isset( $data->user_login ) ? $data->user_login : null;
 		} else {
-			$user_name  = $submitted_data['username'];
+			$user_name  = $args['username'];
 		}
-	} elseif ( isset( $submitted_data['user_email'] ) ) {
-		$authenticate = $submitted_data['user_email'];
+	} elseif ( isset( $args['user_email'] ) ) {
+		$authenticate = $args['user_email'];
 		$field = 'user_email';
-		$data = get_user_by('email', $submitted_data['user_email'] );
-		$user_name = isset( $data->user_login ) ? $data->user_login : '';
+		$is_email = true;
+		$data = get_user_by('email', $args['user_email'] );
+		$user_name = isset( $data->user_login ) ? $data->user_login : null;
 	} else {
 		$field = 'user_login';
-		$user_name = $submitted_data['user_login'];
-		$authenticate = $submitted_data['user_login'];
+		$user_name = $args['user_login'];
+		$authenticate = $args['user_login'];
 	}
 
-	if ( $submitted_data['user_password'] == '' ) {
+	if ( $args['user_password'] == '' ) {
 		UM()->form()->add_error( 'user_password', __( 'Please enter your password', 'ultimate-member' ) );
 	}
 
 	$user = get_user_by( 'login', $user_name );
-	if ( $user && wp_check_password( $submitted_data['user_password'], $user->data->user_pass, $user->ID ) ) {
+	if ( $user && wp_check_password( $args['user_password'], $user->data->user_pass, $user->ID ) ) {
 		UM()->login()->auth_id = username_exists( $user_name );
 	} else {
 		UM()->form()->add_error( 'user_password', __( 'Password is incorrect. Please try again.', 'ultimate-member' ) );
 	}
 
-	// Integration with 3rd-party login handlers e.g. 3rd-party reCAPTCHA etc.
-	$third_party_codes = apply_filters( 'um_custom_authenticate_error_codes', array() );
-
 	// @since 4.18 replacement for 'wp_login_failed' action hook
 	// see WP function wp_authenticate()
 	$ignore_codes = array( 'empty_username', 'empty_password' );
 
-	$user = apply_filters( 'authenticate', null, $authenticate, $submitted_data['user_password'] );
+	$user = apply_filters( 'authenticate', null, $authenticate, $args['user_password'] );
 	if ( is_wp_error( $user ) && ! in_array( $user->get_error_code(), $ignore_codes ) ) {
-		if ( ! empty( $third_party_codes ) && in_array( $user->get_error_code(), $third_party_codes ) ) {
-			UM()->form()->add_error( $user->get_error_code(), $user->get_error_message() );
-		} else {
-			UM()->form()->add_error( 'user_password', __( 'Password is incorrect. Please try again.', 'ultimate-member' ) );
-		}
+		UM()->form()->add_error( $user->get_error_code(), __( 'Password is incorrect. Please try again.', 'ultimate-member' ) );
 	}
 
-	$user = apply_filters( 'wp_authenticate_user', $user, $submitted_data['user_password'] );
+	$user = apply_filters( 'wp_authenticate_user', $user, $args['user_password'] );
 	if ( is_wp_error( $user ) && ! in_array( $user->get_error_code(), $ignore_codes ) ) {
-		if ( ! empty( $third_party_codes ) && in_array( $user->get_error_code(), $third_party_codes ) ) {
-			UM()->form()->add_error( $user->get_error_code(), $user->get_error_message() );
-		} else {
-			UM()->form()->add_error( 'user_password', __( 'Password is incorrect. Please try again.', 'ultimate-member' ) );
-		}
+		UM()->form()->add_error( $user->get_error_code(), __( 'Password is incorrect. Please try again.', 'ultimate-member' ) );
 	}
 
 	// if there is an error notify wp
@@ -84,7 +78,7 @@ function um_submit_form_errors_hook_login( $submitted_data ) {
 		do_action( 'wp_login_failed', $user_name, UM()->form()->get_wp_error() );
 	}
 }
-add_action( 'um_submit_form_errors_hook_login', 'um_submit_form_errors_hook_login' );
+add_action( 'um_submit_form_errors_hook_login', 'um_submit_form_errors_hook_login', 10 );
 
 
 /**
@@ -117,39 +111,42 @@ function um_display_login_errors( $args ) {
 }
 add_action( 'um_before_login_fields', 'um_display_login_errors' );
 
+
 /**
- * Login checks through the frontend login
+ * Login checks thru the frontend login
  *
- * @param array $submitted_data
- * @param array $form_data
+ * @param $args
  */
-function um_submit_form_errors_hook_logincheck( $submitted_data, $form_data ) {
+function um_submit_form_errors_hook_logincheck( $args ) {
 	// Logout if logged in
 	if ( is_user_logged_in() ) {
 		wp_logout();
 	}
 
-	$user_id = isset( UM()->login()->auth_id ) ? UM()->login()->auth_id : '';
+	$user_id = ( isset( UM()->login()->auth_id ) ) ? UM()->login()->auth_id : '';
+	um_fetch_user( $user_id );
 
-	$status = UM()->common()->users()->get_status( $user_id ); // account status
+	$status = um_user( 'account_status' ); // account status
 	switch ( $status ) {
-		// If user can't log in to site...
+
+		// If user can't login to site...
 		case 'inactive':
 		case 'awaiting_admin_review':
 		case 'awaiting_email_confirmation':
 		case 'rejected':
-			// Not `um_safe_redirect()` because UM()->permalinks()->get_current_url() is situated on the same host.
-			wp_safe_redirect( add_query_arg( 'err', esc_attr( $status ), UM()->permalinks()->get_current_url() ) );
-			exit;
+		um_reset_user();
+		exit( wp_redirect( add_query_arg( 'err', esc_attr( $status ), UM()->permalinks()->get_current_url() ) ) );
+		break;
+
 	}
 
-	if ( isset( $form_data['form_id'] ) && absint( $form_data['form_id'] ) === absint( UM()->shortcodes()->core_login_form() ) && UM()->form()->errors && ! isset( $_POST[ UM()->honeypot ] ) ) {
-		// Not `um_safe_redirect()` because predefined login page is situated on the same host.
-		wp_safe_redirect( um_get_core_page( 'login' ) );
-		exit;
+	if ( isset( $args['form_id'] ) && $args['form_id'] == UM()->shortcodes()->core_login_form() && UM()->form()->errors && ! isset( $_POST[ UM()->honeypot ] ) ) {
+		exit( wp_redirect( um_get_core_page( 'login' ) ) );
 	}
+
 }
-add_action( 'um_submit_form_errors_hook_logincheck', 'um_submit_form_errors_hook_logincheck', 9999, 2 );
+add_action( 'um_submit_form_errors_hook_logincheck', 'um_submit_form_errors_hook_logincheck', 9999 );
+
 
 /**
  * Store last login timestamp
@@ -157,9 +154,9 @@ add_action( 'um_submit_form_errors_hook_logincheck', 'um_submit_form_errors_hook
  * @param $user_id
  */
 function um_store_lastlogin_timestamp( $user_id ) {
-	UM()->common()->users()->set_last_login( $user_id );
+	update_user_meta( $user_id, '_um_last_login', current_time( 'timestamp' ) );
 }
-add_action( 'um_on_login_before_redirect', 'um_store_lastlogin_timestamp' );
+add_action( 'um_on_login_before_redirect', 'um_store_lastlogin_timestamp', 10, 1 );
 
 
 /**
@@ -167,165 +164,165 @@ add_action( 'um_on_login_before_redirect', 'um_store_lastlogin_timestamp' );
  */
 function um_store_lastlogin_timestamp_( $login ) {
 	$user = get_user_by( 'login', $login );
+	um_store_lastlogin_timestamp( $user->ID );
 
-	if ( false !== $user ) {
-		UM()->common()->users()->set_last_login( $user->ID );
-
-		$attempts = (int) get_user_meta( $user->ID, 'password_rst_attempts', true );
-		if ( $attempts ) {
-			//don't create meta but update if it's exists only
-			update_user_meta( $user->ID, 'password_rst_attempts', 0 );
-		}
+	$attempts = (int) get_user_meta( $user->ID, 'password_rst_attempts', true );
+	if ( $attempts ) {
+		//don't create meta but update if it's exists only
+		update_user_meta( $user->ID, 'password_rst_attempts', 0 );
 	}
 }
 add_action( 'wp_login', 'um_store_lastlogin_timestamp_' );
 
+
 /**
- * Login user process.
+ * Login user process
  *
- * @param array $submitted_data
+ * @param array $args
  */
-function um_user_login( $submitted_data ) {
-	// phpcs:disable WordPress.Security.NonceVerification -- already verified here
-	$rememberme = ( isset( $_REQUEST['rememberme'], $submitted_data['rememberme'] ) && 1 === (int) $submitted_data['rememberme'] ) ? 1 : 0;
+function um_user_login( $args ) {
+	extract( $args );
 
-	$user_id = isset( UM()->login()->auth_id ) ? UM()->login()->auth_id : '';
-	if ( empty( $user_id ) ) {
-		// refresh page if the user_id is empty
-		// Not `um_safe_redirect()` because UM()->permalinks()->get_current_url() is situated on the same host.
-		wp_safe_redirect( UM()->permalinks()->get_current_url() );
-		exit;
-	}
+	$rememberme = ( isset( $args['rememberme'] ) && 1 == $args['rememberme'] && isset( $_REQUEST['rememberme'] ) ) ? 1 : 0;
 
-	um_fetch_user( $user_id );
-
-	// @todo check using the 'deny_admin_frontend_login' option
-	if ( false !== strrpos( um_user( 'wp_roles' ), 'administrator' ) && ( ! isset( $_GET['provider'] ) && UM()->options()->get( 'deny_admin_frontend_login' ) ) ) {
+	if ( ( UM()->options()->get( 'deny_admin_frontend_login' ) && ! isset( $_GET['provider'] ) ) && strrpos( um_user('wp_roles' ), 'administrator' ) !== false ) {
 		wp_die( esc_html__( 'This action has been prevented for security measures.', 'ultimate-member' ) );
 	}
 
 	UM()->user()->auto_login( um_user( 'ID' ), $rememberme );
 
 	/**
-	 * Fires after successful login and before user is redirected.
+	 * UM hook
 	 *
-	 * @since 1.3.x
-	 * @hook  um_on_login_before_redirect
-	 *
-	 * @param {int} $user_id User ID.
-	 *
-	 * @example <caption>Make any custom action after successful login and before user is redirected.</caption>
+	 * @type action
+	 * @title um_on_login_before_redirect
+	 * @description Hook that runs after successful login and before user is redirected
+	 * @input_vars
+	 * [{"var":"$user_id","type":"int","desc":"User ID"}]
+	 * @change_log
+	 * ["Since: 2.0"]
+	 * @usage add_action( 'um_on_login_before_redirect', 'function_name', 10, 1 );
+	 * @example
+	 * <?php
+	 * add_action( 'um_on_login_before_redirect', 'my_on_login_before_redirect', 10, 1 );
 	 * function my_on_login_before_redirect( $user_id ) {
 	 *     // your code here
 	 * }
-	 * add_action( 'um_on_login_before_redirect', 'my_on_login_before_redirect', 10, 1 );
+	 * ?>
 	 */
 	do_action( 'um_on_login_before_redirect', um_user( 'ID' ) );
 
-	// Priority redirect from $_GET attribute.
-	if ( ! empty( $submitted_data['redirect_to'] ) ) {
-		um_safe_redirect( $submitted_data['redirect_to'] );
-		exit;
+	// Priority redirect
+	if ( ! empty( $args['redirect_to']  ) ) {
+		exit( wp_safe_redirect( $args['redirect_to'] ) );
 	}
 
 	// Role redirect
 	$after_login = um_user( 'after_login' );
 	if ( empty( $after_login ) ) {
-		// Not `um_safe_redirect()` because predefined user profile page is situated on the same host.
-		wp_safe_redirect( um_user_profile_url() );
-		exit;
+		exit( wp_redirect( um_user_profile_url() ) );
 	}
 
 	switch ( $after_login ) {
+
 		case 'redirect_admin':
-			// Not `um_safe_redirect()` because is redirected to wp-admin.
-			wp_safe_redirect( admin_url() );
-			exit;
+			exit( wp_redirect( admin_url() ) );
+			break;
+
 		case 'redirect_url':
 			/**
-			 * Filters change redirect URL after successful login.
+			 * UM hook
 			 *
-			 * @since 2.0
-			 * @hook  um_login_redirect_url
-			 *
-			 * @param {string} $can_view Redirect URL.
-			 * @param {int}    $user_id  User ID.
-			 *
-			 * @return {string} Redirect URL.
-			 *
-			 * @example <caption>Change redirect URL.</caption>
+			 * @type filter
+			 * @title um_login_redirect_url
+			 * @description Change redirect URL after successful login
+			 * @input_vars
+			 * [{"var":"$url","type":"string","desc":"Redirect URL"},
+			 * {"var":"$id","type":"int","desc":"User ID"}]
+			 * @change_log
+			 * ["Since: 2.0"]
+			 * @usage
+			 * <?php add_filter( 'um_login_redirect_url', 'function_name', 10, 2 ); ?>
+			 * @example
+			 * <?php
+			 * add_filter( 'um_login_redirect_url', 'my_login_redirect_url', 10, 2 );
 			 * function my_login_redirect_url( $url, $id ) {
 			 *     // your code here
 			 *     return $url;
 			 * }
-			 * add_filter( 'um_login_redirect_url', 'my_login_redirect_url', 10, 2 );
+			 * ?>
 			 */
 			$redirect_url = apply_filters( 'um_login_redirect_url', um_user( 'login_redirect_url' ), um_user( 'ID' ) );
-			um_safe_redirect( $redirect_url );
-			exit;
+			exit( wp_redirect( $redirect_url ) );
+			break;
+
 		case 'refresh':
-			// Not `um_safe_redirect()` because UM()->permalinks()->get_current_url() is situated on the same host.
-			wp_safe_redirect( UM()->permalinks()->get_current_url() );
-			exit;
+			exit( wp_redirect( UM()->permalinks()->get_current_url() ) );
+			break;
+
 		case 'redirect_profile':
 		default:
-			// Not `um_safe_redirect()` because predefined user profile page is situated on the same host.
-			wp_safe_redirect( um_user_profile_url() );
-			exit;
+			exit( wp_redirect( um_user_profile_url() ) );
+			break;
+
 	}
-	// phpcs:enable WordPress.Security.NonceVerification -- already verified here
 }
-add_action( 'um_user_login', 'um_user_login' );
+add_action( 'um_user_login', 'um_user_login', 10 );
+
 
 /**
  * Form processing
  *
- * @param array $submitted_data
- * @param array $form_data
+ * @param $args
  */
-function um_submit_form_login( $submitted_data, $form_data ) {
+function um_submit_form_login( $args ) {
+
 	if ( ! isset( UM()->form()->errors ) ) {
 		/**
-		 * Fires after successful submit login form.
+		 * UM hook
 		 *
-		 * Internal Ultimate Member callbacks (Priority -> Callback name -> Excerpt):
-		 * * 10 - `um_user_login()` Login form main handler.
-		 *
-		 * @since 1.3.x
-		 * @hook um_user_login
-		 *
-		 * @param {array} $submitted_data $_POST Submission array.
-		 * @param {array} $form_data      UM form data. Since 2.6.7
-		 *
-		 * @example <caption>Make any custom login action if submission is valid.</caption>
-		 * function my_user_login( $submitted_data, $form_data ) {
+		 * @type action
+		 * @title um_user_login
+		 * @description Hook that runs after successful submit login form
+		 * @input_vars
+		 * [{"var":"$args","type":"array","desc":"Form data"}]
+		 * @change_log
+		 * ["Since: 2.0"]
+		 * @usage add_action( 'um_user_login', 'function_name', 10, 1 );
+		 * @example
+		 * <?php
+		 * add_action( 'um_user_login', 'my_user_login', 10, 1 );
+		 * function my_user_login( $args ) {
 		 *     // your code here
 		 * }
-		 * add_action( 'um_user_login', 'my_user_login', 10, 2 );
+		 * ?>
 		 */
-		do_action( 'um_user_login', $submitted_data, $form_data );
+		do_action( 'um_user_login', $args );
 	}
+
 	/**
-	 * Fires after submit login form.
+	 * UM hook
 	 *
-	 * Internal Ultimate Member callbacks (Priority -> Callback name -> Excerpt):
-	 * * 10 - um-messaging.
-	 *
-	 * @since 1.3.x
-	 * @hook um_user_login_extra_hook
-	 *
-	 * @param {array} $submitted_data $_POST Submission array.
-	 * @param {array} $form_data      UM form data. Since 2.6.7
-	 *
-	 * @example <caption>Make any custom login action.</caption>
-	 * function my_user_login_extra( $submitted_data, $form_data ) {
+	 * @type action
+	 * @title um_user_login_extra_hook
+	 * @description Hook that runs after successful submit login form
+	 * @input_vars
+	 * [{"var":"$args","type":"array","desc":"Form data"}]
+	 * @change_log
+	 * ["Since: 2.0"]
+	 * @usage add_action( 'um_user_login_extra_hook', 'function_name', 10, 1 );
+	 * @example
+	 * <?php
+	 * add_action( 'um_user_login_extra_hook', 'my_user_login_extra', 10, 1 );
+	 * function my_user_login_extra( $args ) {
 	 *     // your code here
 	 * }
-	 * add_action( 'um_user_login_extra_hook', 'my_user_login_extra', 10, 2 );
+	 * ?>
 	 */
-	do_action( 'um_user_login_extra_hook', $submitted_data, $form_data );
+	do_action( 'um_user_login_extra_hook', $args );
 }
-add_action( 'um_submit_form_login', 'um_submit_form_login', 10, 2 );
+add_action( 'um_submit_form_login', 'um_submit_form_login', 10 );
+
 
 /**
  * Show the submit button
@@ -360,27 +357,6 @@ function um_add_submit_button_to_login( $args ) {
 	if ( ! isset( $primary_btn_word ) || $primary_btn_word == '' ){
 		$primary_btn_word = UM()->options()->get( 'login_primary_btn_word' );
 	}
-	/**
-	 * Filters the classes applied to the primary button on the login form.
-	 *
-	 * @hook um_login_form_primary_btn_classes
-	 * @since 2.10.5
-	 *
-	 * @param {array} $classes An array of CSS classes applied to the primary button.
-	 * @param {array} $args    An array of arguments or configurations used in the login form.
-	 *
-	 * @return {array} Button CSS classes.
-	 *
-	 * @example <caption>Extend the classes applied to the primary button on the login form.</caption>
-	 * function my_custom_classes( $classes, $args ) {
-	 *     // Add a new class to the button
-	 *     $classes[] = 'new-button-class';
-	 *
-	 *     return $classes;
-	 * }
-	 * add_filter( 'um_login_form_primary_btn_classes', 'my_custom_classes', 10, 2 );
-	 */
-	$primary_btn_classes = apply_filters( 'um_login_form_primary_btn_classes', array( 'um-button' ), $args );
 
 	/**
 	 * UM hook
@@ -445,7 +421,7 @@ function um_add_submit_button_to_login( $args ) {
 		if ( ! empty( $args['secondary_btn'] ) ) { ?>
 
 			<div class="um-left um-half">
-				<input type="submit" value="<?php esc_attr_e( wp_unslash( $primary_btn_word ), 'ultimate-member' ); ?>" class="<?php echo esc_attr( implode( ' ', $primary_btn_classes ) ); ?>" id="um-submit-btn" />
+				<input type="submit" value="<?php esc_attr_e( wp_unslash( $primary_btn_word ), 'ultimate-member' ); ?>" class="um-button" id="um-submit-btn" />
 			</div>
 			<div class="um-right um-half">
 				<a href="<?php echo esc_url( $secondary_btn_url ); ?>" class="um-button um-alt">
@@ -456,7 +432,7 @@ function um_add_submit_button_to_login( $args ) {
 		<?php } else { ?>
 
 			<div class="um-center">
-				<input type="submit" value="<?php esc_attr_e( wp_unslash( $primary_btn_word ), 'ultimate-member' ); ?>" class="<?php echo esc_attr( implode( ' ', $primary_btn_classes ) ); ?>" id="um-submit-btn" />
+				<input type="submit" value="<?php esc_attr_e( wp_unslash( $primary_btn_word ), 'ultimate-member' ); ?>" class="um-button" id="um-submit-btn" />
 			</div>
 
 		<?php } ?>

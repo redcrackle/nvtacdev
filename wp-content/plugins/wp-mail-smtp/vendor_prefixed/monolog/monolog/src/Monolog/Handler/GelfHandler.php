@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -11,10 +10,12 @@ declare (strict_types=1);
  */
 namespace WPMailSMTP\Vendor\Monolog\Handler;
 
+use WPMailSMTP\Vendor\Gelf\IMessagePublisher;
 use WPMailSMTP\Vendor\Gelf\PublisherInterface;
+use WPMailSMTP\Vendor\Gelf\Publisher;
+use InvalidArgumentException;
 use WPMailSMTP\Vendor\Monolog\Logger;
 use WPMailSMTP\Vendor\Monolog\Formatter\GelfMessageFormatter;
-use WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface;
 /**
  * Handler to send messages to a Graylog2 (http://www.graylog2.org) server
  *
@@ -24,28 +25,33 @@ use WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface;
 class GelfHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProcessingHandler
 {
     /**
-     * @var PublisherInterface the publisher object that sends the message to the server
+     * @var Publisher|PublisherInterface|IMessagePublisher the publisher object that sends the message to the server
      */
     protected $publisher;
     /**
-     * @param PublisherInterface $publisher a gelf publisher object
+     * @param PublisherInterface|IMessagePublisher|Publisher $publisher a publisher object
+     * @param int                                            $level     The minimum logging level at which this handler will be triggered
+     * @param bool                                           $bubble    Whether the messages that are handled can bubble up the stack or not
      */
-    public function __construct(\WPMailSMTP\Vendor\Gelf\PublisherInterface $publisher, $level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG, bool $bubble = \true)
+    public function __construct($publisher, $level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG, $bubble = \true)
     {
         parent::__construct($level, $bubble);
+        if (!$publisher instanceof \WPMailSMTP\Vendor\Gelf\Publisher && !$publisher instanceof \WPMailSMTP\Vendor\Gelf\IMessagePublisher && !$publisher instanceof \WPMailSMTP\Vendor\Gelf\PublisherInterface) {
+            throw new \InvalidArgumentException('Invalid publisher, expected a Gelf\\Publisher, Gelf\\IMessagePublisher or Gelf\\PublisherInterface instance');
+        }
         $this->publisher = $publisher;
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    protected function write(array $record) : void
+    protected function write(array $record)
     {
         $this->publisher->publish($record['formatted']);
     }
     /**
      * {@inheritDoc}
      */
-    protected function getDefaultFormatter() : \WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface
+    protected function getDefaultFormatter()
     {
         return new \WPMailSMTP\Vendor\Monolog\Formatter\GelfMessageFormatter();
     }

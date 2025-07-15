@@ -11,9 +11,9 @@ class Helper {
      * @param   int     number
      * @return  bool
      */
-    public static function is_number($number) /** @TODO: starting PHP 8.0 $number can be declared as mixed $number */
+    public static function is_number($number)
     {
-        return ! empty($number) && is_numeric($number) && (intval($number) == floatval($number));
+        return !empty($number) && is_numeric($number) && (intval($number) == floatval($number));
     }
 
     /**
@@ -25,11 +25,10 @@ class Helper {
      * @param   int
      * @return  mixed   string|bool
      */
-    public static function prettify_number($number, $precision = 1) /** @TODO: starting PHP 8.0 $number can be declared as mixed $number */
+    public static function prettify_number($number, $precision = 1)
     {
-        if ( ! is_numeric($number) ) {
+        if ( ! is_numeric($number) )
             return false;
-        }
 
         if ( $number < 900 ) {
             // 0 - 900
@@ -71,7 +70,7 @@ class Helper {
      * @param   string   $format
      * @return  bool
      */
-    public static function is_valid_date(?string $date, $format = 'Y-m-d')
+    public static function is_valid_date($date = null, $format = 'Y-m-d')
     {
         $d = \DateTime::createFromFormat($format, $date);
         return $d && $d->format($format) === $date;
@@ -86,7 +85,7 @@ class Helper {
      * @param   string   $format
      * @return  array|bool
      */
-    public static function get_date_range(string $start_date, string $end_date, string $format = 'Y-m-d')
+    public static function get_date_range($start_date = null, $end_date = null, $format = 'Y-m-d')
     {
         if (
             self::is_valid_date($start_date, $format)
@@ -94,8 +93,8 @@ class Helper {
         ) {
             $dates = [];
 
-            $begin = new \DateTime($start_date, wp_timezone());
-            $end = new \DateTime($end_date, wp_timezone());
+            $begin = new \DateTime($start_date, new \DateTimeZone(Helper::get_timezone()));
+            $end = new \DateTime($end_date, new \DateTimeZone(Helper::get_timezone()));
 
             if ( $begin < $end ) {
                 while( $begin <= $end ) {
@@ -125,7 +124,7 @@ class Helper {
      */
     public static function curdate()
     {
-        return current_datetime()->format('Y-m-d');
+        return current_time('Y-m-d', false);
     }
 
     /**
@@ -137,7 +136,7 @@ class Helper {
      */
     public static function now()
     {
-        return current_datetime()->format('Y-m-d H:i:s');
+        return current_time('mysql');
     }
 
     /**
@@ -148,7 +147,8 @@ class Helper {
      */
     public static function timestamp()
     {
-        return current_datetime()->getTimestamp();
+        // current_datetime() is WP 5.3+
+        return ( function_exists('current_datetime') ) ? current_datetime()->getTimestamp() : current_time('timestamp');
     }
 
     /**
@@ -158,7 +158,7 @@ class Helper {
      * @param   string  $string
      * @return  bool
      */
-    public static function is_timestamp($string) /** @TODO: starting PHP 8.0 $string can be declared as mixed $string */
+    public static function is_timestamp($string)
     {
         if (
             ( is_int($string) || ctype_digit($string) ) 
@@ -168,6 +168,31 @@ class Helper {
         }
 
         return false;
+    }
+
+    /**
+     * Returns site's timezone.
+     *
+     * Code borrowed from Rarst's awesome WpDateTime class: https://github.com/Rarst/wpdatetime
+     *
+     * @since   5.0.0
+     * @return  string
+     */
+    public static function get_timezone()
+    {
+        $timezone_string = get_option('timezone_string');
+
+        if ( ! empty($timezone_string) ) {
+            return $timezone_string;
+        }
+
+        $offset = get_option('gmt_offset');
+        $sign = $offset < 0 ? '-' : '+';
+        $hours = (int) $offset;
+        $minutes = abs(($offset - (int) $offset) * 60);
+        $offset = sprintf('%s%02d:%02d', $sign, abs($hours), $minutes);
+
+        return $offset;
     }
 
     /**
@@ -207,6 +232,25 @@ class Helper {
     }
 
     /**
+     * Debug function.
+     *
+     * @since   3.0.0
+     * @param   mixed $v variable to display with var_dump()
+     * @param   mixed $v,... unlimited optional number of variables to display with var_dump()
+     */
+    public static function debug($v)
+    {
+        if ( !defined('WPP_DEBUG') || !WPP_DEBUG )
+            return;
+
+        foreach( func_get_args() as $arg ) {
+            print "<pre>";
+            var_dump($arg);
+            print "</pre>";
+        }
+    }
+
+    /**
      * Truncates text.
      *
      * @since   4.0.0
@@ -215,23 +259,23 @@ class Helper {
      * @param   bool     $truncate_by_words
      * @return  string
      */
-    public static function truncate(string $text = '', int $length = 25, bool $truncate_by_words = false, string $more = '...')
+    public static function truncate($text = '', $length = 25, $truncate_by_words = false, $more = '...')
     {
         if ( '' !== $text ) {
             $charset = get_bloginfo('charset');
 
             // Truncate by words
             if ( $truncate_by_words ) {
-                $words = explode(' ', $text, $length + 1);
+                $words = explode(" ", $text, $length + 1);
 
                 if ( count($words) > $length ) {
                     array_pop($words);
-                    $text = rtrim(implode(' ', $words), ',.') . $more;
+                    $text = rtrim(implode(" ", $words), ",.") . $more;
                 }
             }
             // Truncate by characters
             elseif ( mb_strlen($text, $charset) > $length ) {
-                $text = rtrim(mb_substr($text, 0, $length, $charset), ' ,.') . $more;
+                $text = rtrim(mb_substr($text, 0, $length , $charset), " ,.") . $more;
             }
         }
 
@@ -256,12 +300,12 @@ class Helper {
 
         if (
             is_singular($trackable) 
-            && ! is_front_page() 
-            && ! is_preview() 
-            && ! is_trackback() 
-            && ! is_feed() 
-            && ! is_robots() 
-            && ! is_customize_preview()
+            && !is_front_page() 
+            && !is_preview() 
+            && !is_trackback() 
+            && !is_feed() 
+            && !is_robots() 
+            && !is_customize_preview()
         ) {
             return get_queried_object_id();
         }
@@ -277,15 +321,14 @@ class Helper {
      * @param   string      $scheme
      * @return  string|bool
      */
-    public static function add_scheme(?string $url, string $scheme = 'https://')
+    static function add_scheme($url = null, $scheme = 'https://')
     {
         $url_args = parse_url($url);
 
         if ( $url_args ) {
             // No need to do anything, URL is fine
-            if ( isset($url_args['scheme']) ) {
+            if ( isset($url_args['scheme']) )
                 return $url;
-            }
             // Return URL with scheme
             return $scheme . $url_args['host'] . $url_args['path'];
         }
@@ -305,63 +348,29 @@ class Helper {
      * @param   string
      * @return  array|bool
      */
-    public static function is_image_url(string $url)
+    static function is_image_url($url)
     {
         $path = parse_url($url, PHP_URL_PATH);
         $encoded_path = array_map('urlencode', explode('/', $path));
         $parse_url = str_replace($path, implode('/', $encoded_path), $url);
 
-        if ( ! filter_var($parse_url, FILTER_VALIDATE_URL) ) {
+        if ( ! filter_var($parse_url, FILTER_VALIDATE_URL) )
             return false;
-        }
 
         // Check extension
         $file_name = basename($path);
         $file_name = sanitize_file_name($file_name);
         $ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-        $allowed_ext = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
+        $allowed_ext = ['jpg', 'jpeg', 'png', 'gif'];
 
-        if ( ! in_array($ext, $allowed_ext) ) {
+        if ( ! in_array($ext, $allowed_ext) )
             return false;
-        }
 
         // sanitize URL, just in case
         $image_url = esc_url($url);
         // remove querystring
-        preg_match('/[^\?]+\.(jpg|jpeg|gif|png|webp|avif)/i', $image_url, $matches);
+        preg_match('/[^\?]+\.(jpg|JPG|jpe|JPE|jpeg|JPEG|gif|GIF|png|PNG)/', $image_url, $matches);
 
         return ( is_array($matches) && ! empty($matches) ) ? $matches : false;
-    }
-
-    /**
-     * Sanitizes HTML output.
-     *
-     * @since   6.3.3
-     * @param   string  $html
-     * @param   array   $options  Public options
-     * @return  string  $html     The (sanitized) HTML code
-     */
-    public static function sanitize_html(string $html, array $options)
-    {
-        $allowed_tags = wp_kses_allowed_html('post');
-
-        if ( isset($allowed_tags['form']) ) {
-            unset($allowed_tags['form']);
-        }
-
-        if (
-            isset($options['theme']['name'])
-            && $options['theme']['name']
-        ) {
-            $allowed_tags['style'] = [
-                'id' => 1,
-                'nonce' => 1
-            ];
-        }
-
-        $allowed_tags['img']['decoding'] = true;
-        $allowed_tags['img']['srcset'] = true;
-
-        return wp_kses($html, $allowed_tags);
     }
 }

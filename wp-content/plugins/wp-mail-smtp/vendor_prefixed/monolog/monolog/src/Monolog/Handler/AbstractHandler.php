@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -11,51 +10,103 @@ declare (strict_types=1);
  */
 namespace WPMailSMTP\Vendor\Monolog\Handler;
 
+use WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface;
+use WPMailSMTP\Vendor\Monolog\Formatter\LineFormatter;
 use WPMailSMTP\Vendor\Monolog\Logger;
 use WPMailSMTP\Vendor\Monolog\ResettableInterface;
-use WPMailSMTP\Vendor\Psr\Log\LogLevel;
 /**
- * Base Handler class providing basic level/bubble support
+ * Base Handler class providing the Handler structure
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
- *
- * @phpstan-import-type Level from \Monolog\Logger
- * @phpstan-import-type LevelName from \Monolog\Logger
  */
-abstract class AbstractHandler extends \WPMailSMTP\Vendor\Monolog\Handler\Handler implements \WPMailSMTP\Vendor\Monolog\ResettableInterface
+abstract class AbstractHandler implements \WPMailSMTP\Vendor\Monolog\Handler\HandlerInterface, \WPMailSMTP\Vendor\Monolog\ResettableInterface
 {
-    /**
-     * @var int
-     * @phpstan-var Level
-     */
     protected $level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG;
-    /** @var bool */
     protected $bubble = \true;
+    /**
+     * @var FormatterInterface
+     */
+    protected $formatter;
+    protected $processors = array();
     /**
      * @param int|string $level  The minimum logging level at which this handler will be triggered
      * @param bool       $bubble Whether the messages that are handled can bubble up the stack or not
-     *
-     * @phpstan-param Level|LevelName|LogLevel::* $level
      */
-    public function __construct($level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG, bool $bubble = \true)
+    public function __construct($level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG, $bubble = \true)
     {
         $this->setLevel($level);
         $this->bubble = $bubble;
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function isHandling(array $record) : bool
+    public function isHandling(array $record)
     {
         return $record['level'] >= $this->level;
     }
     /**
+     * {@inheritdoc}
+     */
+    public function handleBatch(array $records)
+    {
+        foreach ($records as $record) {
+            $this->handle($record);
+        }
+    }
+    /**
+     * Closes the handler.
+     *
+     * This will be called automatically when the object is destroyed
+     */
+    public function close()
+    {
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function pushProcessor($callback)
+    {
+        if (!\is_callable($callback)) {
+            throw new \InvalidArgumentException('Processors must be valid callables (callback or object with an __invoke method), ' . \var_export($callback, \true) . ' given');
+        }
+        \array_unshift($this->processors, $callback);
+        return $this;
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function popProcessor()
+    {
+        if (!$this->processors) {
+            throw new \LogicException('You tried to pop from an empty processor stack.');
+        }
+        return \array_shift($this->processors);
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function setFormatter(\WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface $formatter)
+    {
+        $this->formatter = $formatter;
+        return $this;
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormatter()
+    {
+        if (!$this->formatter) {
+            $this->formatter = $this->getDefaultFormatter();
+        }
+        return $this->formatter;
+    }
+    /**
      * Sets minimum logging level at which this handler will be triggered.
      *
-     * @param  Level|LevelName|LogLevel::* $level Level or level name
+     * @param  int|string $level Level or level name
      * @return self
      */
-    public function setLevel($level) : self
+    public function setLevel($level)
     {
         $this->level = \WPMailSMTP\Vendor\Monolog\Logger::toMonologLevel($level);
         return $this;
@@ -64,10 +115,8 @@ abstract class AbstractHandler extends \WPMailSMTP\Vendor\Monolog\Handler\Handle
      * Gets minimum logging level at which this handler will be triggered.
      *
      * @return int
-     *
-     * @phpstan-return Level
      */
-    public function getLevel() : int
+    public function getLevel()
     {
         return $this->level;
     }
@@ -78,7 +127,7 @@ abstract class AbstractHandler extends \WPMailSMTP\Vendor\Monolog\Handler\Handle
      *                      false means that bubbling is not permitted.
      * @return self
      */
-    public function setBubble(bool $bubble) : self
+    public function setBubble($bubble)
     {
         $this->bubble = $bubble;
         return $this;
@@ -89,14 +138,35 @@ abstract class AbstractHandler extends \WPMailSMTP\Vendor\Monolog\Handler\Handle
      * @return bool true means that this handler allows bubbling.
      *              false means that bubbling is not permitted.
      */
-    public function getBubble() : bool
+    public function getBubble()
     {
         return $this->bubble;
     }
-    /**
-     * {@inheritDoc}
-     */
+    public function __destruct()
+    {
+        try {
+            $this->close();
+        } catch (\Exception $e) {
+            // do nothing
+        } catch (\Throwable $e) {
+            // do nothing
+        }
+    }
     public function reset()
     {
+        foreach ($this->processors as $processor) {
+            if ($processor instanceof \WPMailSMTP\Vendor\Monolog\ResettableInterface) {
+                $processor->reset();
+            }
+        }
+    }
+    /**
+     * Gets the default formatter.
+     *
+     * @return FormatterInterface
+     */
+    protected function getDefaultFormatter()
+    {
+        return new \WPMailSMTP\Vendor\Monolog\Formatter\LineFormatter();
     }
 }

@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -21,7 +20,7 @@ use WPMailSMTP\Vendor\Monolog\Utils;
  */
 class PsrLogMessageProcessor implements \WPMailSMTP\Vendor\Monolog\Processor\ProcessorInterface
 {
-    public const SIMPLE_DATE = "Y-m-d\\TH:i:s.uP";
+    const SIMPLE_DATE = "Y-m-d\\TH:i:s.uP";
     /** @var string|null */
     private $dateFormat;
     /** @var bool */
@@ -30,20 +29,21 @@ class PsrLogMessageProcessor implements \WPMailSMTP\Vendor\Monolog\Processor\Pro
      * @param string|null $dateFormat              The format of the timestamp: one supported by DateTime::format
      * @param bool        $removeUsedContextFields If set to true the fields interpolated into message gets unset
      */
-    public function __construct(?string $dateFormat = null, bool $removeUsedContextFields = \false)
+    public function __construct($dateFormat = null, $removeUsedContextFields = \false)
     {
         $this->dateFormat = $dateFormat;
         $this->removeUsedContextFields = $removeUsedContextFields;
     }
     /**
-     * {@inheritDoc}
+     * @param  array $record
+     * @return array
      */
-    public function __invoke(array $record) : array
+    public function __invoke(array $record)
     {
         if (\false === \strpos($record['message'], '{')) {
             return $record;
         }
-        $replacements = [];
+        $replacements = array();
         foreach ($record['context'] as $key => $val) {
             $placeholder = '{' . $key . '}';
             if (\strpos($record['message'], $placeholder) === \false) {
@@ -51,16 +51,8 @@ class PsrLogMessageProcessor implements \WPMailSMTP\Vendor\Monolog\Processor\Pro
             }
             if (\is_null($val) || \is_scalar($val) || \is_object($val) && \method_exists($val, "__toString")) {
                 $replacements[$placeholder] = $val;
-            } elseif ($val instanceof \DateTimeInterface) {
-                if (!$this->dateFormat && $val instanceof \WPMailSMTP\Vendor\Monolog\DateTimeImmutable) {
-                    // handle monolog dates using __toString if no specific dateFormat was asked for
-                    // so that it follows the useMicroseconds flag
-                    $replacements[$placeholder] = (string) $val;
-                } else {
-                    $replacements[$placeholder] = $val->format($this->dateFormat ?: static::SIMPLE_DATE);
-                }
-            } elseif ($val instanceof \UnitEnum) {
-                $replacements[$placeholder] = $val instanceof \BackedEnum ? $val->value : $val->name;
+            } elseif ($val instanceof \DateTime) {
+                $replacements[$placeholder] = $val->format($this->dateFormat ?: static::SIMPLE_DATE);
             } elseif (\is_object($val)) {
                 $replacements[$placeholder] = '[object ' . \WPMailSMTP\Vendor\Monolog\Utils::getClass($val) . ']';
             } elseif (\is_array($val)) {

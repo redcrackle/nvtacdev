@@ -2,8 +2,6 @@
 
 namespace WPMailSMTP\Providers\Postmark;
 
-use WPMailSMTP\ConnectionInterface;
-use WPMailSMTP\Helpers\UI;
 use WPMailSMTP\Providers\OptionsAbstract;
 
 /**
@@ -24,10 +22,8 @@ class Options extends OptionsAbstract {
 	 * Options constructor.
 	 *
 	 * @since 3.1.0
-	 *
-	 * @param ConnectionInterface $connection The Connection object.
 	 */
-	public function __construct( $connection = null ) {
+	public function __construct() {
 
 		$description = sprintf(
 			wp_kses( /* translators: %1$s - URL to postmarkapp.com site. */
@@ -46,7 +42,7 @@ class Options extends OptionsAbstract {
 				]
 			),
 			'https://postmarkapp.com',
-			esc_url( wp_mail_smtp()->get_utm_url( 'https://wpmailsmtp.com/docs/how-to-set-up-the-postmark-mailer-in-wp-mail-smtp/', 'Postmark documentation' ) )
+			'https://wpmailsmtp.com/docs/how-to-set-up-the-postmark-mailer-in-wp-mail-smtp/'
 		);
 
 		parent::__construct(
@@ -64,8 +60,7 @@ class Options extends OptionsAbstract {
 					'from_name_force'  => true,
 				],
 				'recommended' => false,
-			],
-			$connection
+			]
 		);
 	}
 
@@ -90,24 +85,15 @@ class Options extends OptionsAbstract {
 				<label for="wp-mail-smtp-setting-<?php echo esc_attr( $this->get_slug() ); ?>-server_api_token"><?php esc_html_e( 'Server API Token', 'wp-mail-smtp' ); ?></label>
 			</div>
 			<div class="wp-mail-smtp-setting-field">
-				<?php if ( $this->connection_options->is_const_defined( $this->get_slug(), 'server_api_token' ) ) : ?>
+				<?php if ( $this->options->is_const_defined( $this->get_slug(), 'server_api_token' ) ) : ?>
 					<input type="text" disabled value="****************************************"
 						   id="wp-mail-smtp-setting-<?php echo esc_attr( $this->get_slug() ); ?>-server_api_token"/>
 					<?php $this->display_const_set_message( 'WPMS_POSTMARK_SERVER_API_TOKEN' ); ?>
 				<?php else : ?>
-					<?php
-					$slug  = $this->get_slug();
-					$value = $this->connection_options->get( $this->get_slug(), 'server_api_token' );
-
-					UI::hidden_password_field(
-						[
-							'name'       => "wp-mail-smtp[{$slug}][server_api_token]",
-							'id'         => "wp-mail-smtp-setting-{$slug}-server_api_token",
-							'value'      => $value,
-							'clear_text' => esc_html__( 'Remove Server API Token', 'wp-mail-smtp' ),
-						]
-					);
-					?>
+					<input type="password" spellcheck="false"
+						   name="wp-mail-smtp[<?php echo esc_attr( $this->get_slug() ); ?>][server_api_token]"
+						   value="<?php echo esc_attr( $this->options->get( $this->get_slug(), 'server_api_token' ) ); ?>"
+						   id="wp-mail-smtp-setting-<?php echo esc_attr( $this->get_slug() ); ?>-server_api_token"/>
 				<?php endif; ?>
 				<p class="desc">
 					<?php
@@ -129,11 +115,11 @@ class Options extends OptionsAbstract {
 			</div>
 			<div class="wp-mail-smtp-setting-field">
 				<input name="wp-mail-smtp[<?php echo esc_attr( $this->get_slug() ); ?>][message_stream]" type="text"
-					   value="<?php echo esc_attr( $this->connection_options->get( $this->get_slug(), 'message_stream' ) ); ?>"
-					   <?php echo $this->connection_options->is_const_defined( $this->get_slug(), 'message_stream' ) ? 'disabled' : ''; ?>
+					   value="<?php echo esc_attr( $this->options->get( $this->get_slug(), 'message_stream' ) ); ?>"
+					   <?php echo $this->options->is_const_defined( $this->get_slug(), 'message_stream' ) ? 'disabled' : ''; ?>
 					   id="wp-mail-smtp-setting-<?php echo esc_attr( $this->get_slug() ); ?>-message_stream" spellcheck="false"/>
 				<?php
-				if ( $this->connection_options->is_const_defined( $this->get_slug(), 'message_stream' ) ) {
+				if ( $this->options->is_const_defined( $this->get_slug(), 'message_stream' ) ) {
 					$this->display_const_set_message( 'WPMS_POSTMARK_MESSAGE_STREAM' );
 				}
 				?>
@@ -152,7 +138,7 @@ class Options extends OptionsAbstract {
 								],
 							]
 						),
-						esc_url( wp_mail_smtp()->get_utm_url( 'https://wpmailsmtp.com/docs/how-to-set-up-the-postmark-mailer-in-wp-mail-smtp/#message-stream', 'Postmark documentation - message stream' ) )
+						'https://wpmailsmtp.com/docs/how-to-set-up-the-postmark-mailer-in-wp-mail-smtp/#message-stream'
 					);
 					?>
 				</p>

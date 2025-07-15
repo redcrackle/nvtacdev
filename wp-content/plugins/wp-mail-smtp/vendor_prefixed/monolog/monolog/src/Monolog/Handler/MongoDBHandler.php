@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -11,69 +10,43 @@ declare (strict_types=1);
  */
 namespace WPMailSMTP\Vendor\Monolog\Handler;
 
-use MongoDB\Driver\BulkWrite;
-use MongoDB\Driver\Manager;
-use WPMailSMTP\Vendor\MongoDB\Client;
 use WPMailSMTP\Vendor\Monolog\Logger;
-use WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface;
-use WPMailSMTP\Vendor\Monolog\Formatter\MongoDBFormatter;
+use WPMailSMTP\Vendor\Monolog\Formatter\NormalizerFormatter;
 /**
  * Logs to a MongoDB database.
  *
- * Usage example:
+ * usage example:
  *
- *   $log = new \Monolog\Logger('application');
- *   $client = new \MongoDB\Client('mongodb://localhost:27017');
- *   $mongodb = new \Monolog\Handler\MongoDBHandler($client, 'logs', 'prod');
+ *   $log = new Logger('application');
+ *   $mongodb = new MongoDBHandler(new \Mongo("mongodb://localhost:27017"), "logs", "prod");
  *   $log->pushHandler($mongodb);
  *
- * The above examples uses the MongoDB PHP library's client class; however, the
- * MongoDB\Driver\Manager class from ext-mongodb is also supported.
+ * @author Thomas Tourlourat <thomas@tourlourat.com>
  */
 class MongoDBHandler extends \WPMailSMTP\Vendor\Monolog\Handler\AbstractProcessingHandler
 {
-    /** @var \MongoDB\Collection */
-    private $collection;
-    /** @var Client|Manager */
-    private $manager;
-    /** @var string */
-    private $namespace;
-    /**
-     * Constructor.
-     *
-     * @param Client|Manager $mongodb    MongoDB library or driver client
-     * @param string         $database   Database name
-     * @param string         $collection Collection name
-     */
-    public function __construct($mongodb, string $database, string $collection, $level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG, bool $bubble = \true)
+    protected $mongoCollection;
+    public function __construct($mongo, $database, $collection, $level = \WPMailSMTP\Vendor\Monolog\Logger::DEBUG, $bubble = \true)
     {
-        if (!($mongodb instanceof \WPMailSMTP\Vendor\MongoDB\Client || $mongodb instanceof \MongoDB\Driver\Manager)) {
-            throw new \InvalidArgumentException('MongoDB\\Client or MongoDB\\Driver\\Manager instance required');
+        if (!($mongo instanceof \MongoClient || $mongo instanceof \Mongo || $mongo instanceof \WPMailSMTP\Vendor\MongoDB\Client)) {
+            throw new \InvalidArgumentException('MongoClient, Mongo or MongoDB\\Client instance required');
         }
-        if ($mongodb instanceof \WPMailSMTP\Vendor\MongoDB\Client) {
-            $this->collection = $mongodb->selectCollection($database, $collection);
-        } else {
-            $this->manager = $mongodb;
-            $this->namespace = $database . '.' . $collection;
-        }
+        $this->mongoCollection = $mongo->selectCollection($database, $collection);
         parent::__construct($level, $bubble);
     }
-    protected function write(array $record) : void
+    protected function write(array $record)
     {
-        if (isset($this->collection)) {
-            $this->collection->insertOne($record['formatted']);
-        }
-        if (isset($this->manager, $this->namespace)) {
-            $bulk = new \MongoDB\Driver\BulkWrite();
-            $bulk->insert($record["formatted"]);
-            $this->manager->executeBulkWrite($this->namespace, $bulk);
+        if ($this->mongoCollection instanceof \WPMailSMTP\Vendor\MongoDB\Collection) {
+            $this->mongoCollection->insertOne($record["formatted"]);
+        } else {
+            $this->mongoCollection->save($record["formatted"]);
         }
     }
     /**
      * {@inheritDoc}
      */
-    protected function getDefaultFormatter() : \WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface
+    protected function getDefaultFormatter()
     {
-        return new \WPMailSMTP\Vendor\Monolog\Formatter\MongoDBFormatter();
+        return new \WPMailSMTP\Vendor\Monolog\Formatter\NormalizerFormatter();
     }
 }

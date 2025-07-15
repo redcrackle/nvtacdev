@@ -22,67 +22,6 @@ class Processor {
 	protected $wp_mail_from;
 
 	/**
-	 * Connections manager.
-	 *
-	 * @since 3.7.0
-	 *
-	 * @var ConnectionsManager
-	 */
-	private $connections_manager;
-
-	/**
-	 * This attribute will hold the arguments passed to the `wp_mail` function.
-	 *
-	 * @since 4.0.0
-	 *
-	 * @var array
-	 */
-	private $original_wp_mail_args;
-
-	/**
-	 * This attribute will hold the arguments passed to the `wp_mail` function and filtered via `wp_mail` filter.
-	 *
-	 * @since 4.0.0
-	 *
-	 * @var array
-	 */
-	private $filtered_wp_mail_args;
-
-	/**
-	 * This attribute will hold the From address filtered via the `wp_mail_from` filter.
-	 *
-	 * @since 4.0.0
-	 *
-	 * @var string
-	 */
-	private $filtered_from_email;
-
-	/**
-	 * This attribute will hold the From name filtered via the `wp_mail_from_name` filter.
-	 *
-	 * @since 4.0.0
-	 *
-	 * @var string
-	 */
-	private $filtered_from_name;
-
-	/**
-	 * Class constructor.
-	 *
-	 * @since 3.7.0
-	 *
-	 * @param ConnectionsManager $connections_manager Connections manager.
-	 */
-	public function __construct( $connections_manager = null ) {
-
-		if ( is_null( $connections_manager ) ) {
-			$this->connections_manager = wp_mail_smtp()->get_connections_manager();
-		} else {
-			$this->connections_manager = $connections_manager;
-		}
-	}
-
-	/**
 	 * Assign all hooks to proper places.
 	 *
 	 * @since 1.0.0
@@ -94,9 +33,6 @@ class Processor {
 		// High priority number tries to ensure our plugin code executes last and respects previous hooks, if not forced.
 		add_filter( 'wp_mail_from', array( $this, 'filter_mail_from_email' ), PHP_INT_MAX );
 		add_filter( 'wp_mail_from_name', array( $this, 'filter_mail_from_name' ), PHP_INT_MAX );
-
-		add_action( 'wp_mail', [ $this, 'capture_early_wp_mail_filter_call' ], - PHP_INT_MAX );
-		add_action( 'wp_mail', [ $this, 'capture_late_wp_mail_filter_call' ], PHP_INT_MAX );
 	}
 
 	/**
@@ -108,14 +44,13 @@ class Processor {
 	 */
 	public function phpmailer_init( $phpmailer ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
 
-		$connection         = $this->connections_manager->get_mail_connection();
-		$connection_options = $connection->get_options();
-		$mailer             = $connection->get_mailer_slug();
+		$options = Options::init();
+		$mailer  = $options->get( 'mail', 'mailer' );
 
 		// Check that mailer is not blank, and if mailer=smtp, host is not blank.
 		if (
 			! $mailer ||
-			( 'smtp' === $mailer && ! $connection_options->get( 'smtp', 'host' ) )
+			( 'smtp' === $mailer && ! $options->get( 'smtp', 'host' ) )
 		) {
 			return;
 		}
@@ -123,7 +58,7 @@ class Processor {
 		// If the mailer is pepipost, make sure we have a username and password.
 		if (
 			'pepipost' === $mailer &&
-			( ! $connection_options->get( 'pepipost', 'user' ) && ! $connection_options->get( 'pepipost', 'pass' ) )
+			( ! $options->get( 'pepipost', 'user' ) && ! $options->get( 'pepipost', 'pass' ) )
 		) {
 			return;
 		}
@@ -135,19 +70,19 @@ class Processor {
 		$phpmailer->Mailer = $mailer;
 
 		// Set the Sender (return-path) if required.
-		if ( $connection_options->get( 'mail', 'return_path' ) ) {
+		if ( $options->get( 'mail', 'return_path' ) ) {
 			$phpmailer->Sender = $phpmailer->From;
 		}
 
 		// Set the SMTPSecure value, if set to none, leave this blank. Possible values: 'ssl', 'tls', ''.
-		if ( 'none' === $connection_options->get( $mailer, 'encryption' ) ) {
+		if ( 'none' === $options->get( $mailer, 'encryption' ) ) {
 			$phpmailer->SMTPSecure = '';
 		} else {
-			$phpmailer->SMTPSecure = $connection_options->get( $mailer, 'encryption' );
+			$phpmailer->SMTPSecure = $options->get( $mailer, 'encryption' );
 		}
 
 		// Check if user has disabled SMTPAutoTLS.
-		if ( $connection_options->get( $mailer, 'encryption' ) !== 'tls' && ! $connection_options->get( $mailer, 'autotls' ) ) {
+		if ( $options->get( $mailer, 'encryption' ) !== 'tls' && ! $options->get( $mailer, 'autotls' ) ) {
 			$phpmailer->SMTPAutoTLS = false;
 		}
 
@@ -159,27 +94,25 @@ class Processor {
 		// If we're sending via SMTP, set the host.
 		if ( 'smtp' === $mailer ) {
 			// Set the other options.
-			$phpmailer->Host = $connection_options->get( $mailer, 'host' );
-			$phpmailer->Port = $connection_options->get( $mailer, 'port' );
+			$phpmailer->Host = $options->get( $mailer, 'host' );
+			$phpmailer->Port = $options->get( $mailer, 'port' );
 
 			// If we're using smtp auth, set the username & password.
-			if ( $connection_options->get( $mailer, 'auth' ) ) {
+			if ( $options->get( $mailer, 'auth' ) ) {
 				$phpmailer->SMTPAuth = true;
-				$phpmailer->Username = $connection_options->get( $mailer, 'user' );
-				$phpmailer->Password = $connection_options->get( $mailer, 'pass' );
+				$phpmailer->Username = $options->get( $mailer, 'user' );
+				$phpmailer->Password = $options->get( $mailer, 'pass' );
 			}
 		} elseif ( 'pepipost' === $mailer ) {
 			// Set the Pepipost settings for BC.
 			$phpmailer->Mailer     = 'smtp';
 			$phpmailer->Host       = 'smtp.pepipost.com';
-			$phpmailer->Port       = $connection_options->get( $mailer, 'port' );
-			$phpmailer->SMTPSecure = $connection_options->get( $mailer, 'encryption' ) === 'none' ? '' : $connection_options->get( $mailer, 'encryption' );
+			$phpmailer->Port       = $options->get( $mailer, 'port' );
+			$phpmailer->SMTPSecure = $options->get( $mailer, 'encryption' ) === 'none' ? '' : $options->get( $mailer, 'encryption' );
 			$phpmailer->SMTPAuth   = true;
-			$phpmailer->Username   = $connection_options->get( $mailer, 'user' );
-			$phpmailer->Password   = $connection_options->get( $mailer, 'pass' );
+			$phpmailer->Username   = $options->get( $mailer, 'user' );
+			$phpmailer->Password   = $options->get( $mailer, 'pass' );
 		}
-
-		$phpmailer->Timeout = 30;
 		// phpcs:enable
 
 		// Maybe set default reply-to header.
@@ -203,17 +136,16 @@ class Processor {
 	 */
 	protected function allow_setting_original_from_email_to_reply_to( $reply_to, $mailer ) {
 
-		$connection         = $this->connections_manager->get_mail_connection();
-		$connection_options = $connection->get_options();
-		$forced             = $connection_options->get( 'mail', 'from_email_force' );
-		$from_email         = $connection_options->get( 'mail', 'from_email' );
+		$options    = Options::init();
+		$forced     = $options->get( 'mail', 'from_email_force' );
+		$from_email = $options->get( 'mail', 'from_email' );
 
 		if ( ! empty( $reply_to ) || empty( $this->wp_mail_from ) ) {
 			return false;
 		}
 
-		if ( in_array( $mailer, [ 'zoho' ], true ) ) {
-			$sender     = $connection_options->get( $mailer, 'user_details' );
+		if ( in_array( $mailer, [ 'outlook', 'zoho' ], true ) ) {
+			$sender     = $options->get( $mailer, 'user_details' );
 			$from_email = ! empty( $sender['email'] ) ? $sender['email'] : '';
 			$forced     = true;
 		}
@@ -247,7 +179,7 @@ class Processor {
 		if ( ! $is_sent ) {
 			// Add mailer to the beginning and save to display later.
 			Debug::set(
-				'Mailer: ' . esc_html( wp_mail_smtp()->get_providers()->get_options( wp_mail_smtp()->get_connections_manager()->get_mail_connection()->get_mailer_slug() )->get_title() ) . "\r\n" .
+				'Mailer: ' . esc_html( wp_mail_smtp()->get_providers()->get_options( Options::init()->get( 'mail', 'mailer' ) )->get_title() ) . "\r\n" .
 				'PHPMailer was able to connect to SMTP server but failed while trying to send an email.'
 			);
 		} else {
@@ -255,20 +187,6 @@ class Processor {
 		}
 
 		do_action( 'wp_mail_smtp_mailcatcher_smtp_send_after', $is_sent, $to, $cc, $bcc, $subject, $body, $from );
-	}
-
-	/**
-	 * Validate the email address.
-	 *
-	 * @since 3.6.0
-	 *
-	 * @param string $email The email address.
-	 *
-	 * @return boolean True if email address is valid, false on failure.
-	 */
-	public static function is_email_callback( $email ) {
-
-		return (bool) is_email( $email );
 	}
 
 	/**
@@ -284,14 +202,10 @@ class Processor {
 	 */
 	public function filter_mail_from_email( $wp_email ) {
 
-		// Save the original from address.
-		$this->filtered_from_email = filter_var( $wp_email, FILTER_VALIDATE_EMAIL );
-
-		$connection         = $this->connections_manager->get_mail_connection();
-		$connection_options = $connection->get_options();
-		$forced             = $connection_options->get( 'mail', 'from_email_force' );
-		$from_email         = $connection_options->get( 'mail', 'from_email' );
-		$def_email          = WP::get_default_email();
+		$options    = Options::init();
+		$forced     = $options->get( 'mail', 'from_email_force' );
+		$from_email = $options->get( 'mail', 'from_email' );
+		$def_email  = WP::get_default_email();
 
 		// Save the "original" set WP email from address for later use.
 		if ( $wp_email !== $def_email ) {
@@ -299,7 +213,7 @@ class Processor {
 		}
 
 		// Return FROM EMAIL if forced in settings.
-		if ( $forced && ! empty( $from_email ) ) {
+		if ( $forced & ! empty( $from_email ) ) {
 			return $from_email;
 		}
 
@@ -323,19 +237,15 @@ class Processor {
 	 */
 	public function filter_mail_from_name( $name ) {
 
-		// Save the original from name.
-		$this->filtered_from_name = $name;
-
-		$connection         = $this->connections_manager->get_mail_connection();
-		$connection_options = $connection->get_options();
-		$force              = $connection_options->get( 'mail', 'from_name_force' );
+		$options = Options::init();
+		$force   = $options->get( 'mail', 'from_name_force' );
 
 		// If the FROM NAME is not the default and not forced, return it unchanged.
 		if ( ! $force && $name !== $this->get_default_name() ) {
 			return $name;
 		}
 
-		$name = $connection_options->get( 'mail', 'from_name' );
+		$name = $options->get( 'mail', 'from_name' );
 
 		return $name;
 	}
@@ -423,107 +333,5 @@ class Processor {
 				$phpmailer->addReplyTo( $email );
 			}
 		}
-	}
-
-	/**
-	 * Capture `wp_mail` filter call on earliest priority.
-	 *
-	 * Currently used to capture the original `wp_mail` arguments before they are filtered.
-	 *
-	 * @since 4.0.0
-	 *
-	 * @param array $args The original `wp_mail` arguments.
-	 *
-	 * @return array
-	 */
-	public function capture_early_wp_mail_filter_call( $args ) {
-
-		$this->original_wp_mail_args = $args;
-
-		return $args;
-	}
-
-	/**
-	 * Capture `wp_mail` filter call on latest priority.
-	 *
-	 * Currently used to capture the `wp_mail` arguments after they are filtered
-	 * and capture `wp_mail` function call.
-	 *
-	 * @since 4.0.0
-	 *
-	 * @param array $args The filtered `wp_mail` arguments.
-	 *
-	 * @return array
-	 */
-	public function capture_late_wp_mail_filter_call( $args ) {
-
-		$this->filtered_wp_mail_args = $args;
-
-		$this->capture_wp_mail_call();
-
-		return $args;
-	}
-
-	/**
-	 * Capture `wp_mail` function call.
-	 *
-	 * @since 4.0.0
-	 */
-	private function capture_wp_mail_call() {
-
-		/**
-		 * Fires on `wp_mail` function call.
-		 *
-		 * @since 4.0.0
-		 */
-		do_action( 'wp_mail_smtp_processor_capture_wp_mail_call' );
-	}
-
-	/**
-	 * Get the original `wp_mail` arguments.
-	 *
-	 * @since 4.0.0
-	 *
-	 * @return array
-	 */
-	public function get_original_wp_mail_args() {
-
-		return $this->original_wp_mail_args;
-	}
-
-	/**
-	 * Get the filtered `wp_mail` arguments.
-	 *
-	 * @since 4.0.0
-	 *
-	 * @return array
-	 */
-	public function get_filtered_wp_mail_args() {
-
-		return $this->filtered_wp_mail_args;
-	}
-
-	/**
-	 * Get the filtered `wp_mail_from` value.
-	 *
-	 * @since 4.0.0
-	 *
-	 * @return string
-	 */
-	public function get_filtered_from_email() {
-
-		return $this->filtered_from_email;
-	}
-
-	/**
-	 * Get the filtered `wp_mail_from_name` value.
-	 *
-	 * @since 4.0.0
-	 *
-	 * @return string
-	 */
-	public function get_filtered_from_name() {
-
-		return $this->filtered_from_name;
 	}
 }

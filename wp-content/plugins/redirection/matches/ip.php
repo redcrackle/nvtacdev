@@ -26,11 +26,11 @@ class IP_Match extends Red_Match {
 	/**
 	 * Sanitize a single IP
 	 *
-	 * @param string $ip IP.
-	 * @return string|false
+	 * @param String $ip IP.
+	 * @return String|false
 	 */
 	private function sanitize_single_ip( $ip ) {
-		$ip = @inet_pton( trim( sanitize_text_field( $ip ) ) );
+		$ip = @inet_pton( trim( $ip ) );
 		if ( $ip !== false ) {
 			return @inet_ntop( $ip );  // Convert back to string
 		}
@@ -52,7 +52,7 @@ class IP_Match extends Red_Match {
 	/**
 	 * Get a list of IPs that match.
 	 *
-	 * @param string $match_ip IP to match.
+	 * @param String $match_ip IP to match.
 	 * @return string[]
 	 */
 	private function get_matching_ips( $match_ip ) {

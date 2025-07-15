@@ -120,6 +120,7 @@ function um_replace_placeholders() {
 		'{user_account_link}',
 	);
 
+
 	/**
 	 * UM hook
 	 *
@@ -208,7 +209,7 @@ function um_convert_tags( $content, $args = array(), $with_kses = true ) {
 	// Support for all usermeta keys
 	if ( ! empty( $matches[1] ) && is_array( $matches[1] ) ) {
 		foreach ( $matches[1] as $match ) {
-			$key   = str_replace( 'usermeta:', '', $match );
+			$key = str_replace( 'usermeta:', '', $match );
 			$value = um_user( $key );
 			if ( is_array( $value ) ) {
 				$value = implode( ', ', $value );
@@ -218,6 +219,32 @@ function um_convert_tags( $content, $args = array(), $with_kses = true ) {
 	}
 	return $content;
 }
+
+
+/**
+ * UM Placeholders for activation link in email
+ *
+ * @param $placeholders
+ *
+ * @return array
+ */
+function account_activation_link_tags_patterns( $placeholders ) {
+	$placeholders[] = '{account_activation_link}';
+	return $placeholders;
+}
+
+/**
+ * UM Replace Placeholders for activation link in email
+ *
+ * @param $replace_placeholders
+ *
+ * @return array
+ */
+function account_activation_link_tags_replaces( $replace_placeholders ) {
+	$replace_placeholders[] = um_user( 'account_activation_link' );
+	return $replace_placeholders;
+}
+
 
 /**
  * @function um_user_ip()
@@ -644,10 +671,10 @@ function um_get_snippet( $str, $wordCount = 10 ) {
 
 /**
  * Format submitted data for Info preview & Email template
- * @param  boolean $style
+ * @param  boolean $style 
  * @return string
  *
- * @since  2.1.4
+ * @since  2.1.4 
  */
 function um_user_submitted_registration_formatted( $style = false ) {
 	$output = null;
@@ -658,37 +685,13 @@ function um_user_submitted_registration_formatted( $style = false ) {
 		$output .= '<div class="um-admin-infobox">';
 	}
 
-	// User registered date.
-	$output .= um_user_submited_display( 'user_registered', __( 'User registered date', 'ultimate-member' ) );
-	// Registration form.
+	// Timestamp
+	$output .= um_user_submited_display( 'timestamp', __( 'Date Submitted', 'ultimate-member' ) );
 	$output .= um_user_submited_display( 'form_id', __( 'Form', 'ultimate-member' ), $submitted_data );
 
 	if ( isset( $submitted_data['use_gdpr_agreement'] ) ) {
 		$output .= um_user_submited_display( 'use_gdpr_agreement', __( 'GDPR Applied', 'ultimate-member' ), $submitted_data );
 	}
-
-	/**
-	 * Filters the custom HTML before user registration submitted and formatted data.
-	 *
-	 * @param {string} $before_html    Custom HTML before submitted data.
-	 * @param {string} $output         Prepared submitted data in HTML format.
-	 * @param {array}  $submitted_data Submitted user data during registration.
-	 *
-	 * @return {string} Custom HTML before submitted data.
-	 *
-	 * @since 2.9.2
-	 * @hook um_before_user_submitted_registration_data
-	 *
-	 * @example <caption>Change custom HTML before user registration submitted and formatted data.</caption>
-	 * function my_user_submitted_registration_data( $before_html, $output, $submitted_data ) {
-	 *     if ( ! empty( $submitted_data['custom_data'] ) ) {
-	 *         $before_html .= 'Custom HTML here';
-	 *     }
-	 *     return $before_html;
-	 * }
-	 * add_filter( 'um_before_user_submitted_registration_data', 'my_user_submitted_registration_data', 10, 3 );
-	 */
-	$output .= apply_filters( 'um_before_user_submitted_registration_data', '', $output, $submitted_data );
 
 	if ( isset( $submitted_data ) && is_array( $submitted_data ) ) {
 
@@ -706,7 +709,7 @@ function um_user_submitted_registration_formatted( $style = false ) {
 			UM()->fields()->get_fields = $fields;
 
 			foreach ( $fields as $key => $array ) {
-				if ( isset( $array['type'] ) && 'row' === $array['type'] ) {
+				if ( isset( $array['type'] ) && $array['type'] == 'row' ) {
 					$rows[ $key ] = $array;
 					unset( UM()->fields()->get_fields[ $key ] ); // not needed now
 				}
@@ -744,6 +747,7 @@ function um_user_submitted_registration_formatted( $style = false ) {
 						$cols_num = $col_split[ $c ];
 
 						// sub row fields
+						$subrow_fields = null;
 						$subrow_fields = UM()->fields()->get_fields_in_subrow( $row_fields, $c );
 
 						if ( is_array( $subrow_fields ) ) {
@@ -762,6 +766,7 @@ function um_user_submitted_registration_formatted( $style = false ) {
 										$output .= um_user_submited_display( $key, $data['title'] );
 									}
 								}
+
 							} elseif ( $cols_num == 2 ) {
 
 								$col1_fields = UM()->fields()->get_fields_in_column( $subrow_fields, 1 );
@@ -777,6 +782,7 @@ function um_user_submitted_registration_formatted( $style = false ) {
 										$output .= um_user_submited_display( $key, $data['title'] );
 									}
 								}
+
 							} else {
 
 								$col1_fields = UM()->fields()->get_fields_in_column( $subrow_fields, 1 );
@@ -799,21 +805,29 @@ function um_user_submitted_registration_formatted( $style = false ) {
 										$output .= um_user_submited_display( $key, $data['title'] );
 									}
 								}
+
 							}
+
 						}
+
 					}
+
 				}
+
+
 			} // endfor
+
 		}
 	}
 
-	$output .= apply_filters( 'um_after_user_submitted_registration_data', '', $output, $submitted_data );
 
 	if ( $style ) {
 		$output .= '</div>';
 	}
 
+
 	return $output;
+
 }
 
 /**
@@ -825,39 +839,39 @@ function um_user_submitted_registration_formatted( $style = false ) {
  * @param  boolean $style
  * @return string
  *
- * @since  2.1.4
+ * @since  2.1.4 
  */
 function um_user_submited_display( $k, $title, $data = array(), $style = true ) {
 	$output = '';
 
-	if ( 'form_id' === $k && ! empty( $data['form_id'] ) ) {
-		// translators: %1$s is a form title; %2$s is a form ID.
-		$v = sprintf( __( '%1$s - Form ID#: %2$s', 'ultimate-member' ), get_the_title( $data['form_id'] ), $data['form_id'] );
+	if ( 'form_id' == $k && isset( $data['form_id'] ) && ! empty( $data['form_id'] ) ) {
+		$v = sprintf( __( '%s - Form ID#: %s', 'ultimate-member' ), get_the_title( $data['form_id'] ), $data['form_id'] );
 	} else {
 		$v = um_user( $k );
 	}
 
-	if ( strstr( $k, 'user_pass' ) || in_array( $k, array( 'g-recaptcha-response', 'request', '_wpnonce', '_wp_http_referer' ), true ) ) {
+	if ( strstr( $k, 'user_pass' ) || in_array( $k, array( 'g-recaptcha-response', 'request', '_wpnonce', '_wp_http_referer' ) ) ) {
 		return '';
 	}
 
 	$fields_without_metakey = UM()->builtin()->get_fields_without_metakey();
-	$type                   = UM()->fields()->get_field_type( $k );
-	if ( in_array( $type, $fields_without_metakey, true ) ) {
+	$type = UM()->fields()->get_field_type( $k );
+	if ( in_array( $type, $fields_without_metakey ) ) {
 		return '';
 	}
 
 	if ( ! $v ) {
 		if ( $style ) {
-			return "<p><label>$title: </label><span>" . esc_html__( '(empty)', 'ultimate-member' ) . '</span></p>';
+			return "<p><label>$title: </label><span>" . __( '(empty)', 'ultimate-member' ) ."</span></p>";
+		} else {
+			return '';
 		}
-		return '';
 	}
 
-	if ( in_array( $type, array( 'image', 'file' ), true ) ) {
+	if ( $type == 'image' || $type == 'file' ) {
 		$file = basename( $v );
 
-		$filedata = get_user_meta( um_user( 'ID' ), $k . '_metadata', true );
+		$filedata = get_user_meta( um_user( 'ID' ), $k . "_metadata", true );
 
 		$baseurl = UM()->uploader()->get_upload_base_url();
 		if ( ! file_exists( UM()->uploader()->get_upload_base_dir() . um_user( 'ID' ) . DIRECTORY_SEPARATOR . $file ) ) {
@@ -868,44 +882,20 @@ function um_user_submited_display( $k, $title, $data = array(), $style = true ) 
 		}
 
 		if ( ! empty( $filedata['original_name'] ) ) {
-			$v = '<a class="um-preview-upload" target="_blank" href="' . esc_url( $baseurl . um_user( 'ID' ) . '/' . $file ) . '">' . esc_html( $filedata['original_name'] ) . '</a>';
+			$v = '<a href="' . esc_attr( $baseurl . um_user( 'ID' ) . '/' . $file ) . '">' . esc_html( $filedata['original_name'] ) . '</a>';
 		} else {
 			$v = $baseurl . um_user( 'ID' ) . '/' . $file;
 		}
 	}
 
-	/**
-	 * Filters submitted data info before displaying in modal window or submit to admin email.
-	 *
-	 * @param {string|array} $value Submitted value.
-	 * @param {string}       $k     Submitted data metakey.
-	 * @param {array}        $data  Submitted data
-	 * @param {bool}         $style If styled echo
-	 *
-	 * @return {string|array} Is allowed verify.
-	 *
-	 * @since 2.6.8
-	 * @hook um_submitted_data_value
-	 *
-	 * @example <caption>Change submitted data info before echo.</caption>
-	 * function my_um_submitted_data_value ( $value, $metakey, $data, $style ) {
-	 *     if ( 'some_metakey' === $metakey ) {
-	 *         $value = 'new_value';
-	 *     }
-	 *     return $value;
-	 * }
-	 * add_filter( 'um_submitted_data_value', 'my_um_submitted_data_value', 10, 4 );
-	 */
-	$v = apply_filters( 'um_submitted_data_value', $v, $k, $data, $style );
-
 	if ( is_array( $v ) ) {
 		$v = implode( ',', $v );
 	}
 
-	if ( 'user_registered' === $k ) {
-		$v = wp_date( get_option( 'date_format', 'F j, Y' ) . ' ' . get_option( 'time_format', 'g:i a' ), strtotime( $v ) );
-	} elseif ( 'use_gdpr_agreement' === $k ) {
-		$v = wp_date( get_option( 'date_format', 'F j, Y' ) . ' ' . get_option( 'time_format', 'g:i a' ), strtotime( $v ) );
+	if ( $k == 'timestamp' ) {
+		$v = date( "d M Y H:i", $v );
+	} elseif ( $k == 'use_gdpr_agreement' ) {
+		$v = date( "d M Y H:i", $v );
 	}
 
 	if ( $style ) {
@@ -925,20 +915,18 @@ function um_user_submited_display( $k, $title, $data = array(), $style = true ) 
  * Show filtered social link
  *
  * @param string $key
- * @param null|string $match
+ * @param string $match
  *
  * @return string
  */
-function um_filtered_social_link( $key, $match = null ) {
+function um_filtered_social_link( $key, $match ) {
 	$value = um_profile( $key );
-	if ( ! empty( $match ) ) {
-		$submatch = str_replace( 'https://', '', $match );
-		$submatch = str_replace( 'http://', '', $submatch );
-		if ( strstr( $value, $submatch ) ) {
-			$value = 'https://' . $value;
-		} elseif ( strpos( $value, 'http' ) !== 0 ) {
-			$value = $match . $value;
-		}
+	$submatch = str_replace( 'https://', '', $match );
+	$submatch = str_replace( 'http://', '', $submatch );
+	if ( strstr( $value, $submatch ) ) {
+		$value = 'https://' . $value;
+	} elseif ( strpos( $value, 'http' ) !== 0 ) {
+		$value = $match . $value;
 	}
 	$value = str_replace( 'https://https://', 'https://', $value );
 	$value = str_replace( 'http://https://', 'https://', $value );
@@ -1152,8 +1140,8 @@ function um_is_file_owner( $url, $user_id = null, $image_path = false ) {
 
 /**
  * Check if file is temporary
- * @param  string $filename
- * @return bool
+ * @param  string $filename 
+ * @return bool       
  */
 function um_is_temp_file( $filename ) {
 	$user_basedir = UM()->uploader()->get_upload_user_base_dir( 'temp' );
@@ -1166,21 +1154,23 @@ function um_is_temp_file( $filename ) {
 	return false;
 }
 
+
 /**
  * Get user's last login timestamp
  *
- * @param int $user_id
+ * @param $user_id
  *
- * @return int|string
+ * @return mixed|string
  */
 function um_user_last_login_timestamp( $user_id ) {
 	$value = get_user_meta( $user_id, '_um_last_login', true );
 	if ( $value ) {
-		return strtotime( $value );
+		return $value;
 	}
 
 	return '';
 }
+
 
 /**
  * Get user's last login (time diff)
@@ -1190,9 +1180,10 @@ function um_user_last_login_timestamp( $user_id ) {
  * @return string
  */
 function um_user_last_login( $user_id ) {
-	$value = get_user_meta( $user_id, '_um_last_login', true ); // Datetime format in UTC.
-	return ! empty( $value ) ? UM()->datetime()->time_diff( strtotime( $value ) ) : ''; // Compare with default time() in 2nd attribute.
+	$value = get_user_meta( $user_id, '_um_last_login', true );
+	return ! empty( $value ) ? UM()->datetime()->time_diff( $value, current_time( 'timestamp' ) ) : '';
 }
+
 
 /**
  * Get core page url
@@ -1350,15 +1341,20 @@ function um_get_metadefault( $id ) {
 	return isset( $core_form_meta_all[ '_um_' . $id ] ) ? $core_form_meta_all[ '_um_' . $id ] : '';
 }
 
+
 /**
  * boolean for account page editing
  *
  * @return bool
  */
 function um_submitting_account_page() {
-	// phpcs:ignore WordPress.Security.NonceVerification -- already verified here
-	return ( ! empty( $_POST['_um_account'] ) && is_user_logged_in() );
+	if ( isset( $_POST['_um_account'] ) && $_POST['_um_account'] == 1 && is_user_logged_in() ) {
+		return true;
+	}
+
+	return false;
 }
+
 
 /**
  * Get a user's display name
@@ -1441,7 +1437,7 @@ function um_set_requested_user( $user_id ) {
  */
 function um_get_requested_user() {
 	if ( ! empty( UM()->user()->target_id ) ) {
-		return absint( UM()->user()->target_id );
+		return UM()->user()->target_id;
 	}
 
 	return false;
@@ -1517,10 +1513,10 @@ function um_can_view_field( $data ) {
 		UM()->fields()->set_mode = '';
 	}
 
-	if ( isset( $data['public'] ) && 'register' !== UM()->fields()->set_mode ) {
+	if ( isset( $data['public'] ) && UM()->fields()->set_mode != 'register' ) {
 
-		$can_edit           = false;
-		$current_user_roles = array();
+		$can_edit = false;
+		$current_user_roles = [];
 		if ( is_user_logged_in() ) {
 
 			$can_edit = UM()->roles()->um_current_user_can( 'edit', um_user( 'ID' ) );
@@ -1565,77 +1561,55 @@ function um_can_view_field( $data ) {
 				$can_view = apply_filters( 'um_can_view_field_custom', $can_view, $data );
 				break;
 		}
+
 	}
 
 	return apply_filters( 'um_can_view_field', $can_view, $data );
 }
 
+
 /**
  * Checks if user can view profile
- * @todo make the function review. Maybe rewrite it.
- * @param int $user_id
+ *
+ * @param $user_id
  *
  * @return bool
  */
 function um_can_view_profile( $user_id ) {
-	$can_view = true;
-	$user_id  = absint( $user_id );
 	if ( ! is_user_logged_in() ) {
-		$can_view = ! UM()->user()->is_private_profile( $user_id );
-	} else {
-		$temp_id = um_user( 'ID' );
-		um_fetch_user( get_current_user_id() );
-
-		if ( get_current_user_id() !== $user_id ) {
-			if ( ! um_user( 'can_view_all' ) ) {
-				um_fetch_user( $temp_id );
-				$can_view = false;
-			} elseif ( ! um_user( 'can_access_private_profile' ) && UM()->user()->is_private_profile( $user_id ) ) {
-				um_fetch_user( $temp_id );
-				$can_view = false;
-			} elseif ( um_user( 'can_view_roles' ) ) {
-				$can_view_roles = um_user( 'can_view_roles' );
-
-				if ( ! is_array( $can_view_roles ) ) {
-					$can_view_roles = array();
-				}
-
-				$all_roles = UM()->roles()->get_all_user_roles( $user_id );
-				if ( empty( $all_roles ) ) {
-					um_fetch_user( $temp_id );
-					$can_view = false;
-				} else {
-					if ( count( $can_view_roles ) && count( array_intersect( $all_roles, $can_view_roles ) ) <= 0 ) {
-						um_fetch_user( $temp_id );
-						$can_view = false;
-					}
-				}
-			}
-		}
-
-		um_fetch_user( $temp_id );
+		return ! UM()->user()->is_private_profile( $user_id );
 	}
 
-	/**
-	 * Filters the marker for user capabilities to view other profile
-	 *
-	 * @param {bool} $can_view Can view profile marker.
-	 * @param {int}  $user_id  User ID requested from profile page.
-	 *
-	 * @return {bool} Can view profile marker.
-	 *
-	 * @since 2.6.10
-	 * @hook um_can_view_profile
-	 *
-	 * @example <caption>Set that only user with ID=5 can be viewed on Profile page.</caption>
-	 * function my_um_can_view_profile( $can_view, $user_id ) {
-	 *     $can_view = 5 === $user_id;
-	 *     return $can_view;
-	 * }
-	 * add_filter( 'um_can_view_profile', 'my_um_can_view_profile', 10, 2 );
-	 */
-	return apply_filters( 'um_can_view_profile', $can_view, $user_id );
+	$temp_id = um_user('ID');
+	um_fetch_user( get_current_user_id() );
+
+	if ( ! um_user( 'can_view_all' ) && $user_id != get_current_user_id() && is_user_logged_in() ) {
+		um_fetch_user( $temp_id );
+		return false;
+	}
+
+	if ( ! um_user( 'can_access_private_profile' ) && UM()->user()->is_private_profile( $user_id ) ) {
+		um_fetch_user( $temp_id );
+		return false;
+	}
+
+	if ( um_user( 'can_view_roles' ) && $user_id != get_current_user_id() ) {
+		$can_view_roles = um_user( 'can_view_roles' );
+
+		if ( ! is_array( $can_view_roles ) ) {
+			$can_view_roles = array();
+		}
+
+		if ( count( $can_view_roles ) && count( array_intersect( UM()->roles()->get_all_user_roles( $user_id ), $can_view_roles ) ) <= 0 ) {
+			um_fetch_user( $temp_id );
+			return false;
+		}
+	}
+
+	um_fetch_user( $temp_id );
+	return true;
 }
+
 
 /**
  * boolean check for not same user
@@ -1659,13 +1633,12 @@ function um_is_user_himself() {
 function um_can_edit_field( $data ) {
 	$can_edit = true;
 
-	if ( true === UM()->fields()->editing && isset( UM()->fields()->set_mode ) && UM()->fields()->set_mode == 'profile' ) {
+	if ( ! empty( UM()->fields()->editing ) && isset( UM()->fields()->set_mode ) && UM()->fields()->set_mode == 'profile' ) {
 		if ( ! is_user_logged_in() ) {
 			$can_edit = false;
 		} else {
 			if ( ! UM()->roles()->um_user_can( 'can_edit_everyone' ) ) {
-				// It's for a legacy case `array_key_exists( 'editable', $data )`.
-				if ( array_key_exists( 'editable', $data ) && empty( $data['editable'] ) ) {
+				if ( isset( $data['editable'] ) && $data['editable'] == 0 ) {
 					$can_edit = false;
 				} else {
 					if ( ! um_is_user_himself() ) {
@@ -1711,26 +1684,6 @@ function um_edit_profile_url( $user_id = null ) {
 	$url = remove_query_arg( 'subnav', $url );
 	$url = add_query_arg( 'um_action', 'edit', $url );
 
-	/**
-	 * Filters change edit profile URL.
-	 *
-	 * @param {string} $url      Edit profile URL.
-	 * @param {int}    $user_id  User ID.
-	 *
-	 * @return {string} Edit profile URL.
-	 *
-	 * @since 2.6.8
-	 * @hook um_edit_profile_url
-	 *
-	 * @example <caption>Add/remove your custom $_GET attribute to all links.</caption>
-	 * function my_um_edit_profile_url( $url, $user_id ) {
-	 *     $url = add_query_arg( '{attr_value}', '{attr_key}', $url ); // replace to your custom value and key.
-	 *     return $url;
-	 * }
-	 * add_filter( 'um_edit_profile_url', 'my_um_edit_profile_url', 10, 2 );
-	 */
-	$url = apply_filters( 'um_edit_profile_url', $url, $user_id );
-
 	return $url;
 }
 
@@ -1750,7 +1703,7 @@ function um_can_edit_my_profile() {
 
 
 /**
- * Short for admin email
+ * Short for admin e-mail
  *
  * @return mixed|string|void
  */
@@ -1760,7 +1713,7 @@ function um_admin_email() {
 
 
 /**
- * Get admin emails
+ * Get admin e-mails
  *
  * @return array
  */
@@ -1903,48 +1856,30 @@ function um_profile( $key ) {
 	return $value;
 }
 
+
 /**
- * Get YouTube video ID from URL.
+ * Get youtube video ID from url
  *
- * @param string $url
+ * @param $url
  *
- * @return bool|string
+ * @return bool
  */
 function um_youtube_id_from_url( $url ) {
-	if ( ! $url ) {
-		return true;
-	}
-	$url = preg_replace( '/&ab_channel=.*/', '', $url ); // ADBlock argument.
-	$url = preg_replace( '/\?si=.*/', '', $url ); // referral attribute.
-
 	$pattern =
-		'%^            # Match any youtube URL
-		(?:https?://)? # Optional scheme. Either http or https
-		(?:                 # Optional subdomain, for example m or www.
-			[a-z0-9]          # Subdomain begins with alpha-num.
-			(?:               # Optionally more than one char.
-				[a-z0-9-]{0,61} # Middle part may have dashes.
-				[a-z0-9]        # Starts and ends with alpha-num.
-			)?                # Subdomain length from 1 to 63.
-			\.                # Required dot separates subdomains.
-		)?                  # Subdomain is optional.
-		(?:            # Group host alternatives
-		  youtu\.be/   # Either youtu.be,
-		| youtube\.com # or youtube.com
-		  (?:          # Group path alternatives
-			/embed/      # Either /embed/
-		  | /v/        # or /v/
-		  | /watch\?v= # or /watch\?v=
-		  | /shorts/   # or /shorts/ for short videos
-		  )            # End path alternatives.
-		)              # End host alternatives.
-		([\w-]{10,12}) # Allow 10-12 for 11 char youtube id.
-		(?:            # Additional parameters
-		  (?:\?|\&)
-		  \w+=[^&$]+
-		)*
+		'%^# Match any youtube URL
+		(?:https?://)?  # Optional scheme. Either http or https
+		(?:www\.)?      # Optional www subdomain
+		(?:             # Group host alternatives
+		  youtu\.be/    # Either youtu.be,
+		| youtube\.com  # or youtube.com
+		  (?:           # Group path alternatives
+			/embed/     # Either /embed/
+		  | /v/         # or /v/
+		  | /watch\?v=  # or /watch\?v=
+		  )             # End path alternatives.
+		)               # End host alternatives.
+		([\w-]{10,12})  # Allow 10-12 for 11 char youtube id.
 		$%x';
-
 	$result = preg_match( $pattern, $url, $matches );
 	if ( false !== $result && isset( $matches[1] ) ) {
 		return $matches[1];
@@ -1952,6 +1887,7 @@ function um_youtube_id_from_url( $url ) {
 
 	return false;
 }
+
 
 /**
  * Find closest number in an array
@@ -1980,14 +1916,12 @@ function um_closest_num( $array, $number ) {
  * @return bool|string
  */
 function um_get_cover_uri( $image, $attrs ) {
-	$uri        = false;
+	$uri = false;
 	$uri_common = false;
-	$ext        = '.' . pathinfo( $image, PATHINFO_EXTENSION );
+	$ext = '.' . pathinfo( $image, PATHINFO_EXTENSION );
 
-	$ratio  = str_replace( ':1', '', UM()->options()->get( 'profile_cover_ratio' ) );
+	$ratio = str_replace(':1','',UM()->options()->get( 'profile_cover_ratio' ) );
 	$height = round( $attrs / $ratio );
-
-	$timestamp = time();
 
 	if ( is_multisite() ) {
 		//multisite fix for old customers
@@ -1997,24 +1931,24 @@ function um_get_cover_uri( $image, $attrs ) {
 		$multisite_fix_url = str_replace( '/sites/' . get_current_blog_id() . '/', '/', $multisite_fix_url );
 
 		if ( file_exists( $multisite_fix_dir . um_user( 'ID' ) . DIRECTORY_SEPARATOR . "cover_photo{$ext}" ) ) {
-			$uri_common = $multisite_fix_url . um_user( 'ID' ) . "/cover_photo{$ext}?" . $timestamp;
+			$uri_common = $multisite_fix_url . um_user( 'ID' ) . "/cover_photo{$ext}?" . current_time( 'timestamp' );
 		}
 
 		if ( file_exists( $multisite_fix_dir . um_user( 'ID' ) . DIRECTORY_SEPARATOR . "cover_photo-{$attrs}{$ext}" ) ) {
-			$uri_common = $multisite_fix_url . um_user( 'ID' ) . "/cover_photo-{$attrs}{$ext}?" . $timestamp;
+			$uri_common = $multisite_fix_url . um_user( 'ID' ) . "/cover_photo-{$attrs}{$ext}?" . current_time( 'timestamp' );
 		}elseif ( file_exists( $multisite_fix_dir . um_user( 'ID' ) . DIRECTORY_SEPARATOR . "cover_photo-{$attrs}x{$height}{$ext}" ) ) {
-			$uri_common = $multisite_fix_url . um_user( 'ID' ) . "/cover_photo-{$attrs}x{$height}{$ext}?". $timestamp;
+			$uri_common = $multisite_fix_url . um_user( 'ID' ) . "/cover_photo-{$attrs}x{$height}{$ext}?". current_time( 'timestamp' );
 		}
 	}
 
 	if ( file_exists( UM()->uploader()->get_upload_base_dir() . um_user( 'ID' ) . DIRECTORY_SEPARATOR . "cover_photo{$ext}" ) ) {
-		$uri = UM()->uploader()->get_upload_base_url() . um_user( 'ID' ) . "/cover_photo{$ext}?" . $timestamp;
+		$uri = UM()->uploader()->get_upload_base_url() . um_user( 'ID' ) . "/cover_photo{$ext}?" . current_time( 'timestamp' );
 	}
 
 	if ( file_exists( UM()->uploader()->get_upload_base_dir() . um_user( 'ID' ) . DIRECTORY_SEPARATOR . "cover_photo-{$attrs}{$ext}" ) ) {
-		$uri = UM()->uploader()->get_upload_base_url() . um_user( 'ID' ) . "/cover_photo-{$attrs}{$ext}?" . $timestamp;
+		$uri = UM()->uploader()->get_upload_base_url() . um_user( 'ID' ) . "/cover_photo-{$attrs}{$ext}?" . current_time( 'timestamp' );
 	}elseif ( file_exists( UM()->uploader()->get_upload_base_dir() . um_user( 'ID' ) . DIRECTORY_SEPARATOR . "cover_photo-{$attrs}x{$height}{$ext}" ) ) {
-		$uri = UM()->uploader()->get_upload_base_url() . um_user( 'ID' ) . "/cover_photo-{$attrs}x{$height}{$ext}?". $timestamp;
+		$uri = UM()->uploader()->get_upload_base_url() . um_user( 'ID' ) . "/cover_photo-{$attrs}x{$height}{$ext}?". current_time( 'timestamp' );
 	}
 
 	if ( ! empty( $uri_common ) && empty( $uri ) ) {
@@ -2129,13 +2063,14 @@ function um_get_avatar_uri( $image, $attrs ) {
 	 * }
 	 * ?>
 	 */
-	$cache_time = apply_filters( 'um_filter_avatar_cache_time', time(), um_user( 'ID' ) );
+	$cache_time = apply_filters( 'um_filter_avatar_cache_time', current_time( 'timestamp' ), um_user( 'ID' ) );
 	if ( ! empty( $cache_time ) ) {
 		$uri .= "?{$cache_time}";
 	}
 
 	return $uri;
 }
+
 
 /**
  * Default avatar URL
@@ -2144,13 +2079,14 @@ function um_get_avatar_uri( $image, $attrs ) {
  */
 function um_get_default_avatar_uri() {
 	$uri = UM()->options()->get( 'default_avatar' );
-	$uri = ! empty( $uri['url'] ) ? $uri['url'] : '';
+	$uri = !empty( $uri['url'] ) ? $uri['url'] : '';
 	if ( ! $uri ) {
-		$uri = UM_URL . 'assets/img/default_avatar.jpg';
+		$uri = um_url . 'assets/img/default_avatar.jpg';
 	}
 
 	return set_url_scheme( $uri );
 }
+
 
 /**
  * get user avatar url
@@ -2161,20 +2097,17 @@ function um_get_default_avatar_uri() {
  * @return bool|string
  */
 function um_get_user_avatar_data( $user_id = '', $size = '96' ) {
-	if ( empty( $user_id ) ) {
+	if( empty( $user_id ) ) {
 		$user_id = um_user( 'ID' );
-	}
-
-	if ( $user_id !== um_user( 'ID' ) ) {
-		$temp_id = um_user( 'ID' );
+	} else {
 		um_fetch_user( $user_id );
 	}
 
 	$data = array(
-		'user_id' => $user_id,
-		'default' => um_get_default_avatar_uri(),
-		'class'   => 'gravatar avatar avatar-' . $size . ' um-avatar',
-		'size'    => $size,
+		'user_id'   => $user_id,
+		'default'   => um_get_default_avatar_uri(),
+		'class'     => 'gravatar avatar avatar-' . $size . ' um-avatar',
+		'size'      => $size
 	);
 
 	if ( $profile_photo = um_profile( 'profile_photo' ) ) {
@@ -2195,12 +2128,12 @@ function um_get_user_avatar_data( $user_id = '', $size = '96' ) {
 		}
 
 		$gravatar_type = UM()->options()->get( 'use_um_gravatar_default_builtin_image' );
-		if ( 'default' === $gravatar_type ) {
+		if ( $gravatar_type == 'default' ) {
 			if ( UM()->options()->get( 'use_um_gravatar_default_image' ) ) {
 				$data['url'] = add_query_arg( 'd', $data['default'], $data['url'] );
 			} else {
 				$default = get_option( 'avatar_default', 'mystery' );
-				if ( 'gravatar_default' === $default ) {
+				if ( $default == 'gravatar_default' ) {
 					$default = '';
 				}
 				$data['url'] = add_query_arg( 'd', $default, $data['url'] );
@@ -2209,62 +2142,62 @@ function um_get_user_avatar_data( $user_id = '', $size = '96' ) {
 			$data['url'] = add_query_arg( 'd', $gravatar_type, $data['url'] );
 		}
 
-		$data['type']   = 'gravatar';
+		$data['type'] = 'gravatar';
 		$data['class'] .= ' um-avatar-gravatar';
 	} else {
-		$data['url']    = $data['default'];
-		$data['type']   = 'default';
+		$data['url'] = $data['default'];
+		$data['type'] = 'default';
 		$data['class'] .= ' um-avatar-default';
 	}
 
+
 	/**
-	 * Filters the user avatar URL.
+	 * UM hook
 	 *
-	 * @since 1.3.x
-	 * @hook  um_user_avatar_url_filter
-	 *
-	 * @param {string} $url     Avatar URL.
-	 * @param {int}    $user_id User ID.
-	 * @param {array}  $data    Avatar data.
-	 *
-	 * @return {string} Avatar URL.
-	 *
-	 * @example <caption>Change the user avatar URL.</caption>
-	 * function my_um_user_avatar_url_filter( $url, $user_id, $data ) {
+	 * @type filter
+	 * @title um_user_avatar_url_filter
+	 * @description Change user avatar URL
+	 * @input_vars
+	 * [{"var":"$avatar_uri","type":"string","desc":"Avatar URL"},
+	 * {"var":"$user_id","type":"int","desc":"User ID"}]
+	 * @change_log
+	 * ["Since: 2.0"]
+	 * @usage add_filter( 'um_user_avatar_url_filter', 'function_name', 10, 2 );
+	 * @example
+	 * <?php
+	 * add_filter( 'um_user_avatar_url_filter', 'my_user_avatar_url', 10, 2 );
+	 * function my_user_avatar_url( $avatar_uri ) {
 	 *     // your code here
-	 *     $url = 'some_url';
-	 *     return $url;
+	 *     return $avatar_uri;
 	 * }
-	 * add_filter( 'um_user_avatar_url_filter', 'my_um_user_avatar_url_filter', 10, 3 );
+	 * ?>
 	 */
 	$data['url'] = apply_filters( 'um_user_avatar_url_filter', $data['url'], $user_id, $data );
 	/**
-	 * Filters the user avatar image `alt` argument.
+	 * UM hook
 	 *
-	 * @since 1.3.x
-	 * @hook  um_avatar_image_alternate_text
-	 *
-	 * @param {string} $alt  Avatar `alt` text.
-	 * @param {array}  $data Avatar data.
-	 *
-	 * @return {string} Avatar URL.
-	 *
-	 * @example <caption>Change the user avatar URL.</caption>
-	 * function my_um_avatar_image_alternate_text( $alt, $data ) {
+	 * @type filter
+	 * @title um_avatar_image_alternate_text
+	 * @description Change user display name on um_user function profile photo
+	 * @input_vars
+	 * [{"var":"$display_name","type":"string","desc":"User Display Name"}]
+	 * @change_log
+	 * ["Since: 2.0"]
+	 * @usage add_filter( 'um_avatar_image_alternate_text', 'function_name', 10, 1 );
+	 * @example
+	 * <?php
+	 * add_filter( 'um_avatar_image_alternate_text', 'my_avatar_image_alternate_text', 10, 1 );
+	 * function my_avatar_image_alternate_text( $display_name ) {
 	 *     // your code here
-	 *     $alt = 'some_alt';
-	 *     return $alt;
+	 *     return $display_name;
 	 * }
-	 * add_filter( 'um_avatar_image_alternate_text', 'my_um_avatar_image_alternate_text', 10, 2 );
+	 * ?>
 	 */
-	$data['alt'] = apply_filters( 'um_avatar_image_alternate_text', um_user( 'display_name' ), $data );
-
-	if ( ! empty( $temp_id ) ) {
-		um_fetch_user( $temp_id );
-	}
+	$data['alt'] = apply_filters( "um_avatar_image_alternate_text", um_user( "display_name" ), $data );
 
 	return $data;
 }
+
 
 /**
  * get user avatar url
@@ -2278,6 +2211,7 @@ function um_get_user_avatar_url( $user_id = '', $size = '96' ) {
 	$data = um_get_user_avatar_data( $user_id, $size );
 	return $data['url'];
 }
+
 
 /**
  * default cover
@@ -2320,7 +2254,7 @@ function um_get_default_cover_uri() {
  * @param $data
  * @param null $attrs
  *
- * @return int|string|array
+ * @return string|array
  */
 function um_user( $data, $attrs = null ) {
 
@@ -2371,6 +2305,10 @@ function um_user( $data, $attrs = null ) {
 		case 'last_name':
 
 			$name = um_profile( $data );
+
+			if ( UM()->options()->get( 'force_display_name_capitlized' ) ) {
+				$name = implode( '-', array_map( 'ucfirst', explode( '-', $name ) ) );
+			}
 
 			/**
 			 * UM hook
@@ -2428,7 +2366,14 @@ function um_user( $data, $attrs = null ) {
 				$f_and_l_initial = um_profile( $data );
 			}
 
-			$name = UM()->validation()->safe_name_in_url( $f_and_l_initial );
+			$f_and_l_initial = UM()->validation()->safe_name_in_url( $f_and_l_initial );
+
+			if ( UM()->options()->get( 'force_display_name_capitlized' ) ) {
+				$name = implode( '-', array_map( 'ucfirst', explode( '-', $f_and_l_initial ) ) );
+			} else {
+				$name = $f_and_l_initial;
+			}
+
 			return $name;
 
 			break;
@@ -2514,6 +2459,10 @@ function um_user( $data, $attrs = null ) {
 				}
 			}
 
+			if ( UM()->options()->get( 'force_display_name_capitlized' ) ) {
+				$name = implode( '-', array_map( 'ucfirst', explode( '-', $name ) ) );
+			}
+
 			/**
 			 * UM hook
 			 *
@@ -2557,17 +2506,17 @@ function um_user( $data, $attrs = null ) {
 			break;
 
 		case 'password_reset_link':
-			// Avoid using and make it directly with `UM()->password()->reset_url( $user_id )`
 			return UM()->password()->reset_url();
+			break;
 
 		case 'account_activation_link':
-			// Avoid using and make it directly with `UM()->permalinks()->activate_url( $user_id )`
 			return UM()->permalinks()->activate_url();
+			break;
 
 		case 'profile_photo':
 			$data = um_get_user_avatar_data( um_user( 'ID' ), $attrs );
 
-			return sprintf( '<img src="%s" class="%s" width="%s" height="%s" alt="%s" data-default="%s" onerror="%s" loading="lazy" />',
+			return sprintf( '<img src="%s" class="%s" width="%s" height="%s" alt="%s" data-default="%s" onerror="%s" />',
 				esc_attr( $data['url'] ),
 				esc_attr( $data['class'] ),
 				esc_attr( $data['size'] ),
@@ -2617,7 +2566,7 @@ function um_user( $data, $attrs = null ) {
 
 			$alt = um_profile( 'nickname' );
 
-			$cover_html = $cover_uri ? '<img src="' . esc_attr( $cover_uri ) . '" alt="' . esc_attr( $alt ) . '" loading="lazy" />' : '';
+			$cover_html = $cover_uri ? '<img src="' . esc_attr( $cover_uri ) . '" alt="' . esc_attr( $alt ) . '" />' : '';
 
 			$cover_html = apply_filters( 'um_user_cover_photo_html__filter', $cover_html, $cover_uri, $alt, $is_default, $attrs );
 			return $cover_html;
@@ -2684,13 +2633,9 @@ function um_force_utf8_string( $value ) {
 	if ( is_array( $value ) ) {
 		$arr_value = array();
 		foreach ( $value as $key => $v ) {
-			if ( ! function_exists( 'utf8_decode' ) ) {
-				continue;
-			}
-
 			$utf8_decoded_value = utf8_decode( $v );
 
-			if ( function_exists( 'mb_check_encoding' ) && mb_check_encoding( $utf8_decoded_value, 'UTF-8' ) ) {
+			if ( mb_check_encoding( $utf8_decoded_value, 'UTF-8' ) ) {
 				array_push( $arr_value, $utf8_decoded_value );
 			} else {
 				array_push( $arr_value, $v );
@@ -2700,12 +2645,11 @@ function um_force_utf8_string( $value ) {
 
 		return $arr_value;
 	} else {
-		if ( function_exists( 'utf8_decode' ) ) {
-			$utf8_decoded_value = utf8_decode( $value );
 
-			if ( function_exists( 'mb_check_encoding' ) && mb_check_encoding( $utf8_decoded_value, 'UTF-8' ) ) {
-				return $utf8_decoded_value;
-			}
+		$utf8_decoded_value = utf8_decode( $value );
+
+		if (mb_check_encoding( $utf8_decoded_value, 'UTF-8' )) {
+			return $utf8_decoded_value;
 		}
 	}
 
@@ -2861,115 +2805,4 @@ function um_is_amp( $check_theme_support = true ) {
 	}
 
 	return apply_filters( 'um_is_amp', $is_amp );
-}
-
-/**
- * UM safe redirect. By default, you can be redirected only to WordPress installation Home URL. Fallback URL is wp-admin URL.
- * But it can be changed through filters and extended by UM Setting "Allowed hosts for safe redirect (one host per line)" and filter `um_wp_safe_redirect_fallback`.
- *
- * @since 2.6.8
- *
- * @param string $url redirect URL.
- */
-function um_safe_redirect( $url ) {
-	add_filter( 'allowed_redirect_hosts', 'um_allowed_redirect_hosts' );
-	add_filter( 'wp_safe_redirect_fallback', 'um_wp_safe_redirect_fallback', 10, 2 );
-
-	wp_safe_redirect( $url );
-	exit;
-}
-
-/**
- * UM allowed hosts
- *
- * @since 2.6.8
- *
- * @param array $hosts Allowed hosts.
- *
- * @return array
- */
-function um_allowed_redirect_hosts( $hosts ) {
-	$secure_hosts = UM()->options()->get( 'secure_allowed_redirect_hosts' );
-	$secure_hosts = explode( "\n", $secure_hosts );
-	$secure_hosts = array_unique( $secure_hosts );
-
-	$additional_hosts = array();
-	foreach ( $secure_hosts as $host ) {
-		if ( '' !== trim( $host ) ) {
-			$host = trim( $host );
-			$host = str_replace( array( 'http://', 'https://' ), '', $host );
-			$host = trim( $host, '/' );
-			$host = strtolower( $host );
-
-			if ( ! in_array( $host, $additional_hosts, true ) ) {
-				$additional_hosts[] = $host;
-			}
-
-			if ( strpos( $host, 'www.' ) !== false ) {
-				$strip_www = str_replace( 'www.', '', $host );
-				if ( ! in_array( $strip_www, $additional_hosts, true ) ) {
-					$additional_hosts[] = $strip_www;
-				}
-			} else {
-				$added_www = 'www.' . $host;
-				if ( ! in_array( $added_www, $additional_hosts, true ) ) {
-					$additional_hosts[] = $added_www;
-				}
-			}
-		}
-	}
-	/**
-	 * Filters change allowed hosts. When `wp_safe_redirect()` function is used for the Ultimate Member frontend redirects.
-	 *
-	 * @since 2.6.8
-	 * @hook  um_allowed_redirect_hosts
-	 *
-	 * @param {array} $additional_hosts Allowed hosts.
-	 * @param {array} $hosts            Default hosts.
-	 *
-	 * @return {array} Allowed hosts.
-	 *
-	 * @example <caption>Change allowed hosts.</caption>
-	 * function my_um_allowed_redirect_hosts( $additional_hosts, $hosts ) {
-	 *     // your code here
-	 *     return $allowed_hosts;
-	 * }
-	 * add_filter( 'um_allowed_redirect_hosts', 'my_um_allowed_redirect_hosts', 10, 2 );
-	 */
-	$additional_hosts = apply_filters( 'um_allowed_redirect_hosts', $additional_hosts, $hosts );
-	return array_merge( $hosts, $additional_hosts );
-}
-
-/**
- * UM fallback redirect URL
- *
- * @since 2.6.8
- *
- * @param string $url    Fallback URL.
- * @param string $status Redirect status.
- *
- * @return string
- */
-function um_wp_safe_redirect_fallback( $url, $status ) {
-	/**
-	 * Filters change fallback URL. When `wp_safe_redirect()` function is used for the Ultimate Member frontend redirects.
-	 * It's `home_url()` by default.
-	 *
-	 * @since 2.6.8
-	 * @hook  um_wp_safe_redirect_fallback
-	 *
-	 * @param {string} $url              UM Fallback URL.
-	 * @param {string} $default_fallback Default fallback URL.
-	 * @param {string} $status           Redirect status.
-	 *
-	 * @return {string} Fallback URL.
-	 *
-	 * @example <caption>Change fallback URL.</caption>
-	 * function my_um_wp_safe_redirect_fallback( $url, $status ) {
-	 *     // your code here
-	 *     return $url;
-	 * }
-	 * add_filter( 'um_wp_safe_redirect_fallback', 'my_um_wp_safe_redirect_fallback', 10, 2 );
-	 */
-	return apply_filters( 'um_wp_safe_redirect_fallback', home_url( '/' ), $url, $status );
 }

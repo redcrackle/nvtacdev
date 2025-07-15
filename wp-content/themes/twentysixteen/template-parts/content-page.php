@@ -6,7 +6,6 @@
  * @subpackage Twenty_Sixteen
  * @since Twenty Sixteen 1.0
  */
-
 ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
@@ -26,7 +25,6 @@
 				'after'       => '</div>',
 				'link_before' => '<span>',
 				'link_after'  => '</span>',
-				/* translators: Hidden accessibility text. */
 				'pagelink'    => '<span class="screen-reader-text">' . __( 'Page', 'twentysixteen' ) . ' </span>%',
 				'separator'   => '<span class="screen-reader-text">, </span>',
 			)
@@ -37,7 +35,7 @@
 	<?php
 		edit_post_link(
 			sprintf(
-				/* translators: %s: Post title. Only visible to screen readers. */
+				/* translators: %s: Post title. */
 				__( 'Edit<span class="screen-reader-text"> "%s"</span>', 'twentysixteen' ),
 				get_the_title()
 			),

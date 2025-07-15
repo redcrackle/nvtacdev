@@ -1,11 +1,11 @@
 === GD bbPress Tools ===
 Contributors: GDragoN
-Donate link: https://www.dev4press.com/plugins/gd-bbpress-tools/
-Version: 3.5.3
-Tags: dev4press, bbpress, signature, quote, bbcodes
-Requires at least: 5.9
-Requires PHP: 7.4
-Tested up to: 6.6
+Donate link: https://plugins.dev4press.com/gd-bbpress-tools/
+Version: 3.2
+Tags: dev4press, bbpress, signature, quote, bbcodes, toolbar, views, bbcode, forums, forum, topic, reply
+Requires at least: 5.1
+Requires PHP: 7.0
+Tested up to: 5.9
 Stable tag: trunk
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -32,7 +32,7 @@ Adds various expansions and tools to the bbPress plugin implemented forums. Curr
 * Topics View: Topics by freshness
 
 = bbPress Plugin Versions =
-GD bbPress Tools 3.5.3 supports bbPress 2.6.2 or newer. Older bbPress versions are no longer supported!
+GD bbPress Tools 3.2 supports bbPress 2.5 or newer. Older bbPress versions are no longer supported!
 
 = More free dev4Press.com plugins for bbPress =
 * [GD Forum Manager](https://wordpress.org/plugins/gd-forum-manager-for-bbpress/) - quick and bulk forums and topics edit
@@ -42,7 +42,7 @@ GD bbPress Tools 3.5.3 supports bbPress 2.6.2 or newer. Older bbPress versions a
 * [GD Topic Polls](https://wordpress.org/plugins/gd-topic-polls/) - add polls to the bbPress topics
 
 = Upgrade to GD bbPress Toolbox Pro =
-The Pro version contains many more great features:
+Pro version contains many more great features:
 
 * Enhanced attachments features
 * Limit file types attachments upload
@@ -50,7 +50,6 @@ The Pro version contains many more great features:
 * BBCodes editor toolbar
 * Report topics and replies
 * Say thanks to forum members
-* Query Performance Booster
 * Various SEO features
 * Various privacy features
 * Enable TinyMCE editor
@@ -59,7 +58,6 @@ The Pro version contains many more great features:
 * Notification email control
 * Show user stats in topics and replies
 * Track new and unread topics
-* Mute Forums and Users
 * Great new responsive admin UI
 * Setup Wizard
 * Forum based settings overrides
@@ -72,18 +70,19 @@ The Pro version contains many more great features:
 
 With more features on the roadmap exclusively for Pro version.
 
-* More information about [GD bbPress Toolbox Pro](https://www.dev4press.com/plugins/gd-bbpress-toolbox/)
-* More Premium plugins for bbPress [bbPress Plugins Club](https://www.dev4press.com/bbpress-club/)
+* More information about [GD bbPress Toolbox Pro](https://plugins.dev4press.com/gd-bbpress-toolbox/?utm_source=wporg&utm_medium=link&utm_campaign=gd-bbpress-tools)
+* Compare [Free vs. Pro Plugin](https://plugins.dev4press.com/gd-bbpress-toolbox/articles/toolbox-pro-vs-free-plugins/?utm_source=wporg&utm_medium=link&utm_campaign=gd-bbpress-tools)
+* More Premium plugins for bbPress [bbPress Plugins Club](https://bbpress.dev4press.com/?utm_source=wporg&utm_medium=link&utm_campaign=gd-bbpress-tools)
 
 == Installation ==
 = General Requirements =
-* PHP: 7.4 or newer
+* PHP: 7.0 or newer
 
 = WordPress Requirements =
-* WordPress: 5.9 or newer
+* WordPress: 5.1 or newer
 
 = bbPress Requirements =
-* bbPress Plugin: 2.6.2 or newer
+* bbPress Plugin: 2.5 or newer
 
 = Basic Installation =
 * Plugin folder in the WordPress plugins folder must be `gd-bbpress-tools`
@@ -94,8 +93,8 @@ With more features on the roadmap exclusively for Pro version.
 = Where can I configure the plugin? =
 Open the Forums menu, and you will see Tools item there. This will open a panel with global plugin settings.
 
-= Will this plugin work with old, standalone bbPress (versions 1.x) installation? =
-No. This plugin requires the plugin versions of bbPress 2.6.2 or higher.
+= Will this plugin work with standalone bbPress installation? =
+No. This plugin requires the plugin versions of bbPress 2.5 or higher.
 
 = Click on Quote button doesn't add quoted content? =
 This happens if the plugin's JavaScript is not loaded. Make sure that both CSS and JavaScript options are enabled. If that doesn't help, make sure to enable 'Always Include' option too.
@@ -113,66 +112,13 @@ GD bbPress Tools 3.1 is tested with BuddyPress 6.0 using bbPress for Groups foru
 The problem is caused by the Italic BBCode due to the conflict with the Underscore templates system BuddyPress uses. You can disable Italic BBCode, or you can limit BBCodes to the bbPress content only (highly recommended).
 
 = When the quote is used on the formatted content, formatting will be gone inside displayed quote? =
-This happens because quoting can only take rendered HTML as is, and when saved, bbPress will remove some HTML elements based on the user role. [GD bbPress Toolbox Pro](https://www.dev4press.com/plugins/gd-bbpress-toolbox/) plugin includes additional features that expand the allowed HTML elements for all roles, and that solves this quote problem.
+This happens because quoting can only take rendered HTML as is, and when saved, bbPress will remove some of the HTML elements based on the user role. [GD bbPress Toolbox Pro](https://plugins.dev4press.com/gd-bbpress-toolbox/) plugin includes additional features that expand the allowed HTML elements for all roles, and that solves this quote problem.
 
 == Upgrade Notice ==
-= 3.5 =
-Few updates and improvements.
-
-= 3.4 =
-Various updates and improvements. Several bug fixes.
+= 3.2 =
+Minor updates and improvements.
 
 == Changelog ==
-= 3.5.3 (2024.08.19) =
-* Edit: updated links to the Dev4Press website
-* Edit: various PHP code changes and improvements
-* Fix: fatal error on one of the admin panel tabs
-
-= 3.5.2 (2024.05.15) =
-* Edit few more tweaks to the main JavaScript code
-* Fix problems with the Quote not working with TinyMCE editor
-
-= 3.5.1 (2024.05.14) =
-* Edit few more tweaks to the main JavaScript code
-* Edit various small updates to readme file
-* Fix missing semicolon in the JavaScript code
-
-= 3.5 (2024.04.28) =
-* New directive `Requires Plugin` added into main plugin file
-* New System requirements: PHP 7.4 or newer
-* New System requirements: WordPress 5.8 or newer
-* New plugin fully tested with WordPress up to 6.5
-* New plugin fully tested with PHP 8.3
-* Updated code style and translation formatting
-* Updated main plugin JavaScript library
-
-= 3.4.1 (2023.07.15) =
-* Updated main plugin POT file to include few missing strings
-* Fixed the translation domain name in the main plugin file header
-
-= 3.4 (2023.03.08) =
-* New system requirements: PHP 7.3 or newer
-* New system requirements: WordPress 5.5 or newer
-* New system requirements: bbPress 2.6.2 or newer
-* New fully tested with PHP 8.0, 8.1 and 8.2
-* New notice on the Views tab about the Topic Views
-* Updated integration of signature editor in the admin side
-* Updated various things in PHP code for better PHP 8.x compatibility
-* Updated plugin admin interface items for better accessibility
-* Updated some code to remove use of deprecated functions
-* Fixed some accessibility issues with options labels
-* Fixed dimensions issue with the YouTube and Vimeo BBCodes
-* Fixed fatal error with signature editing in PHP 8
-
-= 3.3 (2022.12.03) =
-* New plugin is tested with WordPress 6.1
-* Updated settings page with use of escaping for attributes
-* Updated some aspects for the PHP core code style
-* Updated some system requirements
-
-= 3.2.1 (2022.05.16) =
-* New plugin is tested with WordPress 6.0
-
 = 3.2 - 2021.10.05 =
 * Improvements to the plugin readme file
 * Few more minor updates

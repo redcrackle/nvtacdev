@@ -26,11 +26,11 @@ class Language_Match extends Red_Match {
 	/**
 	 * Sanitize the language value to a CSV string
 	 *
-	 * @param string $language User supplied language strings.
-	 * @return string
+	 * @param String $language User supplied language strings.
+	 * @return String
 	 */
 	private function sanitize_language( $language ) {
-		$parts = explode( ',', str_replace( ' ', '', sanitize_text_field( $language ) ) );
+		$parts = explode( ',', str_replace( ' ', '', $language ) );
 		return implode( ',', $parts );
 	}
 
@@ -56,7 +56,7 @@ class Language_Match extends Red_Match {
 	/**
 	 * Load the match data into this instance.
 	 *
-	 * @param string $values Match values, as read from the database (plain text or serialized PHP).
+	 * @param String $values Match values, as read from the database (plain text or serialized PHP).
 	 * @return void
 	 */
 	public function load( $values ) {

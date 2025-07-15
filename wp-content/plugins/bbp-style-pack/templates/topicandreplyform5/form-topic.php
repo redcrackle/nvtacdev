@@ -7,10 +7,6 @@
  * @subpackage Theme
  */
 
-// Exit if accessed directly
-defined( 'ABSPATH' ) || exit;
-
-
 ?>
 
 <?php if ( !bbp_is_single_forum() ) : ?>
@@ -42,17 +38,9 @@ defined( 'ABSPATH' ) || exit;
 
 					<?php
 						if ( bbp_is_topic_edit() )
-							printf( 
-																/* translators: %s - topic_title */
-                                                                __( 'Now Editing &ldquo;%s&rdquo;', 'bbpress' ), 
-                                                                bbp_get_topic_title() 
-                                                        );
+							printf( __( 'Now Editing &ldquo;%s&rdquo;', 'bbpress' ), bbp_get_topic_title() );
 						else
-							bbp_is_single_forum() ? printf( 
-																/* translators: %s - forum_title */
-                                                                __( 'Create New Topic in &ldquo;%s&rdquo;', 'bbpress' ), 
-                                                                bbp_get_forum_title() 
-                                                        ) : _e( 'Create New Topic', 'bbpress' );
+							bbp_is_single_forum() ? printf( __( 'Create New Topic in &ldquo;%s&rdquo;', 'bbpress' ), bbp_get_forum_title() ) : _e( 'Create New Topic', 'bbpress' );
 					?>
 
 				</legend>
@@ -86,13 +74,7 @@ defined( 'ABSPATH' ) || exit;
 					<?php do_action( 'bbp_theme_before_topic_form_title' ); ?>
 
 					<p>
-						<label for="bbp_topic_title">
-                                                        <?php printf( 
-																/* translators: %1s - topic_title max length*/
-                                                                __( 'Topic Title (Maximum Length: %d):', 'bbpress' ), 
-                                                                bbp_get_title_max_length() 
-                                                        ); ?>
-                                                </label><br />
+						<label for="bbp_topic_title"><?php printf( __( 'Topic Title (Maximum Length: %d):', 'bbpress' ), bbp_get_title_max_length() ); ?></label><br />
 						<input type="text" id="bbp_topic_title" value="<?php bbp_form_topic_title(); ?>" tabindex="<?php bbp_tab_index(); ?>" size="40" name="bbp_topic_title" maxlength="<?php bbp_title_max_length(); ?>" />
 					</p>
 
@@ -107,15 +89,7 @@ defined( 'ABSPATH' ) || exit;
 					<?php if ( ! ( bbp_use_wp_editor() || current_user_can( 'unfiltered_html' ) ) ) : ?>
 
 						<p class="form-allowed-tags">
-							<label>
-                                                                <?php 
-                                                                        printf( 
-                                                                                /* translators: %s is abbreviation HTML Tag */
-                                                                                esc_html__( 'You may use these %s tags and attributes:', 'bbpress' ), 
-                                                                                '<abbr title="HyperText Markup Language">HTML</abbr>' 
-                                                                        ); 
-                                                                ?>
-                                                        </label><br />
+							<label><?php _e( 'You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes:','bbpress' ); ?></label><br />
 							<code><?php bbp_allowed_tags(); ?></code>
 						</p>
 
@@ -273,13 +247,7 @@ defined( 'ABSPATH' ) || exit;
 
 	<div id="no-topic-<?php bbp_topic_id(); ?>" class="bbp-no-topic">
 		<div class="bbp-template-notice">
-			<p>
-                                <?php printf( 
-                                        /* translators: &#8216; and &#8217; are encoded apostrophes and %s is string for the forum title */
-                                        __( 'The forum &#8216;%s&#8217; is closed to new topics and replies.', 'bbpress' ), 
-                                        bbp_get_forum_title() 
-                                ); ?>
-                        </p>
+			<p><?php printf( __( 'The forum &#8216;%s&#8217; is closed to new topics and replies.', 'bbpress' ), bbp_get_forum_title() ); ?></p>
 		</div>
 	</div>
 
@@ -287,12 +255,7 @@ defined( 'ABSPATH' ) || exit;
 
 	<div id="no-topic-<?php bbp_topic_id(); ?>" class="bbp-no-topic">
 		<div class="bbp-template-notice">
-			<p>
-                                <?php is_user_logged_in() ? 
-                                        _e( 'You cannot create new topics.', 'bbpress' ) 
-                                        : _e( 'You must be logged in to create new topics.', 'bbpress' ); 
-                                ?>
-                        </p>
+			<p><?php is_user_logged_in() ? _e( 'You cannot create new topics.', 'bbpress' ) : _e( 'You must be logged in to create new topics.', 'bbpress' ); ?></p>
 		</div>
 	</div>
 

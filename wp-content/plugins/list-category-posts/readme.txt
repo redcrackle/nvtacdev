@@ -3,13 +3,13 @@ Contributors: fernandobt, zymeth25
 Donate Link: http://picandocodigo.net/programacion/wordpress/list-category-posts-wordpress-plugin-english/#support
 Tags: list, categories, posts, cms
 Requires at least: 3.3
-Tested up to: 6.8.1
-Requires PHP: 5.6
-Stable tag: 0.91.0
+Tested up to: 5.9
+Requires PHP: 5.4
+Stable tag: 0.86.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Very customizable plugin to list posts by category (or tag, author and more) in a post, page or widget. It uses the [catlist] shortcode to select posts.
+List Category Posts allows you to list posts by category and many other parameters in a post, page or widget. You use the [catlist] shortcode to select which posts to show and how. There's tons of customizations available.
 
 == Description ==
 
@@ -24,7 +24,7 @@ The shortcode accepts a category name or id, the order in which you want the pos
 The `[catlist]` shortcode can be used as many times as needed with different arguments on each post/page.
 `[catlist id=1 numberposts=10]`
 
-There's an options page with a few options, new options will be implemented on demand (as long as they make sense).
+There's an options page with only one option -for the moment-, new options will be implemented on demand (as long as they make sense). Right now the only global option is the `numberposts` parameter, to define a default number of posts to show for each instance (you can override this value by using the `numberposts` parameter in your shortcode).
 
 **[Read the instructions](https://github.com/picandocodigo/List-Category-Posts/wiki)** to learn which parameters are available and how to use them.
 
@@ -236,87 +236,6 @@ Widget built for WordPress 2.8's Widget API, so you need at least WP 2.8 to use 
 Template system has changed. Custom templates should be stored in WordPress theme folder.
 
 == Changelog ==
-
-= 0.91.0 =
-
-* Addresses CVE-2025-47636, avoids Local File Inclusion for template system. The code will remove any occurrences of the string  '../' in the template parameter. Templates files must be php files located in a directory named `list-category-posts` under `wp-content/themes/your-theme-folder`.
-https://www.cve.org/CVERecord?id=CVE-2025-47636
-
-= 0.90.3 =
-
-* Hardens xss fix for script tag by checking case insensitive and using tag_escape.
-
-= 0.90.2 =
-
-* Updates fix for stored cross-site scripting from 0.90.0, now applied to all tags. From this version onwards, script is not available to use as a tag when setting an element's tag in the shortcode.
-
-= 0.90.1 =
-
-* Fix PHP 8.2 deprecation notices
-* Remove empty anchor tags from widget morelink
-
-= 0.90.0 =
-
-* Fixes a Stored Cross-Site Scripting issue using `excerpt_tag='script'`.
-
-= 0.89.9 =
-
-* Fix deprecation notices caused by tag_escape - https://wordpress.org/support/topic/php-deprecated-preg_replace-passing-null-to-parameter-3/
-
-= 0.89.8 =
-
-* Fixes previous release not reporting proper version number on Plugin Repository.
-
-= 0.89.7 =
-
-* Updates esc_attr for tag_escape in title_tag for extra protection
-
-= 0.89.6 =
-
-* Same as 0.89.4, more character escaping for security purposes.
-
-= 0.89.5 =
-
-* Fixes an issue where pagination links are invalid after clicking any pagination link.
-* More html tags are now allowed in post titles.
-
-= 0.89.4 =
-
-* This release focuses solely on making sure the plugin does not output malicious scripts if a post's author tries to inject code into LCP shortcodes.
-
-= 0.89.3 =
-
-* Fixes an issue where `excludeposts=this` raised PHP warnings when navigating to non-post pages.
-
-= 0.89.2 =
-
-* Fixes an issue where the LCP widget incorrectly handled the current category for category id '1'.
-
-= 0.89.1 =
-
-* Fixes an issue where the LCP widget incorrectly detected the current post on pages containing multiple posts, such pages do not actually have a 'current' post.
-
-= 0.89 =
-
-* Allows using excluded ids for categorypage=yes (#418). See the docs for usage.
-
-= 0.88.1 =
-
-* Fixed PHP warnings that appeared when creating a new LCP widget.
-* Upgraded testing environment.
-* Fixed PHP 8.1 deprecation warnings reported by testing suite.
-* Deprecation notice: this is the last version with official support of PHP 5.4. Required PHP version will be raised to 5.6 with the next release.
-
-= 0.88 =
-
-* When filtering by a single category, you can add `main_cat_only=yes` to select only the posts that have this category as their main one (#449).
-* Similar to `currenttags`, `currentterms` has been added to support filtering by current post's custom taxonomy terms (#293).
-
-= 0.87 =
-
-* **New feature**: use `keep_orderby_filters=yes` to prevent the plugin from removing 'posts_orderby' filters added by other plugins/themes.
-* **New feature**: use `ignore_sticky_posts=yes` to ignore all sticky posts, they will still be displayed as regular posts in normal order if they match your filtering options, though. (#342)
-* **New feature**: use `cat_sticky_posts=yes` to make sticky posts 'stick' when filtering by category. (#423)
 
 = 0.86.1 =
 

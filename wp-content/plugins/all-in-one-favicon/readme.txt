@@ -2,14 +2,14 @@
 Contributors: techotronic  
 Tags: theme, favicon, admin, blog, wordpress, image, images, graphic, graphics, icon, iphone, multisite  
 Requires at least: 2.8  
-Tested up to: 6.2
-Stable tag: 4.8
+Tested up to: 5.1
+Stable tag: 4.7
 
 Easily add a Favicon to your site and the WordPress admin pages. Complete with upload functionality. Supports all three Favicon types (ico,png,gif).
 
 == Description ==
 
-[Check out the latest WordPress deals for your site.](https://appsumo.com/search?tags=wordpress&utm_source=sumo&utm_medium=wp-widget&utm_campaign=all-in-one-favicon)  
+[**To get even more email subscribers, use this plugin too!**](http://bit.ly/1zqOXPs)
 
 All In One Favicon adds favicons to your site and your admin pages.  
 You can either use favicons you already uploaded or use the builtin upload mechanism to upload a favicon to your WordPress installation.
@@ -92,8 +92,6 @@ Go to the settings page and and upload your Favicon(s) or add the path/URL to al
 
 
 == Changelog ==
-= 4.8 (2023-08-07) =
-* Address file deletion vulnerability.
 
 = 4.7 (2018-07-23) =
 * Resolve XSS vulnerabilities.

@@ -27,10 +27,6 @@ Description: Used to style blocks in the editor.
 	line-height: 1.75;
 }
 
-.rtl .editor-styles-wrapper {
-	font-family: Arial, Tahoma, sans-serif;
-}
-
 .edit-post-visual-editor .editor-block-list__block {
 	color: #1a1a1a;
 }
@@ -252,11 +248,6 @@ Description: Used to style blocks in the editor.
 	padding: 0;
 }
 
-.editor-styles-wrapper ol.has-background,
-.editor-styles-wrapper ul.has-background {
-	padding: 1.25em 2.375em;
-}
-
 /* Quotes */
 
 .rtl .editor-block-list__block blockquote {
@@ -266,12 +257,16 @@ Description: Used to style blocks in the editor.
 
 /* Captions */
 
-figure[class*="wp-block-"] > figcaption {
+[class^="wp-block-"] figcaption {
 	color: #686868;
 	font-style: italic;
 	line-height: 1.6153846154;
 	padding-top: 0.5384615385em;
-	text-align: start;
+	text-align: left;
+}
+
+.rtl [class^="wp-block-"] figcaption {
+	text-align: right;
 }
 
 /*--------------------------------------------------------------
@@ -305,10 +300,6 @@ figure[class*="wp-block-"] > figcaption {
 	padding: 0 0 0 1.263157895em;
 }
 
-.editor-styles-wrapper .wp-block-quote {
-	border-color: currentColor;
-}
-
 .wp-block-quote:not(.is-large):not(.is-style-large).alignleft,
 .wp-block-quote:not(.is-large):not(.is-style-large).alignright {
 	border-left: 0;
@@ -327,10 +318,6 @@ figure[class*="wp-block-"] > figcaption {
 	font-size: 16px;
 	font-size: 1rem;
 	line-height: 1.75;
-}
-
-.wp-block-quote.has-text-color .wp-block-quote__citation {
-	color: inherit;
 }
 
 .wp-block-quote__citation:before {
@@ -416,9 +403,7 @@ figure[class*="wp-block-"] > figcaption {
 
 .editor-styles-wrapper .wp-block-code {
 	border: 0;
-	font-family: Inconsolata, monospace;
-	line-height: 1.75;
-	padding: 0;
+	padding: 0.125em 0.25em;
 	background-color: #d1d1d1;
 }
 
@@ -505,15 +490,10 @@ figure[class*="wp-block-"] > figcaption {
 
 /* Pullquote */
 
-.editor-styles-wrapper .wp-block-pullquote blockquote {
+.editor-block-list__block .wp-block-pullquote blockquote {
 	border: 0;
 	margin: 0;
 	padding: 0;
-}
-
-.editor-styles-wrapper .wp-block-pullquote:where([style*="border-width"]) blockquote {
-	padding-left: 1rem;
-	padding-right: 1rem;
 }
 
 .wp-block-pullquote blockquote > .editor-rich-text p {
@@ -529,28 +509,6 @@ figure[class*="wp-block-"] > figcaption {
 	font-style: italic;
 	line-height: 1.75;
 	text-transform: none;
-}
-
-.wp-block-pullquote.has-text-color blockquote,
-.wp-block-pullquote.has-background blockquote,
-.has-background .wp-block-pullquote blockquote,
-.wp-block-pullquote.has-text-color cite {
-	color: inherit;
-}
-
-.wp-block-pullquote[class*="-font-size"] blockquote,
-.wp-block-pullquote[class*="-font-size"] blockquote p,
-.wp-block-pullquote[class*="-font-size"] cite,
-.wp-block-pullquote[style*="font-size"] blockquote,
-.wp-block-pullquote[style*="font-size"] blockquote p,
-.wp-block-pullquote[style*="font-size"] cite {
-	font-size: inherit;
-}
-	
-.wp-block-pullquote[style*="line-height"] blockquote,
-.wp-block-pullquote[style*="line-height"] blockquote p,
-.wp-block-pullquote[style*="line-height"] cite {
-	line-height: inherit;
 }
 
 .wp-block-pullquote .wp-block-pullquote__citation:before {
@@ -569,23 +527,25 @@ figure[class*="wp-block-"] > figcaption {
 	text-align: right;
 }
 
+/* Verse */
+
+.editor-styles-wrapper .wp-block-verse {
+	font-family: inherit;
+}
+
 /*--------------------------------------------------------------
 5.0 Blocks - Layout Elements
 --------------------------------------------------------------*/
 
 /* Buttons */
 
-.wp-block-buttons {
+.wp-block-button .wp-block-button__link {
+	font-family: Montserrat, "Helvetica Neue", sans-serif;
 	font-weight: 700;
 	letter-spacing: 0.046875em;
 	line-height: 1;
-	text-transform: uppercase;
-}
-
-.wp-block-button .wp-block-button__link {
-	box-shadow: none;
-	font-family: Montserrat, "Helvetica Neue", sans-serif;
 	padding: 0.84375em 1.3125em 0.78125em;
+	text-transform: uppercase;
 }
 
 .wp-block-button__link {
@@ -617,7 +577,7 @@ figure[class*="wp-block-"] > figcaption {
 
 /* Latest Comments */
 
-.editor-styles-wrapper .wp-block-latest-comments__comment-meta a {
+.editor-block-list__block .wp-block-latest-comments__comment-meta a {
 	box-shadow: none;
 	font-weight: 700;
 	text-decoration: none;
@@ -631,7 +591,7 @@ figure[class*="wp-block-"] > figcaption {
 	line-height: 1.6153846154;
 }
 
-.wp-block-latest-comments .wp-block-latest-comments__comment:not(:first-child) {
+.wp-block-latest-comments .wp-block-latest-comments__comment {
 	border-top: 1px solid #d1d1d1;
 	margin-bottom: 0;
 	padding: 1.75em 0;
@@ -651,13 +611,6 @@ figure[class*="wp-block-"] > figcaption {
 
 .edit-post-visual-editor .wp-block-latest-posts.is-grid li {
 	margin-bottom: 16px;
-}
-
-/* Avatar & Post Author */
-
-.editor-styles-wrapper .avatar,
-.wp-block-post-author__avatar img {
-	border-radius: 50%;
 }
 
 /*--------------------------------------------------------------

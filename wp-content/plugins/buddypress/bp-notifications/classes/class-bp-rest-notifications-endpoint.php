@@ -118,8 +118,10 @@ class BP_REST_Notifications_Endpoint extends WP_REST_Controller {
 
 		if ( ! empty( $args['user_ids'] ) ) {
 			$args['user_id'] = $args['user_ids'];
-		} elseif ( empty( $args['user_id'] ) ) {
+		} else {
+			if ( empty( $args['user_id'] ) ) {
 				$args['user_id'] = bp_loggedin_user_id();
+			}
 		}
 
 		if ( empty( $request->get_param( 'component_name' ) ) ) {
@@ -636,7 +638,7 @@ class BP_REST_Notifications_Endpoint extends WP_REST_Controller {
 	 * @since 5.0.0
 	 *
 	 * @param BP_Notifications_Notification $notification Notification item.
-	 * @return array
+	 * @return array Links for the given plugin.
 	 */
 	protected function prepare_links( $notification ) {
 		$base = sprintf( '/%1$s/%2$s/', $this->namespace, $this->rest_base );
@@ -690,7 +692,7 @@ class BP_REST_Notifications_Endpoint extends WP_REST_Controller {
 		}
 
 		// Embed Blog.
-		if ( is_multisite() && bp_is_active( 'blogs' ) && buddypress()->blogs->id === $notification->component_name && ! empty( $notification->item_id ) ) {
+		if ( bp_is_active( 'blogs' ) && buddypress()->blogs->id === $notification->component_name && ! empty( $notification->item_id ) ) {
 			$links['blog'] = array(
 				'embeddable' => true,
 				'href'       => rest_url(

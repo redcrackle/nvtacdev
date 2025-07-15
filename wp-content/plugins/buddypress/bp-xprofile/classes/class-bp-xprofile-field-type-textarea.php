@@ -36,7 +36,8 @@ class BP_XProfile_Field_Type_Textarea extends BP_XProfile_Field_Type {
 		 *
 		 * @since 2.0.0
 		 *
-		 * @param BP_XProfile_Field_Type_Textarea $field_type Current instance of the field type class.
+		 * @param BP_XProfile_Field_Type_Textarea $this Current instance of
+		 *                                              the field type textarea.
 		 */
 		do_action( 'bp_xprofile_field_type_textarea', $this );
 	}
@@ -82,7 +83,7 @@ class BP_XProfile_Field_Type_Textarea extends BP_XProfile_Field_Type {
 			);
 			?>
 
-			<textarea <?php $this->output_edit_field_html_elements( $r ); ?> aria-labelledby="<?php bp_the_profile_field_input_name(); ?>-1" aria-describedby="<?php bp_the_profile_field_input_name(); ?>-3"><?php bp_the_profile_field_edit_value(); ?></textarea>
+			<textarea <?php echo $this->get_edit_field_html_elements( $r ); ?> aria-labelledby="<?php bp_the_profile_field_input_name(); ?>-1" aria-describedby="<?php bp_the_profile_field_input_name(); ?>-3"><?php bp_the_profile_field_edit_value(); ?></textarea>
 
 			<?php
 
@@ -147,7 +148,7 @@ class BP_XProfile_Field_Type_Textarea extends BP_XProfile_Field_Type {
 			);
 			?>
 
-			<textarea <?php $this->output_edit_field_html_elements( $r ); ?>></textarea>
+			<textarea <?php echo $this->get_edit_field_html_elements( $r ); ?>></textarea>
 
 			<?php
 		} else {

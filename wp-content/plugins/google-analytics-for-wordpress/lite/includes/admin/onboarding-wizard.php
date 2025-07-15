@@ -37,15 +37,11 @@ class MonsterInsights_Onboarding_Wizard {
 			$this,
 			'get_install_errors',
 		) );
-		
-		add_action( 'wp_ajax_nopriv_onboarding_monsterinsights_onboarding_get_errors', array(
-			$this,
-			'onboarding_get_install_errors',
-		) );
 
-		add_action( 'monsterinsights_after_ajax_activate_addon', array( $this, 'disable_aioseo_onboarding_wizard' ) );
-		add_action( 'monsterinsights_after_ajax_activate_addon', array( $this, 'disable_wpforms_onboarding_wizard' ) );
-		add_action( 'monsterinsights_after_ajax_activate_addon', array( $this, 'disable_optin_monster_onboarding_wizard' ) );
+		add_action( 'wp_ajax_monsterinsights_onboarding_disable_wpforms_onboarding', array(
+			$this,
+			'disable_wp_forms_onboarding_process',
+		) );
 
 		// This will only be called in the Onboarding Wizard context because of previous checks.
 		add_filter( 'monsterinsights_maybe_authenticate_siteurl', array( $this, 'change_return_url' ) );
@@ -59,14 +55,11 @@ class MonsterInsights_Onboarding_Wizard {
 	 */
 	public function maybe_load_onboarding_wizard() {
 
-		// Check if the page is not set, or if it's not the onboarding wizard page
-		if ( empty( $_GET['page'] ) || 'monsterinsights-onboarding' !== $_GET['page'] ) {
-				return;
-		}
-
-		// Check if the current user is allowed to save settings
-		if ( ! current_user_can( 'monsterinsights_save_settings' ) ) {
-				return;
+		// Check for wizard-specific parameter
+		// Allow plugins to disable the onboarding wizard
+		// Check if current user is allowed to save settings.
+		if ( ! ( isset( $_GET['page'] ) || 'monsterinsights-onboarding' !== $_GET['page'] || apply_filters( 'monsterinsights_enable_onboarding_wizard', true ) || ! current_user_can( 'monsterinsights_save_settings' ) ) ) { // WPCS: CSRF ok, input var ok.
+			return;
 		}
 
 		// Don't load the interface if doing an ajax call.
@@ -109,22 +102,32 @@ class MonsterInsights_Onboarding_Wizard {
 	 * Load the scripts needed for the Onboarding Wizard.
 	 */
 	public function enqueue_scripts() {
-		$version_path = 'lite';
 
-		if ( ! defined( 'MONSTERINSIGHTS_LOCAL_JS_URL' ) ) {
-			MonsterInsights_Admin_Assets::enqueue_script_specific_css( 'src/modules/wizard-onboarding/wizard.js' );
+		global $wp_version;
+		$version_path = monsterinsights_is_pro_version() ? 'pro' : 'lite';
+		$rtl          = is_rtl() ? '.rtl' : '';
+		if ( ! defined( 'MONSTERINSIGHTS_LOCAL_WIZARD_JS_URL' ) ) {
+			wp_enqueue_style( 'monsterinsights-vue-style-vendors', plugins_url( $version_path . '/assets/vue/css/chunk-vendors' . $rtl . '.css', MONSTERINSIGHTS_PLUGIN_FILE ), array(), monsterinsights_get_asset_version() );
+			wp_enqueue_style( 'monsterinsights-vue-style-common', plugins_url( $version_path . '/assets/vue/css/chunk-common' . $rtl . '.css', MONSTERINSIGHTS_PLUGIN_FILE ), array(), monsterinsights_get_asset_version() );
+			wp_enqueue_style( 'monsterinsights-vue-style', plugins_url( $version_path . '/assets/vue/css/wizard' . $rtl . '.css', MONSTERINSIGHTS_PLUGIN_FILE ), array(), monsterinsights_get_asset_version() );
+			wp_enqueue_script( 'monsterinsights-vue-vendors', plugins_url( $version_path . '/assets/vue/js/chunk-vendors.js', MONSTERINSIGHTS_PLUGIN_FILE ), array(), monsterinsights_get_asset_version(), true );
+			wp_enqueue_script( 'monsterinsights-vue-common', plugins_url( $version_path . '/assets/vue/js/chunk-common.js', MONSTERINSIGHTS_PLUGIN_FILE ), array(), monsterinsights_get_asset_version(), true );
+			wp_register_script( 'monsterinsights-vue-script', plugins_url( $version_path . '/assets/vue/js/wizard.js', MONSTERINSIGHTS_PLUGIN_FILE ), array(
+				'monsterinsights-vue-vendors',
+				'monsterinsights-vue-common',
+			), monsterinsights_get_asset_version(), true );
+		} else {
+			wp_enqueue_script( 'monsterinsights-vue-vendors', MONSTERINSIGHTS_LOCAL_VENDORS_JS_URL, array(), monsterinsights_get_asset_version(), true );
+			wp_enqueue_script( 'monsterinsights-vue-common', MONSTERINSIGHTS_LOCAL_COMMON_JS_URL, array(), monsterinsights_get_asset_version(), true );
+			wp_register_script( 'monsterinsights-vue-script', MONSTERINSIGHTS_LOCAL_WIZARD_JS_URL, array(
+				'monsterinsights-vue-vendors',
+				'monsterinsights-vue-common',
+			), monsterinsights_get_asset_version(), true );
 		}
-
-		$app_js_url = MonsterInsights_Admin_Assets::get_js_url( 'src/modules/wizard-onboarding/wizard.js' );
-		wp_register_script( 'monsterinsights-vue-script', $app_js_url, array( 'wp-i18n' ), monsterinsights_get_asset_version(), true );
 		wp_enqueue_script( 'monsterinsights-vue-script' );
 
-		$settings_page        = is_network_admin() ? add_query_arg( 'page', 'monsterinsights_network', network_admin_url( 'admin.php' ) ) : add_query_arg( 'page', 'monsterinsights_settings', admin_url( 'admin.php' ) );
-		$is_file_edit_allowed = 1;
-		// Determine whether file modifications are allowed.
-		if ( function_exists( 'wp_is_file_mod_allowed' ) && ! wp_is_file_mod_allowed( 'monsterinsights_can_install' ) ) {
-			$is_file_edit_allowed = 0;
-		}
+		$settings_page = is_network_admin() ? add_query_arg( 'page', 'monsterinsights_network', network_admin_url( 'admin.php' ) ) : add_query_arg( 'page', 'monsterinsights_settings', admin_url( 'admin.php' ) );
+
 		wp_localize_script(
 			'monsterinsights-vue-script',
 			'monsterinsights',
@@ -132,6 +135,7 @@ class MonsterInsights_Onboarding_Wizard {
 				'ajax'                 => add_query_arg( 'page', 'monsterinsights-onboarding', admin_url( 'admin-ajax.php' ) ),
 				'nonce'                => wp_create_nonce( 'mi-admin-nonce' ),
 				'network'              => is_network_admin(),
+				'translations'         => wp_get_jed_locale_data( 'mi-vue-app' ),
 				'assets'               => plugins_url( $version_path . '/assets/vue', MONSTERINSIGHTS_PLUGIN_FILE ),
 				'roles'                => monsterinsights_get_roles(),
 				'roles_manage_options' => monsterinsights_get_manage_options_roles(),
@@ -139,41 +143,22 @@ class MonsterInsights_Onboarding_Wizard {
 				'is_eu'                => $this->should_include_eu_addon(),
 				'activate_nonce'       => wp_create_nonce( 'monsterinsights-activate' ),
 				'install_nonce'        => wp_create_nonce( 'monsterinsights-install' ),
-				'exit_url'             => add_query_arg( 'page', 'monsterinsights_reports', admin_url( 'admin.php' ) ),
+				'exit_url'             => $settings_page,
 				'shareasale_id'        => monsterinsights_get_shareasale_id(),
 				'shareasale_url'       => monsterinsights_get_shareasale_url( monsterinsights_get_shareasale_id(), '' ),
 				// Used to add notices for future deprecations.
 				'versions'             => monsterinsights_get_php_wp_version_warning_data(),
 				'plugin_version'       => MONSTERINSIGHTS_VERSION,
 				'migrated'             => monsterinsights_get_option( 'gadwp_migrated', false ),
-				'allow_file_edit'      => $is_file_edit_allowed,
-				'reports_url'          => admin_url( 'admin.php?page=monsterinsights_reports' ),
 			)
 		);
 
-		$text_domain = monsterinsights_is_pro_version() ? 'google-analytics-premium' : 'google-analytics-for-wordpress';
-
-		wp_scripts()->add_inline_script(
-			'monsterinsights-vue-script',
-			monsterinsights_get_printable_translations( $text_domain ),
-			'translation'
-		);
 	}
 
 	/**
 	 * Outputs the simplified header used for the Onboarding Wizard.
 	 */
 	public function onboarding_wizard_header() {
-		/**
-		 * Since WordPress 6.4 print_emoji_styles() and wp_admin_bar_header() have been deprecated.
-		 */
-		if ( has_action( 'admin_head', 'wp_admin_bar_header') && function_exists( 'wp_enqueue_admin_bar_header_styles' ) ) {
-			remove_action( 'admin_head', 'wp_admin_bar_header' );
-			add_action( 'admin_head', 'wp_enqueue_admin_bar_header_styles' );
-		}
-		if ( has_action( 'admin_print_styles', 'print_emoji_styles') ) {
-			remove_action( 'admin_print_styles', 'print_emoji_styles' );
-		}
 		?>
 		<!DOCTYPE html>
 		<html <?php language_attributes(); ?>>
@@ -185,7 +170,7 @@ class MonsterInsights_Onboarding_Wizard {
 			<?php do_action( 'admin_print_scripts' ); ?>
 			<?php do_action( 'admin_head' ); ?>
 		</head>
-		<body class="monsterinsights-onboarding monsterinsights_page">
+		<body class="monsterinsights-onboarding">
 		<?php
 	}
 
@@ -261,7 +246,7 @@ class MonsterInsights_Onboarding_Wizard {
 
 		if ( ! monsterinsights_can_install_plugins() ) {
 			wp_send_json( array(
-				'message' => esc_html__( 'Oops! You are not allowed to install plugins. Please contact your site administrator for assistance.', 'google-analytics-for-wordpress' ),
+				'message' => esc_html__( 'You are not allowed to install plugins', 'google-analytics-for-wordpress' ),
 			) );
 		}
 
@@ -372,6 +357,7 @@ class MonsterInsights_Onboarding_Wizard {
 	 * @return mixed
 	 */
 	public function change_success_url( $siteurl ) {
+
 		$admin_url   = is_network_admin() ? network_admin_url() : admin_url();
 		$return_step = is_network_admin() ? 'recommended_addons' : 'recommended_settings';
 
@@ -457,53 +443,27 @@ class MonsterInsights_Onboarding_Wizard {
 
 	}
 
-	public function onboarding_get_install_errors() {
-		check_ajax_referer( 'onboarding', 'nonce' );
-		wp_send_json( monsterinsights_is_code_installed_frontend() );
-	}
+	/**
+	 * Disable WPForms Welcome Screen/Onboarding.
+	 *
+	 * This needs to be done, so that MonsterInsights Onboarding goe to MonsterInsights
+	 * Screen rather than displaying WPForms Welcome Screen when a user has gone
+	 * through MonsterInsights Onboarding.
+	 *
+	 * @since 8.4.0
+	 *
+	 * @return bool
+	 */
+	public function disable_wp_forms_onboarding_process() {
+		 if ( function_exists( 'wpforms' ) ) {
+			if ( get_transient( 'wpforms_activation_redirect' ) ) {
+				delete_transient( 'wpforms_activation_redirect' );
 
-	public function disable_aioseo_onboarding_wizard( $plugin ) {
-		if ( empty( $plugin ) ) {
-			return;
-		}
+				wp_send_json_success();
+			}
+		 }
 
-		if ( 'all-in-one-seo-pack/all_in_one_seo_pack.php' !== $plugin ) {
-			return;
-		}
-
-		update_option( 'aioseo_activation_redirect', true );
-	}
-
-	public function disable_wpforms_onboarding_wizard( $plugin ) {
-		if ( empty( $plugin ) ) {
-			return;
-		}
-
-		if ( 'wpforms-lite/wpforms.php' !== $plugin ) {
-			return;
-		}
-
-		if ( false === get_transient( 'wpforms_activation_redirect' ) ) {
-			return;
-		}
-
-		delete_transient( 'wpforms_activation_redirect' );
-	}
-
-	public function disable_optin_monster_onboarding_wizard( $plugin ) {
-		if ( empty( $plugin ) ) {
-			return;
-		}
-
-		if ( 'optinmonster/optin-monster-wp-api.php' !== $plugin ) {
-			return;
-		}
-
-		if ( false === get_transient( 'optin_monster_api_activation_redirect' ) ){
-			return;
-		}
-
-		delete_transient( 'optin_monster_api_activation_redirect' );
+		 wp_send_json_success();
 	}
 
 }

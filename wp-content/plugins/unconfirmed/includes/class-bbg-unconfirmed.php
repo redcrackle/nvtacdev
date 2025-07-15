@@ -30,21 +30,6 @@ class BBG_Unconfirmed {
 	var $is_multisite;
 
 	/**
-	 * Base URL for this WordPress install
-	 */
-	var $base_url;
-
-	/**
-	 * Count of total user accounts.
-	 */
-	var $total_users;
-
-	/**
-	 * Array of messages.
-	 */
-	var $message;
-
-	/**
 	 * Constructor.
 	 *
 	 * This function sets up a base url to use for URL concatenation throughout the plugin.
@@ -117,20 +102,13 @@ class BBG_Unconfirmed {
 		$page = add_submenu_page( 'users.php', __( 'Unconfirmed', 'unconfirmed' ), __( 'Unconfirmed', 'unconfirmed' ), 'moderate_signups', 'unconfirmed', array( $this, 'admin_panel_main' ) );
 		add_action( "admin_print_styles-$page", array( $this, 'add_admin_styles' ) );
 
-		if ( isset( $_POST['performed_search'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['performed_search'] ) ) ) {
+		if ( isset( $_REQUEST['performed_search'] ) && '1' == $_REQUEST['performed_search'] ) {
 			return;
 		}
 
 		// Look for actions first
-		$unconfirmed_action = null;
-		if ( isset( $_POST['unconfirmed_action'] ) ) {
-			$unconfirmed_action = sanitize_text_field( wp_unslash( $_POST['unconfirmed_action'] ) );
-		} elseif ( isset( $_GET['unconfirmed_action'] ) ) {
-			$unconfirmed_action = sanitize_text_field( wp_unslash( $_GET['unconfirmed_action'] ) );
-		}
-
-		if ( $unconfirmed_action ) {
-			switch ( $unconfirmed_action ) {
+		if ( isset( $_REQUEST['unconfirmed_action'] ) ) {
+			switch ( $_REQUEST['unconfirmed_action'] ) {
 				case 'delete':
 					$this->delete_user();
 					break;
@@ -148,7 +126,7 @@ class BBG_Unconfirmed {
 			$this->do_redirect();
 		}
 
-		if ( isset( $_GET['unconfirmed_complete'] ) ) {
+		if ( isset( $_REQUEST['unconfirmed_complete'] ) ) {
 			$this->setup_get_users();
 		}
 	}
@@ -234,7 +212,7 @@ class BBG_Unconfirmed {
 		$offset  = $r['offset'];
 		$number  = $r['number'];
 
-		$search = isset( $_REQUEST['s'] ) ? sanitize_text_field( wp_unslash( trim( $_REQUEST['s'] ) ) ) : '';
+		$search = isset( $_REQUEST['s'] ) ? wp_unslash( trim( $_REQUEST['s'] ) ) : '';
 
 		// Our query will be different for multisite and for non-multisite
 		if ( $this->is_multisite ) {
@@ -404,7 +382,7 @@ class BBG_Unconfirmed {
 		}
 
 		// Did you mean to do this? HMMM???
-		if ( isset( $_POST['unconfirmed_bulk'] ) ) {
+		if ( isset( $_REQUEST['unconfirmed_bulk'] ) ) {
 			check_admin_referer( 'unconfirmed_bulk_action' );
 		} else {
 			check_admin_referer( 'unconfirmed_activate_user' );
@@ -416,14 +394,9 @@ class BBG_Unconfirmed {
 			return;
 		}
 
-		$keys = wp_unslash( $_REQUEST['unconfirmed_key'] );
-		if ( is_array( $keys ) ) {
-			$keys = array_map( 'sanitize_text_field', $keys );
-		} else {
-			$keys = (array) sanitize_text_field( $keys );
-		}
+		$keys = $_REQUEST['unconfirmed_key'];
 
-		foreach ( $keys as $key ) {
+		foreach ( (array) $keys as $key ) {
 			if ( $this->is_multisite ) {
 				$result  = wpmu_activate_signup( $key );
 				$user_id = ! is_wp_error( $result ) && isset( $result['user_id'] ) ? $result['user_id'] : 0;
@@ -483,14 +456,9 @@ class BBG_Unconfirmed {
 			return;
 		}
 
-		$keys = wp_unslash( $_REQUEST['unconfirmed_key'] );
-		if ( is_array( $keys ) ) {
-			$keys = array_map( 'sanitize_text_field', $keys );
-		} else {
-			$keys = (array) sanitize_text_field( $keys );
-		}
+		$keys = $_REQUEST['unconfirmed_key'];
 
-		foreach ( $keys as $key ) {
+		foreach ( (array) $keys as $key ) {
 			if ( $this->is_multisite ) {
 				// Ensure the user exists before deleting, and pass the data along
 				// to a hook
@@ -562,16 +530,16 @@ class BBG_Unconfirmed {
 		}
 
 		// Get the user's activation key out of the URL params
-		$keys = wp_unslash( $_REQUEST['unconfirmed_key'] );
-		if ( is_array( $keys ) ) {
-			$keys = array_map( 'sanitize_text_field', $keys );
-		} else {
-			$keys = (array) sanitize_text_field( $keys );
+		if ( ! isset( $_REQUEST['unconfirmed_key'] ) ) {
+			$this->record_status( 'error_nokey' );
+			return;
 		}
 
 		$resent_counts = get_site_option( 'unconfirmed_resent_counts' );
 
-		foreach ( $keys as $key ) {
+		$keys = $_REQUEST['unconfirmed_key'];
+
+		foreach ( (array) $keys as $key ) {
 			if ( $this->is_multisite ) {
 				$user = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->signups WHERE activation_key = %s", $key ) );
 			} else {
@@ -649,7 +617,7 @@ class BBG_Unconfirmed {
 
 	function add_args( $add_args ) {
 		if ( ! empty( $_REQUEST['s'] ) ) {
-			$search_text   = urlencode( sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ) );
+			$search_text   = urlencode( $_REQUEST['s'] );
 			$add_args['s'] = $search_text;
 		} else {
 			$add_args['s'] = '';
@@ -669,12 +637,12 @@ class BBG_Unconfirmed {
 		foreach ( $_REQUEST as $get_key => $activation_keys ) {
 			$get_key = explode( '_', $get_key );
 
-			if ( 'updated' === $get_key[0] || 'error' === $get_key[0] ) {
-				$activation_keys = array_map( 'sanitize_text_field', explode( ',', $activation_keys ) );
+			if ( 'updated' == $get_key[0] || 'error' == $get_key[0] ) {
+				$activation_keys = explode( ',', $activation_keys );
 
 				if ( $this->is_multisite ) {
 					foreach ( (array) $activation_keys as $ak_index => $activation_key ) {
-						$activation_keys[ $ak_index ] = '"' . $wpdb->prepare( $activation_key ) . '"';
+						$activation_keys[ $ak_index ] = '"' . sanitize_text_field( $activation_key ) . '"';
 					}
 					$activation_keys = implode( ',', $activation_keys );
 
@@ -916,7 +884,7 @@ class BBG_Unconfirmed {
 		// Complete the pagination setup
 		$pagination->setup_query( $query );
 
-		$search_value = isset( $_REQUEST['s'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ) : '';
+		$search_value = isset( $_REQUEST['s'] ) ? wp_unslash( $_REQUEST['s'] ) : '';
 
 		?>
 		<div class="wrap">

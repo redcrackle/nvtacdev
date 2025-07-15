@@ -38,17 +38,7 @@ $act_post_type_settings = $this->plugin->get_setting('act_post_type_settings');
 							<select name="<?php echo $this->plugin->get_field_name('act_post_type_settings'); ?>[<?php echo $pto->name; ?>][auto_load]">
 								<option value="false">None</option>
 								<?php foreach($templates as $t): ?>
-                                    <?php
-                                        $key_exists = $act_post_type_settings[$pto->name] ?? false;
-                                        $auto_load_id = $act_post_type_settings[$pto->name]['auto_load'] ?? false;
-                                        $auto_load_current = $auto_load_id == $t->ID;
-
-                                        $selected_text = "";
-                                        if ($key_exists && $auto_load_id && $auto_load_current) {
-                                            $selected_text = "selected";
-                                        }
-                                    ?>
-									<option value="<?php echo $t->ID; ?>" <?php echo $selected_text ?>><?php echo $t->post_title; ?></option>
+									<option value="<?php echo $t->ID; ?>" <?php if( isset($act_post_type_settings[$pto->name]) && $act_post_type_settings[$pto->name]['auto_load'] == $t->ID ) echo "selected"; ?>><?php echo $t->post_title; ?></option>
 								<?php endforeach; ?>
 							</select>
 							</label><br />

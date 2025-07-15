@@ -34,13 +34,10 @@ function cptui_edit_plugin_list_links( $links ) {
 	}
 
 	// Add our custom links to the returned array value.
-	return array_merge(
-		array(
-			'<a href="' . admin_url( 'admin.php?page=cptui_main_menu' ) . '">' . esc_html__( 'About', 'custom-post-type-ui' ) . '</a>',
-			'<a href="' . admin_url( 'admin.php?page=cptui_support' ) . '">' . esc_html__( 'Help', 'custom-post-type-ui' ) . '</a>',
-		),
-		$links
-	);
+	return array_merge( [
+		'<a href="' . admin_url( 'admin.php?page=cptui_main_menu' ) . '">' . __( 'About', 'custom-post-type-ui' ) . '</a>',
+		'<a href="' . admin_url( 'admin.php?page=cptui_support' ) . '">' . __( 'Help', 'custom-post-type-ui' ) . '</a>',
+	], $links );
 }
 add_filter( 'plugin_action_links_' . plugin_basename( dirname( __DIR__ ) ) . '/custom-post-type-ui.php', 'cptui_edit_plugin_list_links' );
 
@@ -108,34 +105,29 @@ function cptui_footer( $original = '' ) {
 	}
 
 	return sprintf(
-		// translators: Placeholder will hold the name of the plugin, version of the plugin and a link to WebdevStudios.
-		esc_attr__( '%1$s version %2$s by %3$s', 'custom-post-type-ui' ),
-		esc_attr__( 'Custom Post Type UI', 'custom-post-type-ui' ),
+		__( '%s version %s by %s', 'custom-post-type-ui' ),
+		__( 'Custom Post Type UI', 'custom-post-type-ui' ),
 		CPTUI_VERSION,
 		'<a href="https://webdevstudios.com" target="_blank" rel="noopener">WebDevStudios</a>'
 	) . ' - ' .
 	sprintf(
-		// translators: Placeholders are just for HTML markup that doesn't need translated.
 		'<a href="http://wordpress.org/support/plugin/custom-post-type-ui" target="_blank" rel="noopener">%s</a>',
-		esc_attr__( 'Support forums', 'custom-post-type-ui' )
+		__( 'Support forums', 'custom-post-type-ui' )
 	) . ' - ' .
 	sprintf(
-		// translators: Placeholders are just for HTML markup that doesn't need translated.
 		'<a href="https://wordpress.org/plugins/custom-post-type-ui/reviews/" target="_blank" rel="noopener">%s</a>',
 		sprintf(
 			// translators: Placeholder will hold `<abbr>` tag for CPTUI.
-			esc_attr__( 'Review %s', 'custom-post-type-ui' ),
+			__( 'Review %s', 'custom-post-type-ui' ),
 			sprintf(
-				// translators: Placeholders are just for HTML markup that doesn't need translated.
 				'<abbr title="%s">%s</abbr>',
 				esc_attr__( 'Custom Post Type UI', 'custom-post-type-ui' ),
 				'CPTUI'
 			)
 		)
 	) . ' - ' .
-	esc_attr__( 'Follow on Twitter:', 'custom-post-type-ui' ) .
+	__( 'Follow on Twitter:', 'custom-post-type-ui' ) .
 	sprintf(
-		// translators: Placeholders are just for HTML markup that doesn't need translated.
 		' %s',
 		'<a href="https://twitter.com/webdevstudios" target="_blank" rel="noopener">WebDevStudios</a>'
 	);
@@ -161,8 +153,7 @@ function cptui_flush_rewrite_rules() {
 	 * post types or taxonomies are created, updated, deleted, or imported. Any other time and this condition
 	 * should not be met.
 	 */
-	$flush_it = get_transient( 'cptui_flush_rewrite_rules' );
-	if ( 'true' === $flush_it ) {
+	if ( 'true' === ( $flush_it = get_transient( 'cptui_flush_rewrite_rules' ) ) ) {
 		flush_rewrite_rules( false );
 		// So we only run this once.
 		delete_transient( 'cptui_flush_rewrite_rules' );
@@ -179,8 +170,8 @@ add_action( 'admin_init', 'cptui_flush_rewrite_rules' );
  */
 function cptui_get_current_action() {
 	$current_action = '';
-	if ( ! empty( $_GET ) && isset( $_GET['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
-		$current_action .= esc_textarea( wp_unslash( $_GET['action'] ) ); // phpcs:ignore
+	if ( ! empty( $_GET ) && isset( $_GET['action'] ) ) {
+		$current_action .= esc_textarea( $_GET['action'] );
 	}
 
 	return $current_action;
@@ -355,12 +346,12 @@ function cptui_products_sidebar() {
 			printf(
 				'<p><a href="%s">%s</a></p>',
 				esc_url( $ad['url'] ),
-				$the_ad // phpcs:ignore WordPress.Security.EscapeOutput
+				$the_ad
 			);
 		}
 		printf(
 			'<p><a href="%s">%s</a></p>',
-			'https://pluginize.com/plugins/custom-post-type-ui-extended/',
+			'https://pluginize.com/plugins/custom-post-type-ui-extended/ref/pluginizeaff/?campaign=cptui-sidebar-remove',
 			esc_html__( 'Remove these ads?', 'custom-post-type-ui' )
 		);
 	}
@@ -380,56 +371,43 @@ function cptui_newsletter_form() {
 	?>
 
 <div class="email-octopus-form-wrapper">
-	<?php
-		echo sprintf(
-			/* translators: Placeholders are just for HTML markup that doesn't need translated */
-			'<p><strong>%s</strong></p>',
-			esc_html__( 'Get email updates from pluginize.com about Custom Post Type UI', 'custom-post-type-ui' )
-		);
-	?>
-	<p class="email-octopus-success-message"></p>
-	<p class="email-octopus-error-message"></p>
+    <p><strong>Get email updates from pluginize.com about Custom Post Type UI</strong></p>
+    <p class="email-octopus-success-message"></p>
+    <p class="email-octopus-error-message"></p>
 
-	<form method="post" action="https://emailoctopus.com/lists/2039e001-4775-11ea-be00-06b4694bee2a/members/embedded/1.3/add" class="email-octopus-form" data-sitekey="6LdYsmsUAAAAAPXVTt-ovRsPIJ_IVhvYBBhGvRV6">
-		<div class="email-octopus-form-row">
+    <form method="post"
+      action="https://emailoctopus.com/lists/2039e001-4775-11ea-be00-06b4694bee2a/members/embedded/1.3/add"
+      class="email-octopus-form"
+      data-sitekey="6LdYsmsUAAAAAPXVTt-ovRsPIJ_IVhvYBBhGvRV6">
+        <div class="email-octopus-form-row">
+            <label for="field_0">Email address</label>
+            <input id="field_0" name="field_0" type="email" placeholder="email@domain.com" style="max-width:100%;">
+        </div>
 
-			<?php
-				echo sprintf(
-					/* translators: Placeholders are just for HTML markup that doesn't need translated */
-					'<label for="field_0">%s</label>',
-					esc_html__( 'Email address', 'custom-post-type-ui' )
-				);
-			?>
-			<input id="field_0" name="field_0" type="email" placeholder="email@domain.com" style="max-width:100%;">
-		</div>
+        <div class="email-octopus-form-row-hp" aria-hidden="true">
+            <!-- Do not remove this field, otherwise you risk bot sign-ups -->
+            <input type="text" name="hp2039e001-4775-11ea-be00-06b4694bee2a"
+               tabindex="-1"
+               autocomplete="nope">
+        </div>
 
-		<div class="email-octopus-form-row-hp" aria-hidden="true">
-			<!-- Do not remove this field, otherwise you risk bot sign-ups -->
-			<input type="text" name="hp2039e001-4775-11ea-be00-06b4694bee2a" tabindex="-1" autocomplete="nope">
-		</div>
-
-		<div class="email-octopus-form-row-subscribe">
-			<input type="hidden" name="successRedirectUrl" value="">
-			<?php
-				echo sprintf(
-					/* translators: Placeholders are just for HTML markup that doesn't need translated */
-					'<button type="submit" class="button button-secondary">%s</button>',
-					esc_html__( 'Subscribe', 'custom-post-type-ui' )
-				);
-			?>
-
-		</div>
-	</form>
+        <div class="email-octopus-form-row-subscribe">
+            <input type="hidden"
+               name="successRedirectUrl"
+               value="">
+            <button type="submit" class="button button-secondary">Subscribe</button>
+        </div>
+    </form>
 </div>
 
-	<?php
+<?php
 }
 
 /**
  * Add our Email Octopus scripts and stylesheet.
  *
  * @author Scott Anderson <scott.anderson@webdevstudios.com>
- * @since  1.7.3
+ * @since  NEXT
  */
 function enqueue_email_octopus_assets() {
 
@@ -453,9 +431,9 @@ function enqueue_email_octopus_assets() {
 		return;
 	}
 
-	wp_enqueue_style( 'cptui-emailoctopus', 'https://emailoctopus.com/bundles/emailoctopuslist/css/formEmbed.css' ); // phpcs:ignore
+	wp_enqueue_style( 'cptui-emailoctopus', 'https://emailoctopus.com/bundles/emailoctopuslist/css/formEmbed.css' );
 
-	wp_enqueue_script( 'cptui-emailoctopus-js', 'https://emailoctopus.com/bundles/emailoctopuslist/js/1.4/formEmbed.js', [ 'jquery' ], '', true ); // phpcs:ignore
+	wp_enqueue_script( 'cptui-emailoctopus-js', 'https://emailoctopus.com/bundles/emailoctopuslist/js/1.4/formEmbed.js', [ 'jquery' ], '', true );
 
 }
 add_action( 'admin_enqueue_scripts', 'enqueue_email_octopus_assets' );
@@ -513,9 +491,9 @@ function cptui_default_ads( $ads = [] ) {
 	];
 
 	$ads[] = [
-		'url'   => 'https://pluginize.com/plugins/wp-search-with-algolia-pro/?utm_source=cptui-sidebar&utm_medium=text&utm_campaign=wp-search-with-algolia-pro',
-		'image' => plugin_dir_url( __DIR__ ) . 'images/wds_ads/wp-search-with-algolia-pro.png',
-		'text'  => 'WP Search with Algolia Pro product ad',
+		'url'   => 'https://maintainn.com/?utm_source=Pluginize-v2&utm_medium=Plugin-Sidebar&utm_campaign=CPTUI',
+		'image' => plugin_dir_url( __DIR__ ) . 'images/wds_ads/maintainn.png',
+		'text'  => 'Maintainn product ad',
 	];
 
 	return $ads;
@@ -592,15 +570,15 @@ function cptui_admin_notices_helper( $message = '', $success = true ) {
  * @return string
  */
 function cptui_get_object_from_post_global() {
-	if ( isset( $_POST['cpt_custom_post_type']['name'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
-		$type_item = filter_input( INPUT_POST, 'cpt_custom_post_type', FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY );
+	if ( isset( $_POST['cpt_custom_post_type']['name'] ) ) {
+		$type_item = filter_input( INPUT_POST, 'cpt_custom_post_type', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY );
 		if ( $type_item ) {
 			return sanitize_text_field( $type_item['name'] );
 		}
 	}
 
-	if ( isset( $_POST['cpt_custom_tax']['name'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
-		$tax_item = filter_input( INPUT_POST, 'cpt_custom_tax', FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY );
+	if ( isset( $_POST['cpt_custom_tax']['name'] ) ) {
+		$tax_item = filter_input( INPUT_POST, 'cpt_custom_tax', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY );
 		if ( $tax_item ) {
 			return sanitize_text_field( $tax_item['name'] );
 		}
@@ -615,9 +593,8 @@ function cptui_get_object_from_post_global() {
  * @since 1.4.0
  */
 function cptui_add_success_admin_notice() {
-	echo cptui_admin_notices_helper( // phpcs:ignore WordPress.Security.EscapeOutput
+	echo cptui_admin_notices_helper(
 		sprintf(
-			/* translators: Placeholders are just for HTML markup that doesn't need translated */
 			esc_html__( '%s has been successfully added', 'custom-post-type-ui' ),
 			cptui_get_object_from_post_global()
 		)
@@ -630,9 +607,8 @@ function cptui_add_success_admin_notice() {
  * @since 1.4.0
  */
 function cptui_add_fail_admin_notice() {
-	echo cptui_admin_notices_helper( // phpcs:ignore WordPress.Security.EscapeOutput
+	echo cptui_admin_notices_helper(
 		sprintf(
-			/* translators: Placeholders are just for HTML markup that doesn't need translated */
 			esc_html__( '%s has failed to be added', 'custom-post-type-ui' ),
 			cptui_get_object_from_post_global()
 		),
@@ -646,9 +622,8 @@ function cptui_add_fail_admin_notice() {
  * @since 1.4.0
  */
 function cptui_update_success_admin_notice() {
-	echo cptui_admin_notices_helper( // phpcs:ignore WordPress.Security.EscapeOutput
+	echo cptui_admin_notices_helper(
 		sprintf(
-			/* translators: Placeholders are just for HTML markup that doesn't need translated */
 			esc_html__( '%s has been successfully updated', 'custom-post-type-ui' ),
 			cptui_get_object_from_post_global()
 		)
@@ -661,9 +636,8 @@ function cptui_update_success_admin_notice() {
  * @since 1.4.0
  */
 function cptui_update_fail_admin_notice() {
-	echo cptui_admin_notices_helper( // phpcs:ignore WordPress.Security.EscapeOutput
+	echo cptui_admin_notices_helper(
 		sprintf(
-			/* translators: Placeholders are just for HTML markup that doesn't need translated */
 			esc_html__( '%s has failed to be updated', 'custom-post-type-ui' ),
 			cptui_get_object_from_post_global()
 		),
@@ -677,9 +651,8 @@ function cptui_update_fail_admin_notice() {
  * @since 1.4.0
  */
 function cptui_delete_success_admin_notice() {
-	echo cptui_admin_notices_helper( // phpcs:ignore WordPress.Security.EscapeOutput
+	echo cptui_admin_notices_helper(
 		sprintf(
-			/* translators: Placeholders are just for HTML markup that doesn't need translated */
 			esc_html__( '%s has been successfully deleted', 'custom-post-type-ui' ),
 			cptui_get_object_from_post_global()
 		)
@@ -692,9 +665,8 @@ function cptui_delete_success_admin_notice() {
  * @since 1.4.0
  */
 function cptui_delete_fail_admin_notice() {
-	echo cptui_admin_notices_helper( // phpcs:ignore WordPress.Security.EscapeOutput
+	echo cptui_admin_notices_helper(
 		sprintf(
-			/* translators: Placeholders are just for HTML markup that doesn't need translated */
 			esc_html__( '%s has failed to be deleted', 'custom-post-type-ui' ),
 			cptui_get_object_from_post_global()
 		),
@@ -708,7 +680,7 @@ function cptui_delete_fail_admin_notice() {
  * @since 1.5.0
  */
 function cptui_import_success_admin_notice() {
-	echo cptui_admin_notices_helper( // phpcs:ignore WordPress.Security.EscapeOutput
+	echo cptui_admin_notices_helper(
 		esc_html__( 'Successfully imported data.', 'custom-post-type-ui' )
 	);
 }
@@ -719,19 +691,14 @@ function cptui_import_success_admin_notice() {
  * @since 1.5.0
  */
 function cptui_import_fail_admin_notice() {
-	echo cptui_admin_notices_helper( // phpcs:ignore WordPress.Security.EscapeOutput
+	echo cptui_admin_notices_helper(
 		esc_html__( 'Invalid data provided', 'custom-post-type-ui' ),
 		false
 	);
 }
 
-/**
- * Failure to verify nonce, callback
- *
- * @since 1.7.4
- */
 function cptui_nonce_fail_admin_notice() {
-	echo cptui_admin_notices_helper( // phpcs:ignore WordPress.Security.EscapeOutput
+	echo cptui_admin_notices_helper(
 		esc_html__( 'Nonce failed verification', 'custom-post-type-ui' ),
 		false
 	);
@@ -746,7 +713,6 @@ function cptui_nonce_fail_admin_notice() {
  */
 function cptui_slug_matches_post_type() {
 	return sprintf(
-		/* translators: Placeholders are just for HTML markup that doesn't need translated */
 		esc_html__( 'Please choose a different post type name. %s is already registered.', 'custom-post-type-ui' ),
 		cptui_get_object_from_post_global()
 	);
@@ -761,7 +727,6 @@ function cptui_slug_matches_post_type() {
  */
 function cptui_slug_matches_taxonomy() {
 	return sprintf(
-		/* translators: Placeholders are just for HTML markup that doesn't need translated */
 		esc_html__( 'Please choose a different taxonomy name. %s is already registered.', 'custom-post-type-ui' ),
 		cptui_get_object_from_post_global()
 	);
@@ -786,13 +751,12 @@ function cptui_empty_cpt_on_taxonomy() {
  * @return string
  */
 function cptui_slug_matches_page() {
-	$slug         = cptui_get_object_from_post_global();
+	$slug = cptui_get_object_from_post_global();
 	$matched_slug = get_page_by_path(
 		cptui_get_object_from_post_global()
 	);
 	if ( $matched_slug instanceof WP_Post ) {
 		$slug = sprintf(
-			/* translators: Placeholders are just for HTML markup that doesn't need translated */
 			'<a href="%s">%s</a>',
 			get_edit_post_link( $matched_slug->ID ),
 			cptui_get_object_from_post_global()
@@ -800,7 +764,6 @@ function cptui_slug_matches_page() {
 	}
 
 	return sprintf(
-		/* translators: Placeholders are just for HTML markup that doesn't need translated */
 		esc_html__( 'Please choose a different post type name. %s matches an existing page slug, which can cause conflicts.', 'custom-post-type-ui' ),
 		$slug
 	);
@@ -826,7 +789,7 @@ function cptui_slug_has_quotes() {
  * @since 1.4.0
  */
 function cptui_error_admin_notice() {
-	echo cptui_admin_notices_helper( // phpcs:ignore WordPress.Security.EscapeOutput
+	echo cptui_admin_notices_helper(
 		apply_filters( 'cptui_custom_error_message', '' ),
 		false
 	);
@@ -996,65 +959,9 @@ add_action( 'cptui_post_register_post_types', 'cptui_published_post_format_fix' 
  * @return string
  */
 function cptui_get_add_new_link( $content_type = '' ) {
-	if ( ! in_array( $content_type, [ 'post_types', 'taxonomies' ], true ) ) {
+	if ( ! in_array( $content_type, [ 'post_types', 'taxonomies' ] ) ) {
 		return cptui_admin_url( 'admin.php?page=cptui_manage_post_types' );
 	}
 
 	return cptui_admin_url( 'admin.php?page=cptui_manage_' . $content_type );
 }
-
-/**
- * Register theme support for CPTUI based content types, for extra assurance.
- *
- * @since 1.14.0
- */
-function cptui_post_thumbnail_theme_support() {
-	$post_types = cptui_get_post_type_data();
-
-	if ( empty( $post_types ) || ! is_array( $post_types ) ) {
-		return;
-	}
-
-	$supported = [];
-	foreach ( $post_types as $post_type ) {
-		if ( empty( $post_type['supports'] ) ) {
-			continue;
-		}
-		if (
-			// Some way, somehow, null can end up saved in the supports spot.
-			// Lets check for an array first.
-			is_array( $post_type['supports'] ) &&
-			in_array( 'thumbnail', $post_type['supports'] )
-		) {
-			$supported[] = $post_type['name'];
-		}
-	}
-	if ( ! empty( $supported ) ) {
-		add_theme_support( 'post-thumbnails', $supported );
-	}
-}
-add_action( 'after_setup_theme', 'cptui_post_thumbnail_theme_support' );
-
-function cptui_add_dialog_missing_post_type_confirm() {
-?>
-	<dialog id="cptui-select-post-type-confirm">
-		<p><?php esc_html_e( 'Please select a post type to associate with.', 'custom-post-type-ui' ); ?></p>
-		<button id="cptui-select-post-type-confirm-close" class="confirm button-secondary" type="button"><?php esc_html_e( 'OK', 'custom-post-type-ui' ); ?></button>
-	</dialog>
-<?php
-}
-add_action( 'cptui_taxonomy_after_fieldsets', 'cptui_add_dialog_missing_post_type_confirm' );
-
-function cptui_add_dialog_delete_content_type_confirm() {
-	?>
-	<dialog id="cptui-content-type-delete" class="wp-core-ui">
-		<p><?php esc_html_e( 'Are you sure you want to delete this? Deleting will NOT remove created content.', 'custom-post-type-ui' ); ?></p>
-		<div class="cptui-confirm-deny-delete">
-			<button id="cptui-content-type-confirm-delete" class="confirm button-secondary" type="button"><?php esc_html_e( 'OK', 'custom-post-type-ui' ); ?></button>
-			<button id="cptui-content-type-deny-delete" class="confirm button-secondary" type="button"><?php esc_html_e( 'Cancel', 'custom-post-type-ui' ); ?></button>
-		</div>
-	</dialog>
-	<?php
-}
-#add_action( 'cptui_post_type_after_fieldsets', 'cptui_add_dialog_delete_content_type_confirm' );
-#add_action( 'cptui_taxonomy_after_fieldsets', 'cptui_add_dialog_delete_content_type_confirm' );

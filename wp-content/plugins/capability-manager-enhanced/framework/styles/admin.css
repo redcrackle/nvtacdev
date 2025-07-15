@@ -68,7 +68,7 @@ table#akmin dl dt {
     background: #dfdfdf;
 }
 
-table#akmin p:not(.pp-recommendations-heading) {
+table#akmin p {
     padding: 5px 0 5px 0;
     margin: 0;
 }
@@ -127,8 +127,7 @@ table#akmin td.sidebar ul li {
     border-bottom: 1px dotted gray;
 }
 
-table#akmin td.sidebar dd,
-table#akmin td .pp-column-right dd {
+table#akmin td.sidebar dd {
     margin: 0;
     padding: 5px 10px 5px 10px;
 }

@@ -138,7 +138,7 @@ class Redirection_Api_Group extends Redirection_Api_Filter_Route {
 	/**
 	 * 404 API endpoint constructor
 	 *
-	 * @param string $namespace Namespace.
+	 * @param String $namespace Namespace.
 	 */
 	public function __construct( $namespace ) {
 		$orders = [ 'name', 'id', '' ];
@@ -247,18 +247,7 @@ class Redirection_Api_Group extends Redirection_Api_Filter_Route {
 	 */
 	public function route_create( WP_REST_Request $request ) {
 		$params = $request->get_params( $request );
-		$name = '';
-		$module = 0;
-
-		if ( isset( $params['name'] ) ) {
-			$name = sanitize_text_field( $params['name'] );
-		}
-
-		if ( isset( $params['moduleId'] ) ) {
-			$module = intval( $params['moduleId'], 10 );
-		}
-
-		$group = Red_Group::create( $name, $module );
+		$group = Red_Group::create( isset( $params['name'] ) ? $params['name'] : '', isset( $params['moduleId'] ) ? $params['moduleId'] : 0 );
 
 		if ( $group ) {
 			return Red_Group::get_filtered( $params );
@@ -300,7 +289,6 @@ class Redirection_Api_Group extends Redirection_Api_Filter_Route {
 
 		$items = [];
 		if ( isset( $params['items'] ) && is_array( $params['items'] ) ) {
-			// Array of integers, sanitized below
 			$items = $params['items'];
 		} elseif ( isset( $params['global'] ) && $params['global'] ) {
 			// Groups have additional actions that fire and so we need to action them individually

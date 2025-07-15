@@ -497,9 +497,7 @@ function bbp_admin_repair_user_topic_count() {
 	$statement   = esc_html__( 'Counting the number of topics each user has created&hellip; %s', 'bbpress' );
 	$result      = esc_html__( 'Failed!', 'bbpress' );
 
-	$sql_type    = bbp_get_topic_post_type();
-	$sql_status  = "'" . implode( "','", bbp_get_public_topic_statuses() ) . "'";
-	$sql_select  = "SELECT `post_author`, COUNT(DISTINCT `ID`) as `_count` FROM `{$bbp_db->posts}` WHERE `post_type` = '{$sql_type}' AND `post_status` IN ({$sql_status}) GROUP BY `post_author`";
+	$sql_select  = "SELECT `post_author`, COUNT(DISTINCT `ID`) as `_count` FROM `{$bbp_db->posts}` WHERE `post_type` = '" . bbp_get_topic_post_type() . "' AND `post_status` = '" . bbp_get_public_status_id() . "' GROUP BY `post_author`";
 	$insert_rows = $bbp_db->get_results( $sql_select );
 
 	if ( is_wp_error( $insert_rows ) ) {
@@ -543,13 +541,11 @@ function bbp_admin_repair_user_topic_count() {
 function bbp_admin_repair_user_reply_count() {
 
 	// Define variables
-	$bbp_db      = bbp_db();
+	$bbp_db    = bbp_db();
 	$statement   = esc_html__( 'Counting the number of topics to which each user has replied&hellip; %s', 'bbpress' );
 	$result      = esc_html__( 'Failed!', 'bbpress' );
 
-	$sql_type    = bbp_get_reply_post_type();
-	$sql_status  = "'" . implode( "','", bbp_get_public_reply_statuses() ) . "'";
-	$sql_select  = "SELECT `post_author`, COUNT(DISTINCT `ID`) as `_count` FROM `{$bbp_db->posts}` WHERE `post_type` = '{$sql_type}' AND `post_status` IN ({$sql_status}) GROUP BY `post_author`";
+	$sql_select  = "SELECT `post_author`, COUNT(DISTINCT `ID`) as `_count` FROM `{$bbp_db->posts}` WHERE `post_type` = '" . bbp_get_reply_post_type() . "' AND `post_status` = '" . bbp_get_public_status_id() . "' GROUP BY `post_author`";
 	$insert_rows = $bbp_db->get_results( $sql_select );
 
 	if ( is_wp_error( $insert_rows ) ) {
@@ -605,11 +601,8 @@ function bbp_admin_repair_user_favorites() {
 		return array( 1, sprintf( $statement, $result ) );
 	}
 
-	$sql_type   = bbp_get_topic_post_type();
-	$sql_status = "'" . implode( "','", bbp_get_public_topic_statuses() ) . "'";
-	$sql_select = "SELECT `ID` FROM `{$bbp_db->posts}` WHERE `post_type` = '{$sql_type}' AND `post_status` IN ({$sql_status})";
+	$topics = $bbp_db->get_col( "SELECT `ID` FROM `{$bbp_db->posts}` WHERE `post_type` = '" . bbp_get_topic_post_type() . "' AND `post_status` = '" . bbp_get_public_status_id() . "'" );
 
-	$topics = $bbp_db->get_col( $sql_select );
 	if ( is_wp_error( $topics ) ) {
 		return array( 2, sprintf( $statement, $result ) );
 	}
@@ -674,11 +667,7 @@ function bbp_admin_repair_user_topic_subscriptions() {
 		return array( 1, sprintf( $statement, $result ) );
 	}
 
-	$sql_type    = bbp_get_topic_post_type();
-	$sql_status  = "'" . implode( "','", bbp_get_public_topic_statuses() ) . "'";
-	$sql_select  = "SELECT `ID` FROM `{$bbp_db->posts}` WHERE `post_type` = '{$sql_type}' AND `post_status` IN ({$sql_status})";
-
-	$topics = $bbp_db->get_col( $sql_select );
+	$topics = $bbp_db->get_col( "SELECT `ID` FROM `{$bbp_db->posts}` WHERE `post_type` = '" . bbp_get_topic_post_type() . "' AND `post_status` = '" . bbp_get_public_status_id() . "'" );
 	if ( is_wp_error( $topics ) ) {
 		return array( 2, sprintf( $statement, $result ) );
 	}
@@ -743,11 +732,7 @@ function bbp_admin_repair_user_forum_subscriptions() {
 		return array( 1, sprintf( $statement, $result ) );
 	}
 
-	$sql_type    = bbp_get_forum_post_type();
-	$sql_status  = "'" . implode( "','", bbp_get_public_forum_statuses() ) . "'";
-	$sql_select  = "SELECT `ID` FROM `{$bbp_db->posts}` WHERE `post_type` = '{$sql_type}' AND `post_status` IN ({$sql_status})";
-
-	$forums = $bbp_db->get_col( $sql_select );
+	$forums = $bbp_db->get_col( "SELECT `ID` FROM `{$bbp_db->posts}` WHERE `post_type` = '" . bbp_get_forum_post_type() . "' AND `post_status` = '" . bbp_get_public_status_id() . "'" );
 	if ( is_wp_error( $forums ) ) {
 		return array( 2, sprintf( $statement, $result ) );
 	}

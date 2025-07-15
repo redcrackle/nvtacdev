@@ -49,13 +49,6 @@ var WPMailSmtpDebugEvents = window.WPMailSmtpDebugEvents || ( function( document
 
 			app.initDateRange();
 			app.events();
-
-			// Open debug event popup from the query string.
-			var searchParams = new URLSearchParams( location.search );
-
-			if ( searchParams.has( 'debug_event_id' ) ) {
-				app.openDebugEventPopup( searchParams.get( 'debug_event_id' ) );
-			}
 		},
 
 		/**
@@ -206,21 +199,9 @@ var WPMailSmtpDebugEvents = window.WPMailSmtpDebugEvents || ( function( document
 
 			event.preventDefault();
 
-			app.openDebugEventPopup( $( this ).data( 'event-id' ) );
-		},
-
-		/**
-		 * Open debug event popup.
-		 *
-		 * @since 3.5.0
-		 *
-		 * @param {int} eventId Debug event ID.
-		 */
-		openDebugEventPopup: function( eventId ) {
-
 			var data = {
 				action: 'wp_mail_smtp_debug_event_preview',
-				id: eventId,
+				id: $( this ).data( 'event-id' ),
 				nonce: $( '#wp-mail-smtp-debug-events-nonce', el.$debugEventsPage ).val()
 			};
 
@@ -239,9 +220,6 @@ var WPMailSmtpDebugEvents = window.WPMailSmtpDebugEvents || ( function( document
 						btnClass: 'btn-confirm',
 						keys: [ 'enter' ]
 					}
-				},
-				onOpenBefore: function() {
-					this.$contentPane.addClass( 'no-scroll' );
 				}
 			} );
 
@@ -250,8 +228,6 @@ var WPMailSmtpDebugEvents = window.WPMailSmtpDebugEvents || ( function( document
 					popup.setTitle( response.data.title );
 					popup.setContent( response.data.content );
 				} else {
-					popup.setIcon( app.getModalIcon( 'exclamation-circle-regular-red' ) );
-					popup.setType( 'red' );
 					popup.setContent( response.data );
 				}
 			} ).fail( function() {

@@ -169,15 +169,11 @@ class MonsterInsights_Popular_Posts {
 		}
 		$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 
-		$url = apply_filters(
-			'monsterinsights_frontend_style_url',
-			plugins_url( 'assets/css/frontend' . $suffix . '.css', MONSTERINSIGHTS_PLUGIN_FILE )
-		);
-
 		// Load Popular Posts styles.
-		wp_register_style( 'monsterinsights-editor-frontend-style', $url, array(), monsterinsights_get_asset_version() );
+		wp_register_style( 'monsterinsights-popular-posts-style', plugins_url( 'assets/css/frontend' . $suffix . '.css', MONSTERINSIGHTS_PLUGIN_FILE ), array(), monsterinsights_get_asset_version() );
 
 		$this->add_theme_specific_styles();
+
 	}
 
 	/**
@@ -193,11 +189,11 @@ class MonsterInsights_Popular_Posts {
 
 		wp_enqueue_script( 'monsterinsights-popular-posts-js' );
 
-		monsterinsights_localize_script( 'monsterinsights-popular-posts-js', 'monsterinsights_pp', array(
+		wp_localize_script( 'monsterinsights-popular-posts-js', 'monsterinsights_pp', array(
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
 			'post_id' => get_the_ID(),
-			'nonce'   => wp_create_nonce('mi-popular-posts'),
 		) );
+
 	}
 
 	/**
@@ -206,7 +202,7 @@ class MonsterInsights_Popular_Posts {
 	public function add_theme_specific_styles() {
 
 		if ( ! self::$styles_printed ) {
-			wp_add_inline_style( 'monsterinsights-editor-frontend-style', $this->get_inline_styles() );
+			wp_add_inline_style( 'monsterinsights-popular-posts-style', $this->get_inline_styles() );
 			self::$styles_printed = true;
 		}
 
@@ -227,9 +223,6 @@ class MonsterInsights_Popular_Posts {
 	 * @return string
 	 */
 	public function render_shortcode( $args ) {
-		if ( empty( $args ) || ! is_array( $args ) ) {
-			$args = array();
-		}
 
 		return apply_filters( 'monsterinsights_popular_posts_shortcode_output', $this->shortcode_output( $args ), $args, $this );
 
@@ -244,7 +237,7 @@ class MonsterInsights_Popular_Posts {
 	 */
 	public function shortcode_output( $args ) {
 		// Load frontend.css file when shortcode is available
-		wp_enqueue_style( 'monsterinsights-editor-frontend-style' );
+		wp_enqueue_style( 'monsterinsights-popular-posts-style' );
 
 		if ( $this->ajaxify ) {
 			return $this->get_ajax_json_data( $args );
@@ -374,10 +367,9 @@ class MonsterInsights_Popular_Posts {
 	private function get_query_args() {
 
 		$args = array(
-			'numberposts'         => 25,
+			'numberposts'         => $this->posts_count,
 			'ignore_sticky_posts' => true,
 			'fields'              => 'ids',
-			'orderby'              => 'rand', // phpcs:ignore WordPressVIPMinimum.Performance.OrderByRand.orderby_orderby
 		);
 		$args = wp_parse_args( $this->query_args(), $args );
 
@@ -408,16 +400,13 @@ class MonsterInsights_Popular_Posts {
 	 * @return array
 	 */
 	protected function get_query_args_comments() {
-		return array(
-			'orderby'    => 'comment_count',
-			'order'      => 'DESC',
-			'date_query' => array(
-				array(
-					'after'     => '-1 month',
-					'inclusive' => true,
-				),
-			)
+
+		$query_args = array(
+			'orderby' => 'comment_count',
+			'order'   => 'DESC',
 		);
+
+		return $query_args;
 	}
 
 	/**
@@ -504,10 +493,10 @@ class MonsterInsights_Popular_Posts {
 	/**
 	 * Generic helper function to build style attributes for elements based on shortcode/block parameters.
 	 *
-	 * @param string $theme  The theme for which  we're building the style.
+	 * @param string $theme The theme for which  we're building the style.
 	 * @param string $object Object we're styling like title, label, background, etc.
-	 * @param array  $atts   Attributes passed from shortcode/block.
-	 * @param string $key    The key of the style we're going to output.
+	 * @param array  $atts Attributes passed from shortcode/block.
+	 * @param string $key The key of the style we're going to output.
 	 *
 	 * @return string
 	 */
@@ -524,6 +513,7 @@ class MonsterInsights_Popular_Posts {
 
 		// Find theme-specific available options and check if our attributes have those set.
 		$theme_styles = $this->get_theme_props( $theme )->get_theme();
+		$style_output = '';
 		$style_css    = '';
 
 		if ( ! empty( $theme_styles['styles'] ) ) {
@@ -559,7 +549,12 @@ class MonsterInsights_Popular_Posts {
 			}
 		}
 
-		return $style_css;
+		if ( ! empty( $style_css ) ) {
+			$style_output = 'style="' . $style_css . '"';
+		}
+
+		return $style_output;
+
 	}
 
 	/**
@@ -655,7 +650,7 @@ class MonsterInsights_Popular_Posts {
 	public function is_current_post( $id ) {
 
 		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-			$current_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$current_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : false;
 
 			return $id === $current_id;
 		}
@@ -707,7 +702,6 @@ class MonsterInsights_Popular_Posts {
 
 		if ( apply_filters( 'monsterinsights_popular_posts_show_duplicates', true ) && count( $posts ) > 0 && count( $this->shown_posts ) > 0 && count( $returned_posts ) === 0 ) {
 			$this->shown_posts = array(); // Reset shown posts.
-
 			return $this->get_posts_to_display(); // Run the function to grab the same posts again.
 		}
 

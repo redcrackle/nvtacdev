@@ -548,17 +548,17 @@ class Table extends \WP_List_Table {
 		?>
 		<div class="alignleft actions wp-mail-smtp-filter-date">
 
-			<input type="text" name="date" class="regular-text wp-mail-smtp-filter-date-selector wp-mail-smtp-filter-date__control"
+			<input type="text" name="date" class="regular-text wp-mail-smtp-filter-date-selector"
 						 placeholder="<?php esc_attr_e( 'Select a date range', 'wp-mail-smtp' ); ?>"
 						 value="<?php echo esc_attr( $date ); ?>">
 
-			<button type="submit" name="action" value="filter_date" class="button wp-mail-smtp-filter-date__btn">
+			<button type="submit" name="action" value="filter_date" class="button">
 				<?php esc_html_e( 'Filter', 'wp-mail-smtp' ); ?>
 			</button>
 
 		</div>
 		<?php
-		if ( current_user_can( wp_mail_smtp()->get_capability_manage_options() ) ) {
+		if ( current_user_can( 'manage_options' ) ) {
 			wp_nonce_field( 'wp_mail_smtp_debug_events', 'wp-mail-smtp-debug-events-nonce', false );
 			printf(
 				'<button id="wp-mail-smtp-delete-all-debug-events-button" type="button" class="button">%s</button>',

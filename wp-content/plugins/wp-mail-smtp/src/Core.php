@@ -2,18 +2,14 @@
 
 namespace WPMailSMTP;
 
-use Exception;
-use ReflectionFunction;
 use WPMailSMTP\Admin\AdminBarMenu;
 use WPMailSMTP\Admin\DashboardWidget;
 use WPMailSMTP\Admin\DebugEvents\DebugEvents;
 use WPMailSMTP\Admin\Notifications;
-use WPMailSMTP\Compatibility\Compatibility;
-use WPMailSMTP\Providers\Outlook\Provider as OutlookProvider;
-use WPMailSMTP\Queue\Queue;
-use WPMailSMTP\Reports\Reports;
 use WPMailSMTP\Tasks\Meta;
 use WPMailSMTP\UsageTracking\UsageTracking;
+use WPMailSMTP\Compatibility\Compatibility;
+use WPMailSMTP\Reports\Reports;
 
 /**
  * Class Core to handle all plugin initialization.
@@ -115,12 +111,6 @@ class Core {
 		// Activation hook.
 		register_activation_hook( WPMS_PLUGIN_FILE, [ $this, 'activate' ] );
 
-		// Initialize DB migrations.
-		add_action( 'plugins_loaded', [ $this, 'get_migrations' ] );
-
-		// Load Pro if available.
-		add_action( 'plugins_loaded', [ $this, 'get_pro' ] );
-
 		// Redefine PHPMailer.
 		add_action( 'plugins_loaded', [ $this, 'get_processor' ] );
 		add_action( 'plugins_loaded', [ $this, 'replace_phpmailer' ] );
@@ -133,6 +123,10 @@ class Core {
 		// Initialize Action Scheduler tasks.
 		add_action( 'init', [ $this, 'get_tasks' ], 5 );
 
+		// Initialize DB migrations.
+		add_action( 'admin_init', [ $this, 'init_migrations' ] );
+
+		add_action( 'plugins_loaded', [ $this, 'get_pro' ] );
 		add_action( 'plugins_loaded', [ $this, 'get_usage_tracking' ] );
 		add_action( 'plugins_loaded', [ $this, 'get_admin_bar_menu' ] );
 		add_action( 'plugins_loaded', [ $this, 'get_notifications' ] );
@@ -140,17 +134,6 @@ class Core {
 		add_action( 'plugins_loaded', [ $this, 'get_compatibility' ], 0 );
 		add_action( 'plugins_loaded', [ $this, 'get_dashboard_widget' ], 20 );
 		add_action( 'plugins_loaded', [ $this, 'get_reports' ] );
-		add_action( 'plugins_loaded', [ $this, 'get_db_repair' ] );
-		add_action( 'plugins_loaded', [ $this, 'get_connections_manager' ], 20 );
-		add_action( 'plugins_loaded', [ $this, 'get_wp_mail_initiator' ] );
-		add_action( 'plugins_loaded', [ $this, 'get_queue' ] );
-		add_action(
-			'plugins_loaded',
-			function() {
-				( new OptimizedEmailSending() )->hooks();
-				( new OutlookProvider() )->hooks();
-			}
-		);
 	}
 
 	/**
@@ -184,7 +167,7 @@ class Core {
 		}
 
 		// Plugin admin area notices. Display to "admins" only.
-		if ( current_user_can( wp_mail_smtp()->get_capability_manage_options() ) ) {
+		if ( current_user_can( 'manage_options' ) ) {
 			add_action( 'admin_notices', array( '\WPMailSMTP\WP', 'display_admin_notices' ) );
 			add_action( 'admin_notices', array( $this, 'display_general_notices' ) );
 
@@ -208,6 +191,10 @@ class Core {
 		$is_allowed = true;
 
 		if ( ! is_readable( $this->plugin_path . '/src/Pro/Pro.php' ) ) {
+			$is_allowed = false;
+		}
+
+		if ( version_compare( phpversion(), '5.6', '<' ) ) {
 			$is_allowed = false;
 		}
 
@@ -293,18 +280,7 @@ class Core {
 		static $processor;
 
 		if ( ! isset( $processor ) ) {
-
-			/**
-			 * Filters Processor instance.
-			 *
-			 * @since 4.0.0
-			 *
-			 * @param Processor $processor Processor instance.
-			 */
-			$processor = apply_filters(
-				'wp_mail_smtp_core_get_processor',
-				new Processor()
-			);
+			$processor = apply_filters( 'wp_mail_smtp_core_get_processor', new Processor() );
 
 			if ( method_exists( $processor, 'hooks' ) ) {
 				$processor->hooks();
@@ -327,10 +303,6 @@ class Core {
 
 		if ( ! isset( $admin ) ) {
 			$admin = apply_filters( 'wp_mail_smtp_core_get_admin', new Admin\Area() );
-
-			if ( method_exists( $admin, 'hooks' ) ) {
-				$admin->hooks();
-			}
 		}
 
 		return $admin;
@@ -379,35 +351,34 @@ class Core {
 	/**
 	 * Initialize DB migrations.
 	 *
-	 * @deprecated 4.0.0
-	 *
 	 * @since 3.0.0
 	 */
 	public function init_migrations() {
 
-		_deprecated_function( __METHOD__, '3.10.0', '\WPMailSMTP\Migrations::init_migrations_on_request' );
-
-		$this->get_migrations()->init_migrations_on_request();
-	}
-
-	/**
-	 * Get the Migrations object.
-	 *
-	 * @since 4.0.0
-	 *
-	 * @return Migrations
-	 */
-	public function get_migrations() {
-
-		static $migrations;
-
-		if ( ! isset( $migrations ) ) {
-			$migrations = new Migrations();
-
-			$migrations->hooks();
+		if ( WP::is_doing_ajax() || wp_doing_cron() ) {
+			return;
 		}
 
-		return $migrations;
+		$migrations = [
+			Migration::class,
+			\WPMailSMTP\Admin\DebugEvents\Migration::class,
+		];
+
+		/**
+		 * Filters DB migrations.
+		 *
+		 * @since 3.0.0
+		 *
+		 * @param array $migrations Migrations classes.
+		 */
+		$migrations = apply_filters( 'wp_mail_smtp_core_init_migrations', $migrations );
+
+		foreach ( $migrations as $migration ) {
+			if ( is_subclass_of( $migration, '\WPMailSMTP\MigrationAbstract' ) && $migration::is_enabled() ) {
+				$new_migration = new $migration();
+				$new_migration->init();
+			}
+		}
 	}
 
 	/**
@@ -423,10 +394,6 @@ class Core {
 
 		if ( ! isset( $upgrade ) ) {
 			$upgrade = apply_filters( 'wp_mail_smtp_core_get_upgrade', new Upgrade() );
-
-			if ( method_exists( $upgrade, 'run' ) ) {
-				$upgrade->run();
-			}
 		}
 
 		return $upgrade;
@@ -451,11 +418,55 @@ class Core {
 	}
 
 	/**
-	 * Display various notifications to a user.
+	 * Display various notifications to a user
 	 *
 	 * @since 1.0.0
 	 */
-	public function init_notifications() { }
+	public function init_notifications() {
+
+		// Old PHP version notification.
+		if (
+			version_compare( phpversion(), '5.6', '<' ) &&
+			is_super_admin() &&
+			(
+				isset( $GLOBALS['pagenow'] ) &&
+				$GLOBALS['pagenow'] === 'index.php'
+			)
+		) {
+			WP::add_admin_notice(
+				sprintf(
+					wp_kses( /* translators: %1$s - WP Mail SMTP plugin name; %2$s - WPMailSMTP.com URL to a related doc. */
+						__( 'Your site is running an outdated version of PHP that is no longer supported and may cause issues with %1$s. <a href="%2$s" target="_blank" rel="noopener noreferrer">Read more</a> for additional information.', 'wp-mail-smtp' ),
+						array(
+							'a' => array(
+								'href'   => array(),
+								'target' => array(),
+								'rel'    => array(),
+							),
+						)
+					),
+					'<strong>WP Mail SMTP</strong>',
+					'https://wpmailsmtp.com/docs/supported-php-versions-for-wp-mail-smtp/'
+				) .
+				'<br><br><em>' .
+				wp_kses(
+					__( '<strong>Please Note:</strong> Support for PHP 5.5 will be discontinued in 2021. After this, if no further action is taken, WP Mail SMTP functionality will be disabled.', 'wp-mail-smtp' ),
+					array(
+						'strong' => array(),
+						'em'     => array(),
+					)
+				) .
+				'</em>',
+				WP::ADMIN_NOTICE_ERROR,
+				false
+			);
+		}
+
+		// Awesome Motive Notifications.
+		if ( Options::init()->get( 'general', 'am_notifications_hidden' ) ) {
+			return;
+		}
+	}
 
 	/**
 	 * Display all debug mail-delivery related notices.
@@ -509,10 +520,6 @@ class Core {
 
 			<?php
 			return;
-		}
-
-		if ( wp_mail_smtp()->get_admin()->is_admin_page() ) {
-			wp_mail_smtp()->wp_mail_function_incorrect_location_notice();
 		}
 
 		if ( wp_mail_smtp()->get_admin()->is_error_delivery_notice_enabled() ) {
@@ -638,7 +645,7 @@ class Core {
 	public function detect_conflicts() {
 
 		// Display only for those who can actually deactivate plugins.
-		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_options() ) ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
@@ -717,8 +724,6 @@ class Core {
 			update_option( 'wp_mail_smtp_activated', $activated );
 		}
 
-		set_transient( 'wp_mail_smtp_just_activated', true, 60 );
-
 		// Add transient to trigger redirect to the Setup Wizard.
 		set_transient( 'wp_mail_smtp_activation_redirect', true, 30 );
 	}
@@ -783,36 +788,11 @@ class Core {
 	 */
 	public function get_upgrade_link( $utm ) {
 
-		$url = $this->get_utm_url( 'https://wpmailsmtp.com/lite-upgrade/', $utm );
-
-		/**
-		 * Filters upgrade link.
-		 *
-		 * @since 1.5.0
-		 *
-		 * @param string $url Upgrade link.
-		 */
-		return apply_filters( 'wp_mail_smtp_core_get_upgrade_link', $url );
-	}
-
-	/**
-	 * Get UTM URL.
-	 *
-	 * @since 3.4.0
-	 *
-	 * @param string       $url Base url.
-	 * @param array|string $utm Array of UTM params, or if string provided - utm_content URL parameter.
-	 *
-	 * @return string
-	 */
-	public function get_utm_url( $url, $utm ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-
 		// Defaults.
 		$source   = 'WordPress';
 		$medium   = 'plugin-settings';
-		$campaign = $this->is_pro() ? 'plugin' : 'liteplugin';
+		$campaign = 'liteplugin';
 		$content  = 'general';
-		$locale   = get_user_locale();
 
 		if ( is_array( $utm ) ) {
 			if ( isset( $utm['source'] ) ) {
@@ -827,25 +807,17 @@ class Core {
 			if ( isset( $utm['content'] ) ) {
 				$content = $utm['content'];
 			}
-			if ( isset( $utm['locale'] ) ) {
-				$locale = $utm['locale'];
-			}
 		} elseif ( is_string( $utm ) ) {
 			$content = $utm;
 		}
 
-		$query_args = [
-			'utm_source'   => esc_attr( rawurlencode( $source ) ),
-			'utm_medium'   => esc_attr( rawurlencode( $medium ) ),
-			'utm_campaign' => esc_attr( rawurlencode( $campaign ) ),
-			'utm_locale'   => esc_attr( sanitize_key( $locale ) ),
-		];
+		$url = 'https://wpmailsmtp.com/lite-upgrade/?utm_source=' . esc_attr( rawurlencode( $source ) ) . '&utm_medium=' . esc_attr( rawurlencode( $medium ) ) . '&utm_campaign=' . esc_attr( rawurlencode( $campaign ) );
 
 		if ( ! empty( $content ) ) {
-			$query_args['utm_content'] = esc_attr( rawurlencode( $content ) );
+			$url .= '&utm_content=' . esc_attr( rawurlencode( $content ) );
 		}
 
-		return add_query_arg( $query_args, $url );
+		return apply_filters( 'wp_mail_smtp_core_get_upgrade_link', $url );
 	}
 
 	/**
@@ -900,10 +872,6 @@ class Core {
 			DebugEvents::get_table_name(),
 		];
 
-		if ( $this->get_queue()->is_enabled() ) {
-			$tables[] = Queue::get_table_name();
-		}
-
 		return apply_filters( 'wp_mail_smtp_core_get_custom_db_tables', $tables );
 	}
 
@@ -922,14 +890,12 @@ class Core {
 	 */
 	public function generate_mail_catcher( $exceptions = null ) {
 
-		$is_old_version = version_compare( get_bloginfo( 'version' ), '5.5-alpha', '<' );
-
-		if ( $is_old_version ) {
+		if ( version_compare( get_bloginfo( 'version' ), '5.5-alpha', '<' ) ) {
 			if ( ! class_exists( '\PHPMailer', false ) ) {
 				require_once ABSPATH . WPINC . '/class-phpmailer.php';
 			}
 
-			$class_name = MailCatcher::class;
+			$mail_catcher = new MailCatcher( $exceptions );
 		} else {
 			if ( ! class_exists( '\PHPMailer\PHPMailer\PHPMailer', false ) ) {
 				require_once ABSPATH . WPINC . '/PHPMailer/PHPMailer.php';
@@ -943,24 +909,7 @@ class Core {
 				require_once ABSPATH . WPINC . '/PHPMailer/SMTP.php';
 			}
 
-			$class_name = MailCatcherV6::class;
-		}
-
-		/**
-		 * Filters MailCatcher class name.
-		 *
-		 * @since 3.7.0
-		 *
-		 * @param string $mail_catcher The MailCatcher class name.
-		 */
-		$class_name = apply_filters( 'wp_mail_smtp_core_generate_mail_catcher', $class_name );
-
-		$mail_catcher = new $class_name( $exceptions );
-
-		if ( $is_old_version ) {
-			$mail_catcher::$validator = static function ( $email ) {
-				return (bool) is_email( $email );
-			};
+			$mail_catcher = new MailCatcherV6( $exceptions );
 		}
 
 		return $mail_catcher;
@@ -1180,10 +1129,6 @@ class Core {
 			 */
 			$class_name       = apply_filters( 'wp_mail_smtp_core_get_dashboard_widget', DashboardWidget::class );
 			$dashboard_widget = new $class_name();
-
-			if ( method_exists( $dashboard_widget, 'init' ) ) {
-				$dashboard_widget->init();
-			}
 		}
 
 		return $dashboard_widget;
@@ -1218,213 +1163,5 @@ class Core {
 		}
 
 		return $reports;
-	}
-
-	/**
-	 * Get the DBRepair object (lite or pro version).
-	 *
-	 * @since 3.6.0
-	 *
-	 * @return DBRepair
-	 */
-	public function get_db_repair() {
-
-		static $db_repair;
-
-		if ( ! isset( $db_repair ) ) {
-
-			/**
-			 * Filter the DBRepair class name.
-			 *
-			 * @since 3.6.0
-			 *
-			 * @param DBRepair $class_name The reports class name to be instantiated.
-			 */
-			$class_name = apply_filters( 'wp_mail_smtp_core_get_db_repair', DBRepair::class );
-			$db_repair  = new $class_name();
-
-			if ( method_exists( $db_repair, 'hooks' ) ) {
-				$db_repair->hooks();
-			}
-		}
-
-		return $db_repair;
-	}
-
-	/**
-	 * Get connections manager.
-	 *
-	 * @since 3.7.0
-	 *
-	 * @return ConnectionsManager
-	 */
-	public function get_connections_manager() {
-
-		static $connections_manager = null;
-
-		if ( is_null( $connections_manager ) ) {
-
-			/**
-			 * Filter the connections manager class name.
-			 *
-			 * @since 3.7.0
-			 *
-			 * @param ConnectionsManager $connections_manager The connections manager class name to be instantiated.
-			 */
-			$class_name          = apply_filters( 'wp_mail_smtp_core_get_connections_manager', ConnectionsManager::class );
-			$connections_manager = new $class_name();
-
-			if ( method_exists( $connections_manager, 'hooks' ) ) {
-				$connections_manager->hooks();
-			}
-		}
-
-		return $connections_manager;
-	}
-
-	/**
-	 * Get the `wp_mail` function initiator.
-	 *
-	 * @since 3.7.0
-	 *
-	 * @return WPMailInitiator
-	 */
-	public function get_wp_mail_initiator() {
-
-		static $wp_mail_initiator = null;
-
-		if ( is_null( $wp_mail_initiator ) ) {
-
-			/**
-			 * Filter the `wp_mail` function initiator class name.
-			 *
-			 * @since 3.7.0
-			 *
-			 * @param WPMailInitiator $wp_mail_initiator The `wp_mail` function initiator class name to be instantiated.
-			 */
-			$class_name        = apply_filters( 'wp_mail_smtp_core_get_wp_mail_initiator', WPMailInitiator::class );
-			$wp_mail_initiator = new $class_name();
-
-			if ( method_exists( $wp_mail_initiator, 'hooks' ) ) {
-				$wp_mail_initiator->hooks();
-			}
-		}
-
-		return $wp_mail_initiator;
-	}
-
-	/**
-	 * Detect incorrect `wp_mail` function location and display warning.
-	 *
-	 * @since 3.5.0
-	 */
-	private function wp_mail_function_incorrect_location_notice() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-
-		/**
-		 * Filters whether to display incorrect `wp_mail` function location warning.
-		 *
-		 * @since 3.5.0
-		 *
-		 * @param bool $display Whether to display incorrect `wp_mail` function location warning.
-		 */
-		$display_notice = apply_filters( 'wp_mail_smtp_core_wp_mail_function_incorrect_location_notice', true );
-
-		if ( ! $display_notice || ! defined( 'ABSPATH' ) || ! defined( 'WPINC' ) ) {
-			return;
-		}
-
-		try {
-			$wp_mail_reflection = new ReflectionFunction( 'wp_mail' );
-			$wp_mail_filepath   = $wp_mail_reflection->getFileName();
-			$separator          = defined( 'DIRECTORY_SEPARATOR' ) ? DIRECTORY_SEPARATOR : '/';
-
-			$wp_mail_original_filepath = ABSPATH . WPINC . $separator . 'pluggable.php';
-
-			if ( str_replace( '\\', '/', $wp_mail_filepath ) === str_replace( '\\', '/', $wp_mail_original_filepath ) ) {
-				return;
-			}
-
-			if ( strpos( $wp_mail_filepath, WPINC . $separator . 'pluggable.php' ) !== false ) {
-				return;
-			}
-
-			$conflict = WP::get_initiator( $wp_mail_filepath );
-
-			$message = esc_html__( 'WP Mail SMTP has detected incorrect "wp_mail" function location. Usually, this means that emails will not be sent successfully!', 'wp-mail-smtp' );
-
-			if ( $conflict['type'] === 'plugin' ) {
-				$message .= '<br><br>' . sprintf(
-					/* translators: %s - plugin name. */
-					esc_html__( 'It looks like the "%s" plugin is overwriting the "wp_mail" function. Please reach out to the plugin developer on how to disable or remove the "wp_mail" function overwrite to prevent conflicts with WP Mail SMTP.', 'wp-mail-smtp' ),
-					esc_html( $conflict['name'] )
-				);
-			} elseif ( $conflict['type'] === 'mu-plugin' ) {
-				$message .= '<br><br>' . sprintf(
-					/* translators: %s - must-use plugin name. */
-					esc_html__( 'It looks like the "%s" must-use plugin is overwriting the "wp_mail" function. Please reach out to your hosting provider on how to disable or remove the "wp_mail" function overwrite to prevent conflicts with WP Mail SMTP.', 'wp-mail-smtp' ),
-					esc_html( $conflict['name'] )
-				);
-			} elseif ( $wp_mail_filepath === ABSPATH . 'wp-config.php' ) {
-				$message .= '<br><br>' . esc_html__( 'It looks like it\'s overwritten in the "wp-config.php" file. Please reach out to your hosting provider on how to disable or remove the "wp_mail" function overwrite to prevent conflicts with WP Mail SMTP.', 'wp-mail-smtp' );
-			}
-
-			$message .= '<br><br>' . sprintf(
-				/* translators: %s - path. */
-				esc_html__( 'Current function path: %s', 'wp-mail-smtp' ),
-				$wp_mail_filepath . ':' . $wp_mail_reflection->getStartLine()
-			);
-
-			printf(
-				'<div class="notice %1$s"><p>%2$s</p></div>',
-				esc_attr( WP::ADMIN_NOTICE_ERROR ),
-				wp_kses( $message, [ 'br' => [] ] )
-			);
-		} catch ( Exception $e ) {
-			return;
-		}
-	}
-
-	/**
-	 * Get the default capability to manage everything for WP Mail SMTP.
-	 *
-	 * @since 3.11.0
-	 *
-	 * @return string
-	 */
-	public function get_capability_manage_options() {
-
-		/**
-		 * Filters the default capability to manage everything for WP Mail SMTP.
-		 *
-		 * @since 3.11.0
-		 *
-		 * @param string $capability The default capability to manage everything for WP Mail SMTP.
-		 */
-		return apply_filters( 'wp_mail_smtp_core_get_capability_manage_options', 'manage_options' );
-	}
-
-	/**
-	 * Load the queue functionality.
-	 *
-	 * @since 4.0.0
-	 *
-	 * @return Queue
-	 */
-	public function get_queue() {
-
-		static $queue;
-
-		if ( ! isset( $queue ) ) {
-			/**
-			 * Filter the Queue object.
-			 *
-			 * @since 4.0.0
-			 *
-			 * @param Queue $queue The Queue object.
-			 */
-			$queue = apply_filters( 'wp_mail_smtp_core_get_queue', new Queue() );
-		}
-
-		return $queue;
 	}
 }

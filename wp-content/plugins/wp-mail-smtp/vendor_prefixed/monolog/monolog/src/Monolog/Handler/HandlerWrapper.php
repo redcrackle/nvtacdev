@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the Monolog package.
  *
@@ -30,90 +29,75 @@ use WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface;
  *
  * @author Alexey Karapetov <alexey@karapetov.com>
  */
-class HandlerWrapper implements \WPMailSMTP\Vendor\Monolog\Handler\HandlerInterface, \WPMailSMTP\Vendor\Monolog\Handler\ProcessableHandlerInterface, \WPMailSMTP\Vendor\Monolog\Handler\FormattableHandlerInterface, \WPMailSMTP\Vendor\Monolog\ResettableInterface
+class HandlerWrapper implements \WPMailSMTP\Vendor\Monolog\Handler\HandlerInterface, \WPMailSMTP\Vendor\Monolog\ResettableInterface
 {
     /**
      * @var HandlerInterface
      */
     protected $handler;
+    /**
+     * HandlerWrapper constructor.
+     * @param HandlerInterface $handler
+     */
     public function __construct(\WPMailSMTP\Vendor\Monolog\Handler\HandlerInterface $handler)
     {
         $this->handler = $handler;
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function isHandling(array $record) : bool
+    public function isHandling(array $record)
     {
         return $this->handler->isHandling($record);
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function handle(array $record) : bool
+    public function handle(array $record)
     {
         return $this->handler->handle($record);
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function handleBatch(array $records) : void
+    public function handleBatch(array $records)
     {
-        $this->handler->handleBatch($records);
+        return $this->handler->handleBatch($records);
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function close() : void
+    public function pushProcessor($callback)
     {
-        $this->handler->close();
+        $this->handler->pushProcessor($callback);
+        return $this;
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function pushProcessor(callable $callback) : \WPMailSMTP\Vendor\Monolog\Handler\HandlerInterface
+    public function popProcessor()
     {
-        if ($this->handler instanceof \WPMailSMTP\Vendor\Monolog\Handler\ProcessableHandlerInterface) {
-            $this->handler->pushProcessor($callback);
-            return $this;
-        }
-        throw new \LogicException('The wrapped handler does not implement ' . \WPMailSMTP\Vendor\Monolog\Handler\ProcessableHandlerInterface::class);
+        return $this->handler->popProcessor();
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function popProcessor() : callable
+    public function setFormatter(\WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface $formatter)
     {
-        if ($this->handler instanceof \WPMailSMTP\Vendor\Monolog\Handler\ProcessableHandlerInterface) {
-            return $this->handler->popProcessor();
-        }
-        throw new \LogicException('The wrapped handler does not implement ' . \WPMailSMTP\Vendor\Monolog\Handler\ProcessableHandlerInterface::class);
+        $this->handler->setFormatter($formatter);
+        return $this;
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setFormatter(\WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface $formatter) : \WPMailSMTP\Vendor\Monolog\Handler\HandlerInterface
+    public function getFormatter()
     {
-        if ($this->handler instanceof \WPMailSMTP\Vendor\Monolog\Handler\FormattableHandlerInterface) {
-            $this->handler->setFormatter($formatter);
-            return $this;
-        }
-        throw new \LogicException('The wrapped handler does not implement ' . \WPMailSMTP\Vendor\Monolog\Handler\FormattableHandlerInterface::class);
-    }
-    /**
-     * {@inheritDoc}
-     */
-    public function getFormatter() : \WPMailSMTP\Vendor\Monolog\Formatter\FormatterInterface
-    {
-        if ($this->handler instanceof \WPMailSMTP\Vendor\Monolog\Handler\FormattableHandlerInterface) {
-            return $this->handler->getFormatter();
-        }
-        throw new \LogicException('The wrapped handler does not implement ' . \WPMailSMTP\Vendor\Monolog\Handler\FormattableHandlerInterface::class);
+        return $this->handler->getFormatter();
     }
     public function reset()
     {
         if ($this->handler instanceof \WPMailSMTP\Vendor\Monolog\ResettableInterface) {
-            $this->handler->reset();
+            return $this->handler->reset();
         }
     }
 }

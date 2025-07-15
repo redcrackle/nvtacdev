@@ -11,10 +11,6 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Messages endpoints.
  *
- * /messages/
- * /messages/{thread_id}
- * /messages/starred/{message_id}
- *
  * @since 5.0.0
  */
 class BP_REST_Messages_Endpoint extends WP_REST_Controller {
@@ -93,6 +89,12 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 				$this->namespace,
 				$starred_endpoint,
 				array(
+					'args'   => array(
+						'id' => array(
+							'description' => __( 'ID of one of the message of the Thread.', 'buddypress' ),
+							'type'        => 'integer',
+						),
+					),
 					array(
 						'methods'             => WP_REST_Server::EDITABLE,
 						'callback'            => array( $this, 'update_starred' ),
@@ -234,33 +236,12 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 	 * @return WP_REST_Response
 	 */
 	public function get_item( $request ) {
-		$args = array(
-			'recipients_page'     => $request->get_param( 'recipients_page' ),
-			'recipients_per_page' => $request->get_param( 'recipients_per_page' ),
-			'page'                => $request->get_param( 'messages_page' ),
-			'per_page'            => $request->get_param( 'messages_per_page' ),
-			'order'               => $request->get_param( 'order' ),
-			'user_id'             => $request->get_param( 'user_id' ),
-		);
-
-		if ( empty( $args['user_id'] ) ) {
-			$args['user_id'] = bp_loggedin_user_id();
+		$user_id = bp_loggedin_user_id();
+		if ( ! empty( $request->get_param( 'user_id' ) ) ) {
+			$user_id = $request->get_param( 'user_id' );
 		}
 
-		/**
-		 * Filter the query arguments for the request.
-		 *
-		 * @param array           $args    Key value array of query var to query value.
-		 * @param WP_REST_Request $request The request sent to the API.
-		 */
-		$args = apply_filters( 'bp_rest_messages_get_item_query_args', $args, $request );
-
-		$thread = new BP_Messages_Thread(
-			$request->get_param( 'id' ),
-			'ASC', // not used.
-			$args
-		);
-
+		$thread = $this->get_thread_object( $request->get_param( 'id' ), $user_id );
 		$retval = array(
 			$this->prepare_response_for_collection(
 				$this->prepare_item_for_response( $thread, $request )
@@ -268,7 +249,6 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 		);
 
 		$response = rest_ensure_response( $retval );
-		$response = bp_rest_response_add_total_headers( $response, $thread->messages_total_count, $args['per_page'] );
 
 		/**
 		 * Fires after a thread is fetched via the REST API.
@@ -307,10 +287,8 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 			$user_id = $request->get_param( 'user_id' );
 		}
 
-		$id = $request->get_param( 'id' );
-
 		if ( is_user_logged_in() ) {
-			$thread = BP_Messages_Thread::is_valid( $id );
+			$thread = $this->get_thread_object( $request->get_param( 'id' ), $user_id );
 
 			if ( empty( $thread ) ) {
 				$retval = new WP_Error(
@@ -320,8 +298,10 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 						'status' => 404,
 					)
 				);
-			} elseif ( bp_current_user_can( 'bp_moderate' ) || messages_check_thread_access( $id, $user_id ) ) {
+			} elseif ( bp_current_user_can( 'bp_moderate' ) || messages_check_thread_access( $thread->thread_id, $user_id ) ) {
 				$retval = true;
+			} else {
+				$retval = $error;
 			}
 		}
 
@@ -584,6 +564,17 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 	 */
 	public function update_starred( $request ) {
 		$message = $this->get_message_object( $request->get_param( 'id' ) );
+
+		if ( empty( $message->id ) ) {
+			return new WP_Error(
+				'bp_rest_invalid_id',
+				__( 'Sorry, this message does not exist.', 'buddypress' ),
+				array(
+					'status' => 404,
+				)
+			);
+		}
+
 		$user_id = bp_loggedin_user_id();
 		$result  = false;
 		$action  = 'star';
@@ -654,24 +645,8 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 			)
 		);
 
-		if ( ! is_user_logged_in() ) {
-			$retval = new WP_Error(
-				'bp_rest_authorization_required',
-				__( 'Sorry, you need to be logged in to star/unstar a message.', 'buddypress' ),
-				array(
-					'status' => rest_authorization_required_code(),
-				)
-			);
-		} else {
-			$thread_id = messages_get_message_thread_id( $request->get_param( 'id' ) ); // This is a message id.
-
-			if ( empty( $thread_id ) ) {
-				return new WP_Error(
-					'bp_rest_invalid_id',
-					__( 'Sorry, the thread of this message does not exist.', 'buddypress' ),
-					array( 'status' => 404 )
-				);
-			}
+		if ( is_user_logged_in() ) {
+			$thread_id = messages_get_message_thread_id( $request->get_param( 'id' ) );
 
 			if ( messages_check_thread_access( $thread_id ) ) {
 				$retval = true;
@@ -849,11 +824,11 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 			'sender_id' => (int) $message->sender_id,
 			'subject'   => array(
 				'raw'      => $message->subject,
-				'rendered' => apply_filters( 'bp_get_message_thread_subject', $message->subject ),
+				'rendered' => apply_filters( 'bp_get_message_thread_subject', wp_staticize_emoji( $message->subject ) ),
 			),
 			'message'   => array(
 				'raw'      => $message->message,
-				'rendered' => apply_filters( 'bp_get_the_thread_message_content', $message->message ),
+				'rendered' => apply_filters( 'bp_get_the_thread_message_content', wp_staticize_emoji( $message->message ) ),
 			),
 			'date_sent' => bp_rest_prepare_date_response( $message->date_sent ),
 		);
@@ -868,9 +843,8 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 			$data['is_starred'] = bp_messages_is_message_starred( $data['id'], $user_id );
 		}
 
-		$context = ! empty( $request->get_param( 'context' ) ) ? $request->get_param( 'context' ) : 'view';
-		$data    = $this->add_additional_fields_to_object( $data, $request );
-		$data    = $this->filter_response_by_context( $data, $context );
+		// Add REST Fields (BP Messages meta) data.
+		$data = $this->add_additional_fields_to_object( $data, $request );
 
 		/**
 		 * Filter a message value returned from the API.
@@ -894,22 +868,10 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 	 * @return array                     The recipient data for the REST response.
 	 */
 	public function prepare_recipient_for_response( $recipient, $request ) {
-		$display_name = '';
-		$user_info    = get_userdata( (int) $recipient->user_id );
-
-		if ( $user_info instanceof WP_User && ! empty( $user_info->display_name ) ) {
-			$display_name = (string) $user_info->display_name;
-		}
-
 		$data = array(
-			'id'           => (int) $recipient->id,
-			'is_deleted'   => (int) $recipient->is_deleted,
-			'name'         => $display_name,
-			'sender_only'  => (int) $recipient->sender_only,
-			'thread_id'    => (int) $recipient->thread_id,
-			'unread_count' => (int) $recipient->unread_count,
-			'user_id'      => (int) $recipient->user_id,
-			'user_link'    => esc_url( bp_members_get_user_url( $recipient->user_id ) ),
+			'id'        => (int) $recipient->id,
+			'user_id'   => (int) $recipient->user_id,
+			'user_link' => esc_url( bp_core_get_user_domain( $recipient->user_id ) ),
 		);
 
 		// Fetch the user avatar urls (Full & thumb).
@@ -924,6 +886,16 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 				);
 			}
 		}
+
+		$data = array_merge(
+			$data,
+			array(
+				'thread_id'    => (int) $recipient->thread_id,
+				'unread_count' => (int) $recipient->unread_count,
+				'sender_only'  => (int) $recipient->sender_only,
+				'is_deleted'   => (int) $recipient->is_deleted,
+			)
+		);
 
 		/**
 		 * Filter a recipient value returned from the API.
@@ -958,7 +930,7 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 			'last_sender_id' => (int) $thread->last_sender_id,
 			'subject'        => array(
 				'raw'      => $thread->last_message_subject,
-				'rendered' => apply_filters( 'bp_get_message_thread_subject', $thread->last_message_subject ),
+				'rendered' => apply_filters( 'bp_get_message_thread_subject', wp_staticize_emoji( $thread->last_message_subject ) ),
 			),
 			'excerpt'        => array(
 				'raw'      => $excerpt,
@@ -966,7 +938,7 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 			),
 			'message'        => array(
 				'raw'      => $thread->last_message_content,
-				'rendered' => apply_filters( 'bp_get_message_thread_content', $thread->last_message_content ),
+				'rendered' => apply_filters( 'bp_get_message_thread_content', wp_staticize_emoji( $thread->last_message_content ) ),
 			),
 			'date'           => bp_rest_prepare_date_response( $thread->last_message_date, get_date_from_gmt( $thread->last_message_date ) ),
 			'date_gmt'       => bp_rest_prepare_date_response( $thread->last_message_date ),
@@ -983,7 +955,7 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 
 		// Loop through recipients to prepare them for the response.
 		foreach ( $thread->recipients as $recipient ) {
-			$data['recipients'][] = $this->prepare_recipient_for_response( $recipient, $request );
+			$data['recipients'][ $recipient->user_id ] = $this->prepare_recipient_for_response( $recipient, $request );
 		}
 
 		// Pluck starred message ids.
@@ -1015,7 +987,7 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 	 * @since 5.0.0
 	 *
 	 * @param BP_Messages_Thread $thread  Thread object.
-	 * @return array
+	 * @return array Links for the given thread.
 	 */
 	protected function prepare_links( $thread ) {
 		$base = sprintf( '/%s/%s/', $this->namespace, $this->rest_base );
@@ -1031,7 +1003,7 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 		);
 
 		// Add star links for each message of the thread.
-		if ( is_user_logged_in() && bp_is_active( 'messages', 'star' ) ) {
+		if ( bp_is_active( 'messages', 'star' ) ) {
 			$starred_base = $base . bp_get_messages_starred_slug() . '/';
 
 			foreach ( $thread->messages as $message ) {
@@ -1067,14 +1039,13 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 			$args = array( 'user_id' => $user_id );
 		}
 
-		// Validate the thread ID.
-		$thread_id = BP_Messages_Thread::is_valid( $thread_id );
+		$thread_object = new BP_Messages_Thread( (int) $thread_id, 'ASC', $args );
 
-		if ( false === (bool) $thread_id ) {
+		if ( false === (bool) $thread_object::is_valid( $thread_id ) ) {
 			return '';
 		}
 
-		return new BP_Messages_Thread( (int) $thread_id, 'ASC', $args );
+		return $thread_object;
 	}
 
 	/**
@@ -1104,6 +1075,7 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 	 * @return array Endpoint arguments.
 	 */
 	public function get_endpoint_args_for_item_schema( $method = WP_REST_Server::CREATABLE ) {
+		$key                       = 'get_item';
 		$args                      = parent::get_endpoint_args_for_item_schema( $method );
 		$args['id']['description'] = __( 'ID of the Messages Thread.', 'buddypress' );
 
@@ -1144,6 +1116,8 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 			unset( $args['subject']['properties'], $args['message']['properties'] );
 
 		} else {
+			unset( $args['sender_id'], $args['subject'], $args['message'], $args['recipients'] );
+
 			if ( WP_REST_Server::EDITABLE === $method ) {
 				$key = 'update_item';
 
@@ -1184,69 +1158,6 @@ class BP_REST_Messages_Endpoint extends WP_REST_Controller {
 					'sanitize_callback' => 'absint',
 					'validate_callback' => 'rest_validate_request_arg',
 					'default'           => bp_loggedin_user_id(),
-				);
-
-				unset( $args['sender_id'], $args['subject'], $args['message'], $args['recipients'] );
-			}
-
-			if ( WP_REST_Server::READABLE === $method ) {
-				unset( $args['sender_id'], $args['subject'], $args['message'], $args['recipients'] );
-
-				$key = 'get_item';
-
-				$args['user_id'] = array(
-					'description'       => __( 'The user ID to get the thread for.', 'buddypress' ),
-					'required'          => false,
-					'type'              => 'integer',
-					'sanitize_callback' => 'absint',
-					'validate_callback' => 'rest_validate_request_arg',
-				);
-
-				$args['recipients_page'] = array(
-					'description'       => __( 'Current page of the recipients collection.', 'buddypress' ),
-					'type'              => 'integer',
-					'default'           => 1,
-					'sanitize_callback' => 'absint',
-					'validate_callback' => 'rest_validate_request_arg',
-					'minimum'           => 1,
-				);
-
-				$args['recipients_per_page'] = array(
-					'description'       => __( 'Maximum number of recipients to be returned in result set.', 'buddypress' ),
-					'type'              => 'integer',
-					'default'           => 10,
-					'minimum'           => 1,
-					'maximum'           => 100,
-					'sanitize_callback' => 'absint',
-					'validate_callback' => 'rest_validate_request_arg',
-				);
-
-				$args['messages_page'] = array(
-					'description'       => __( 'Current page of the messages collection.', 'buddypress' ),
-					'type'              => 'integer',
-					'default'           => 1,
-					'sanitize_callback' => 'absint',
-					'validate_callback' => 'rest_validate_request_arg',
-					'minimum'           => 1,
-				);
-
-				$args['messages_per_page'] = array(
-					'description'       => __( 'Maximum number of messages to be returned in result set.', 'buddypress' ),
-					'type'              => 'integer',
-					'default'           => 10,
-					'minimum'           => 1,
-					'maximum'           => 100,
-					'sanitize_callback' => 'absint',
-					'validate_callback' => 'rest_validate_request_arg',
-				);
-
-				$args['order'] = array(
-					'description'       => __( 'Order sort attribute ascending or descending.', 'buddypress' ),
-					'default'           => 'asc',
-					'type'              => 'string',
-					'enum'              => array( 'asc', 'desc' ),
-					'sanitize_callback' => 'sanitize_key',
-					'validate_callback' => 'rest_validate_request_arg',
 				);
 			}
 		}

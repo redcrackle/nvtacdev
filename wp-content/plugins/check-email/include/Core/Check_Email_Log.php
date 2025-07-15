@@ -1,11 +1,14 @@
 <?php namespace CheckEmail\Core;
-defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
+
+use CheckEmail\Core\DB\Check_Email_Table_Manager;
+use CheckEmail\CheckEmailLogAutoloader;
+
 /**
  * The main plugin class.
  */
 class Check_Email_Log {
 
-	const VERSION = '1.0.12';
+	const VERSION = '1.0.0';
 
 	private $loaded = false;
 

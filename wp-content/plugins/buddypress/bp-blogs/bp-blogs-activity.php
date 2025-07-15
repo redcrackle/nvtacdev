@@ -14,6 +14,8 @@ defined( 'ABSPATH' ) || exit;
  * Register activity actions for the blogs component.
  *
  * @since 1.0.0
+ *
+ * @return bool|null Returns false if activity component is not active.
  */
 function bp_blogs_register_activity_actions() {
 	if ( is_multisite() ) {
@@ -113,63 +115,17 @@ function bp_blogs_register_post_tracking_args( $params = null, $post_type = 0 ) 
 add_filter( 'bp_activity_get_post_type_tracking_args', 'bp_blogs_register_post_tracking_args', 10, 2 );
 
 /**
- * Returns the blog URL and name which relates to a post or comment activity.
- *
- * @since 11.0.0
- *
- * @param BP_Activity_Activity $activity The activity object.
- * @return array The blog URL and name which relates to a post or comment activity.
- */
-function bp_blogs_activity_get_site_link_meta( $activity = null ) {
-	$attributes = array(
-		'blog_url'  => '',
-		'blog_name' => '',
-	);
-
-	if ( ! isset( $activity->item_id, $activity->component ) || ! $activity->item_id || 'blogs' !== $activity->component ) {
-		return $attributes;
-	}
-
-	if ( isset( $activity->blog_url ) ) {
-		$attributes['blog_url'] = $activity->blog_url;
-	} else {
-		$blog_url = bp_blogs_get_blogmeta( $activity->item_id, 'url' );
-
-		if ( ! $blog_url ) {
-			$blog_url = get_home_url( $activity->item_id );
-			bp_blogs_update_blogmeta( $activity->item_id, 'url', $blog_url );
-		} else {
-			$attributes['blog_url'] = $blog_url;
-		}
-	}
-
-	if ( isset( $activity->blog_name ) ) {
-		$attributes['blog_name'] = $activity->blog_name;
-	} else {
-		$blog_name = bp_blogs_get_blogmeta( $activity->item_id, 'name' );
-
-		if ( ! $blog_name ) {
-			$blog_name = get_blog_option( $activity->item_id, 'blogname' );
-			bp_blogs_update_blogmeta( $activity->item_id, 'name', $blog_name );
-		} else {
-			$attributes['blog_name'] = $blog_name;
-		}
-	}
-
-	return $attributes;
-}
-
-/**
  * Format 'new_blog' activity actions.
  *
  * @since 2.0.0
  *
  * @param string $action   Static activity action.
  * @param object $activity Activity data object.
- * @return string Constructed activity action.
+ * @return string
  */
 function bp_blogs_format_activity_action_new_blog( $action, $activity ) {
-	list( $blog_url, $blog_name ) = array_values( bp_blogs_activity_get_site_link_meta( $activity ) );
+	$blog_url  = bp_blogs_get_blogmeta( $activity->item_id, 'url' );
+	$blog_name = bp_blogs_get_blogmeta( $activity->item_id, 'name' );
 
 	$action = sprintf(
 		/* translators: 1: the activity user link. 2: the blog link. */
@@ -186,8 +142,7 @@ function bp_blogs_format_activity_action_new_blog( $action, $activity ) {
 		}
 
 		if ( isset( $recorded_blog ) ) {
-			$blog_description = bp_blogs_get_blogmeta( $activity->item_id, 'description' );
-			$action           = apply_filters_deprecated( 'bp_blogs_activity_created_blog_action', array( $action, $recorded_blog, $blog_name, $blog_description ), '2.0.0', 'bp_blogs_format_activity_action_new_blog' );
+			$action = apply_filters( 'bp_blogs_activity_created_blog_action', $action, $recorded_blog, $blog_name, bp_blogs_get_blogmeta( $activity->item_id, 'description' ) );
 		}
 	}
 
@@ -212,23 +167,93 @@ function bp_blogs_format_activity_action_new_blog( $action, $activity ) {
  * @return string Constructed activity action.
  */
 function bp_blogs_format_activity_action_new_blog_post( $action, $activity ) {
+	$blog_url  = bp_blogs_get_blogmeta( $activity->item_id, 'url' );
+	$blog_name = bp_blogs_get_blogmeta( $activity->item_id, 'name' );
+
+	if ( empty( $blog_url ) || empty( $blog_name ) ) {
+		$blog_url  = get_home_url( $activity->item_id );
+		$blog_name = get_blog_option( $activity->item_id, 'blogname' );
+
+		bp_blogs_update_blogmeta( $activity->item_id, 'url', $blog_url );
+		bp_blogs_update_blogmeta( $activity->item_id, 'name', $blog_name );
+	}
+
+	/**
+	 * When the post is published we are faking an activity object
+	 * to which we add 2 properties :
+	 * - the post url
+	 * - the post title
+	 * This is done to build the 'post link' part of the activity
+	 * action string.
+	 * NB: in this case the activity has not yet been created.
+	 */
+	if ( isset( $activity->post_url ) ) {
+		$post_url = $activity->post_url;
+
+	/**
+	 * The post_url property is not set, we need to build the url
+	 * thanks to the post id which is also saved as the secondary
+	 * item id property of the activity object.
+	 */
+	} else {
+		$post_url = add_query_arg( 'p', $activity->secondary_item_id, trailingslashit( $blog_url ) );
+	}
+
+	// Should be the case when the post has just been published.
+	if ( isset( $activity->post_title ) ) {
+		$post_title = $activity->post_title;
+
+	// If activity already exists try to get the post title from activity meta.
+	} else if ( ! empty( $activity->id ) ) {
+		$post_title = bp_activity_get_meta( $activity->id, 'post_title' );
+	}
+
+	/**
+	 * In case the post was published without a title
+	 * or the activity meta was not found.
+	 */
+	if ( empty( $post_title ) ) {
+		// Defaults to no title.
+		$post_title = __( '(no title)', 'buddypress' );
+
+		switch_to_blog( $activity->item_id );
+
+		$post = get_post( $activity->secondary_item_id );
+		if ( is_a( $post, 'WP_Post' ) ) {
+			// Does the post have a title ?
+			if ( ! empty( $post->post_title ) ) {
+				$post_title = $post->post_title;
+			}
+
+			// Make sure the activity exists before saving the post title in activity meta.
+			if ( ! empty( $activity->id ) ) {
+				bp_activity_update_meta( $activity->id, 'post_title', $post_title );
+			}
+		}
+
+		restore_current_blog();
+	}
+
+	// Build the 'post link' part of the activity action string.
+	$post_link = '<a href="' . esc_url( $post_url ) . '">' . esc_html( $post_title ) . '</a>';
+
 	$user_link = bp_core_get_userlink( $activity->user_id );
 
 	// Build the complete activity action string.
 	if ( is_multisite() ) {
-		list( $blog_url, $blog_name ) = array_values( bp_blogs_activity_get_site_link_meta( $activity ) );
-
 		$action = sprintf(
-			/* translators: 1: the activity user link. 2: the blog link. */
-			esc_html_x( '%1$s wrote a new post on the site %2$s', 'Multisite `new_blog_post` activity action, since 11.0 only accepts two arguments', 'buddypress' ),
+			/* translators: 1: the activity user link. 2: the post link. 3: the blog link. */
+			esc_html_x( '%1$s wrote a new post, %2$s, on the site %3$s', '`new_blog_post` activity action', 'buddypress' ),
 			$user_link,
+			$post_link,
 			'<a href="' . esc_url( $blog_url ) . '">' . esc_html( $blog_name ) . '</a>'
 		);
 	} else {
 		$action = sprintf(
-			/* translators: 1: the activity user link. */
-			esc_html_x( '%s wrote a new post', '`new_blog_post` activity action, since 11.0 only accepts one argument', 'buddypress' ),
-			$user_link
+			/* translators: 1: the activity user link. 2: the post link. */
+			esc_html_x( '%1$s wrote a new post, %2$s', '`new_blog_post` activity action', 'buddypress' ),
+			$user_link,
+			$post_link
 		);
 	}
 
@@ -238,9 +263,8 @@ function bp_blogs_format_activity_action_new_blog_post( $action, $activity ) {
 		$post = get_post( $activity->secondary_item_id );
 		restore_current_blog();
 
-		if ( ! empty( $post ) && $post instanceof WP_Post ) {
-			$post_url = add_query_arg( 'p', $post->ID, trailingslashit( get_home_url( $activity->item_id ) ) );
-			$action   = apply_filters_deprecated( 'bp_blogs_activity_new_post_action', array( $action, $post, $post_url ), '2.0.0', 'bp_blogs_format_activity_action_new_blog_post' );
+		if ( ! empty( $post ) && ! is_wp_error( $post ) ) {
+			$action = apply_filters( 'bp_blogs_activity_new_post_action', $action, $post, $post_url );
 		}
 	}
 
@@ -276,8 +300,34 @@ function bp_blogs_format_activity_action_new_blog_comment( $action, $activity ) 
 	 * action string.
 	 * NB: in this case the activity has not yet been created.
 	 */
-	list( $blog_url, $blog_name ) = array_values( bp_blogs_activity_get_site_link_meta( $activity ) );
-	$post_url                     = false;
+
+	$blog_url = false;
+
+	// Try to get the blog url from the activity object.
+	if ( isset( $activity->blog_url ) ) {
+		$blog_url = $activity->blog_url;
+	} else {
+		$blog_url = bp_blogs_get_blogmeta( $activity->item_id, 'url' );
+	}
+
+	$blog_name = false;
+
+	// Try to get the blog name from the activity object.
+	if ( isset( $activity->blog_name ) ) {
+		$blog_name = $activity->blog_name;
+	} else {
+		$blog_name = bp_blogs_get_blogmeta( $activity->item_id, 'name' );
+	}
+
+	if ( empty( $blog_url ) || empty( $blog_name ) ) {
+		$blog_url  = get_home_url( $activity->item_id );
+		$blog_name = get_blog_option( $activity->item_id, 'blogname' );
+
+		bp_blogs_update_blogmeta( $activity->item_id, 'url', $blog_url );
+		bp_blogs_update_blogmeta( $activity->item_id, 'name', $blog_name );
+	}
+
+	$post_url = false;
 
 	// Try to get the post url from the activity object.
 	if ( isset( $activity->post_url ) ) {
@@ -350,8 +400,8 @@ function bp_blogs_format_activity_action_new_blog_comment( $action, $activity ) 
 		$comment = get_comment( $activity->secondary_item_id );
 		restore_current_blog();
 
-		if ( ! empty( $comment ) && $comment instanceof WP_Comment ) {
-			$action = apply_filters_deprecated( 'bp_blogs_activity_new_comment_action', array( $action, $comment, $post_url . '#' . $activity->secondary_item_id ), '2.0.0', 'bp_blogs_format_activity_action_new_blog_comment' );
+		if ( ! empty( $comment ) && ! is_wp_error( $comment ) ) {
+			$action = apply_filters( 'bp_blogs_activity_new_comment_action', $action, $comment, $post_url . '#' . $activity->secondary_item_id );
 		}
 	}
 
@@ -451,9 +501,9 @@ function bp_blogs_record_activity( $args = '' ) {
 		 *
 		 * @since 1.2.0
 		 *
-		 * @param string $summary Generated summary from content for the activity stream.
-		 * @param string $content Content for the activity stream.
-		 * @param array  $r       Array of arguments used for the activity stream item.
+		 * @param string $value Generated summary from content for the activity stream.
+		 * @param string $value Content for the activity stream.
+		 * @param array  $r     Array of arguments used for the activity stream item.
 		 */
 		$r['content'] = apply_filters( 'bp_blogs_record_activity_content', bp_activity_create_summary( $r['content'], $r ), $r['content'], $r );
 	}
@@ -483,7 +533,7 @@ function bp_blogs_record_activity( $args = '' ) {
  *     bp_activity_add().
  *     @type string $component Default: 'blogs'.
  * }
- * @return bool
+ * @return bool True on success, false on failure.
  */
 function bp_blogs_delete_activity( $args = '' ) {
 	$r = bp_parse_args(
@@ -497,7 +547,7 @@ function bp_blogs_delete_activity( $args = '' ) {
 		)
 	);
 
-	return bp_activity_delete_by_item_id( $r );
+	bp_activity_delete_by_item_id( $r );
 }
 
 /**
@@ -612,8 +662,8 @@ function bp_blogs_record_activity_on_site_creation( $recorded_blog, $is_private,
 			 *
 			 * @since 1.1.0
 			 *
-			 * @param string $link    Blog primary link.
-			 * @param int    $blog_id Blog ID.
+			 * @param string $value Blog primary link.
+			 * @param int    $value Blog ID.
 			 */
 			'primary_link' => apply_filters( 'bp_blogs_activity_created_blog_primary_link', bp_blogs_get_blogmeta( $recorded_blog->blog_id, 'url' ), $recorded_blog->blog_id ),
 			'type'         => 'new_blog',
@@ -671,12 +721,11 @@ add_action( 'bp_blogs_remove_data_for_blog', 'bp_blogs_delete_activity_for_site'
  *
  * @since 1.0.0
  *
- * @global wpdb $wpdb WordPress database object.
- *
  * @param int $post_id ID of the post to be removed.
  * @param int $blog_id Optional. Defaults to current blog ID.
  * @param int $user_id Optional. Defaults to the logged-in user ID. This param
  *                     is currently unused in the function (but is passed to hooks).
+ * @return bool
  */
 function bp_blogs_remove_post( $post_id, $blog_id = 0, $user_id = 0 ) {
 	global $wpdb;
@@ -786,7 +835,7 @@ function bp_blogs_sync_add_from_activity_comment( $comment_id, $params, $parent_
 		'comment_post_ID'      => $parent_activity->secondary_item_id,
 		'comment_author'       => bp_core_get_user_displayname( $params['user_id'] ),
 		'comment_author_email' => $user->user_email,
-		'comment_author_url'   => bp_members_get_user_url( $params['user_id'] ),
+		'comment_author_url'   => bp_core_get_user_domain( $params['user_id'], $user->user_nicename, $user->user_login ),
 		'comment_content'      => $params['content'],
 		'comment_type'         => '', // Could be interesting to add 'BuddyPress' here...
 		'comment_parent'       => (int) $comment_parent,
@@ -956,6 +1005,7 @@ function bp_blogs_sync_activity_edit_to_post_comment( BP_Activity_Activity $acti
 
 	// Get the comment status.
 	$post_comment_status = wp_get_comment_status( $post_comment_id );
+	$old_comment_status  = $post_comment_status;
 
 	// No need to edit the activity, as it's the activity who's updating the comment.
 	remove_action( 'transition_comment_status', 'bp_activity_transition_post_type_comment_status', 10 );
@@ -1024,8 +1074,6 @@ add_action( 'trashed_post_comments', 'bp_blogs_remove_activity_meta_for_trashed_
  * @since 2.1.0
  * @since 2.5.0 Used for any synced Post type comments, in wp-admin or front-end contexts.
  *
- * @global wpdb $wpdb WordPress database object.
- *
  * @param array $args Arguments passed from bp_parse_args() in bp_has_activities().
  * @return array $args
  */
@@ -1033,8 +1081,8 @@ function bp_blogs_new_blog_comment_query_backpat( $args ) {
 	global $wpdb;
 	$bp = buddypress();
 
-	// If activity comments are disabled for blog posts or if the action is not a string, stop now!
-	if ( bp_disable_blogforum_comments() || ! is_string( $args['action'] ) ) {
+	// If activity comments are disabled for blog posts, stop now!
+	if ( bp_disable_blogforum_comments() ) {
 		return $args;
 	}
 
@@ -1204,8 +1252,6 @@ add_action( 'bp_before_activity_comment', 'bp_blogs_setup_comment_loop_globals_o
  *
  * @since 2.0.0
  *
- * @global BP_Activity_Template $activities_template The Activity template object.
- *
  * @param bool $retval Is activity commenting enabled for this activity entry.
  * @return bool
  */
@@ -1337,8 +1383,6 @@ add_filter( 'bp_activity_can_comment_reply', 'bp_blogs_can_comment_reply', 10, 2
  *
  * @since 2.0.0
  *
- * @global BP_Activity_Template $activities_template The Activity template object.
- *
  * @param string $retval The activity comment permalink.
  * @return string
  */
@@ -1424,6 +1468,7 @@ function bp_blogs_activity_comment_single_action( $retval, $activity ) {
 	$blog_comment_id = bp_activity_get_meta( $activity->id, "bp_blogs_{$post_type}_comment_id" );
 
 	if ( ! empty( $blog_comment_id ) ) {
+		$bp = buddypress();
 
 		// Check if a comment action id is set for the parent activity.
 		$comment_action_id = bp_activity_post_type_get_tracking_arg( $parent_activity->type, 'comment_action_id' );

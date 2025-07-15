@@ -6,6 +6,10 @@ div.pp-capability-menus-wrapper-promo select.ppc-nav-menu-role {
   filter: blur(2px);
 }
 
+#pp-capability-menu-wrapper {
+  border: inherit;
+}
+
 #pp-capability-menu-wrapper div.pp-capability-menus-promo {
   height: 600px;
   overflow: hidden;
@@ -91,8 +95,7 @@ div.pp-capability-menus-wrapper-promo select.ppc-nav-menu-role {
   height: 370px;
 }
 
-tr.pp-promo-blur,
-.div-pp-promo-blur {
+tr.pp-promo-blur {
 filter: blur(1.5px);
 }
 
@@ -116,11 +119,6 @@ filter: blur(1.5px);
   box-sizing: border-box;
   box-shadow: 0 0 25px #ccc;
   z-index: 999;
-}
-
-.frontendelements .pp-promo-overlay-row .pp-promo-upgrade-notice {
-  left: calc(58% - 225px);
-  margin-top: -70px;
 }
 
 .pp-promo-overlay-row .pp-promo-upgrade-notice p {

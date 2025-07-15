@@ -3,7 +3,7 @@
  * Messages functions
  *
  * @since 3.0.0
- * @version 12.0.0
+ * @version 10.0.0
  */
 
 // Exit if accessed directly.
@@ -90,75 +90,33 @@ function bp_nouveau_messages_localize_scripts( $params = array() ) {
 		return $params;
 	}
 
-	$bp   = buddypress();
-	$slug = bp_nouveau_get_component_slug( 'messages' );
-
-	// Use the primary nav to get potential custom slugs.
-	$primary_nav = $bp->members->nav->get( $slug );
-	if ( isset( $primary_nav->link ) && $primary_nav->link ) {
-		$root_url = $primary_nav->link;
-
-		// Make sure to use the displayed user domain.
-		if ( bp_loggedin_user_url() ) {
-			$root_url = str_replace( bp_loggedin_user_url(), bp_displayed_user_url(), $root_url );
-		}
-	} else {
-		$root_url = $primary_nav->link;
-	}
-
-	// Build default routes list.
-	$routes = array(
-		'inbox'   => 'inbox',
-		'sentbox' => 'sentbox',
-		'compose' => 'compose',
-	);
-
-	if ( bp_is_active( 'messages', 'star' ) ) {
-		$routes['starred'] = 'starred';
-	}
-
-	// Use the secondary nav to get potential custom slugs.
-	$secondary_nav = $bp->members->nav->get_secondary( array( 'parent_slug' => $slug ), false );
-
-	// Resets the routes list using link slugs.
-	if ( $secondary_nav ) {
-		foreach ( $secondary_nav as $subnav_item ) {
-			$routes[ $subnav_item->slug ] = trim( str_replace( $root_url, '', $subnav_item->link ), '/' );
-
-			if ( ! $routes[ $subnav_item->slug ] ) {
-				$routes[ $subnav_item->slug ] = $subnav_item->slug;
-			}
-		}
-	}
-
 	$params['messages'] = array(
-		'errors'            => array(
+		'errors' => array(
 			'send_to'         => __( 'Please add at least one recipient.', 'buddypress' ),
 			'subject'         => __( 'Please add a subject to your message.', 'buddypress' ),
 			'message_content' => __( 'Please add some content to your message.', 'buddypress' ),
 		),
-		'nonces'            => array(
+		'nonces' => array(
 			'send' => wp_create_nonce( 'messages_send_message' ),
 		),
-		'loading'           => __( 'Loading messages. Please wait.', 'buddypress' ),
-		'doingAction'       => array(
+		'loading'       => __( 'Loading messages. Please wait.', 'buddypress' ),
+		'doingAction'   => array(
 			'read'   => __( 'Marking messages as read. Please wait.', 'buddypress' ),
 			'unread' => __( 'Marking messages as unread. Please wait.', 'buddypress' ),
 			'delete' => __( 'Deleting messages. Please wait.', 'buddypress' ),
 			'star'   => __( 'Starring messages. Please wait.', 'buddypress' ),
 			'unstar' => __( 'Unstarring messages. Please wait.', 'buddypress' ),
 		),
-		'bulk_actions'      => bp_nouveau_messages_get_bulk_actions(),
-		'howto'             => __( 'Click on the message title to preview it in the Active conversation box below.', 'buddypress' ),
-		'howtoBulk'         => __( 'Use the select box to define your bulk action and click on the &#10003; button to apply.', 'buddypress' ),
-		'toOthers'          => array(
+		'bulk_actions'  => bp_nouveau_messages_get_bulk_actions(),
+		'howto'         => __( 'Click on the message title to preview it in the Active conversation box below.', 'buddypress' ),
+		'howtoBulk'     => __( 'Use the select box to define your bulk action and click on the &#10003; button to apply.', 'buddypress' ),
+		'toOthers'      => array(
 			'one'  => __( '(and 1 other)', 'buddypress' ),
 
 			/* translators: %s: number of message recipients */
 			'more' => __( '(and %d others)', 'buddypress' ),
 		),
-		'rootUrl'           => wp_parse_url( $root_url, PHP_URL_PATH ),
-		'supportedRoutes'   => $routes,
+		'rootUrl' => parse_url( trailingslashit( bp_displayed_user_domain() . bp_nouveau_get_component_slug( 'messages' ) ), PHP_URL_PATH ),
 	);
 
 	// Star private messages.
@@ -209,29 +167,22 @@ function bp_nouveau_messages_adjust_nav() {
 }
 
 /**
- * Replaces the Notices Compose URL.
- *
  * @since 3.0.0
- *
- * @param array $admin_nav The WP Admin Nav.
  */
 function bp_nouveau_messages_adjust_admin_nav( $admin_nav ) {
 	if ( empty( $admin_nav ) ) {
 		return $admin_nav;
 	}
 
+	$user_messages_link = trailingslashit( bp_loggedin_user_domain() . bp_nouveau_get_component_slug( 'messages' ) );
+
 	foreach ( $admin_nav as $nav_iterator => $nav ) {
 		$nav_id = str_replace( 'my-account-messages-', '', $nav['id'] );
 
 		if ( 'notices' === $nav_id ) {
-			$admin_nav[ $nav_iterator ]['href'] = esc_url(
-				add_query_arg(
-					array(
-						'page' => 'bp-notices',
-					),
-					bp_get_admin_url( 'users.php' )
-				)
-			);
+			$admin_nav[ $nav_iterator ]['href'] = esc_url( add_query_arg( array(
+				'page' => 'bp-notices'
+			), bp_get_admin_url( 'users.php' ) ) );
 		}
 	}
 
@@ -277,7 +228,7 @@ function bp_nouveau_add_notice_notification_for_user( $notifications, $user_id )
 		'is_new'            => 1,
 		'total_count'       => 1,
 		'content'           => __( 'New sitewide notice', 'buddypress' ),
-		'href'              => bp_loggedin_user_url(),
+		'href'              => bp_loggedin_user_domain(),
 	);
 
 	if ( ! is_array( $notifications ) ) {
@@ -303,10 +254,9 @@ function bp_nouveau_format_notice_notification_for_user( $array ) {
 
 /**
  * @since 3.0.0
- * @deprecated 12.0.0
  */
 function bp_nouveau_unregister_notices_widget() {
-	_deprecated_function( __FUNCTION__, '12.0.0' );
+	unregister_widget( 'BP_Messages_Sitewide_Notices_Widget' );
 }
 
 /**
@@ -512,17 +462,4 @@ function bp_nouveau_messages_catch_hook_content( $hooks = array() ) {
 	ob_end_clean();
 
 	return $content;
-}
-
-/**
- * Register Messages Ajax actions.
- *
- * @since 12.0.0
- */
-function bp_nouveau_register_messages_ajax_actions() {
-	$ajax_actions = array( 'messages_send_message', 'messages_send_reply', 'messages_get_user_message_threads', 'messages_thread_read', 'messages_get_thread_messages', 'messages_delete', 'messages_exit', 'messages_unstar', 'messages_star', 'messages_unread', 'messages_read', 'messages_dismiss_sitewide_notice' );
-
-	foreach ( $ajax_actions as $ajax_action ) {
-		bp_ajax_register_action( $ajax_action );
-	}
 }

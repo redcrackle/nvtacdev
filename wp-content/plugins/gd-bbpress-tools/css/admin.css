@@ -6,7 +6,7 @@
   margin-top: 15px;
   padding-top: 15px;
   font-size: 11px;
-  border-top: 1px solid #CCC;
+  border-top: 1px solid #CCCCCC;
 }
 
 .d4p-settings,
@@ -39,10 +39,10 @@
 }
 .d4p-bbpress-toolbox > fieldset.the-top {
   background-color: #224760;
-  color: #FFF;
+  color: #fff;
 }
 .d4p-bbpress-toolbox > fieldset.the-top a {
-  color: #FFF;
+  color: #fff;
 }
 .d4p-bbpress-toolbox > fieldset.the-top h3 {
   margin: 5px 0;
@@ -52,7 +52,7 @@
 .d4p-bbpress-toolbox > fieldset.the-top h4 {
   margin: 5px 0;
   padding: 5px 0 0;
-  border-top: 1px solid #EEE;
+  border-top: 1px solid #eee;
 }
 
 .d4p-bbpress-toolbox > fieldset > *:first-child,
@@ -99,7 +99,7 @@ div.d4p-updated {
 }
 
 .d4p-tab-toolbox {
-  color: #C00 !important;
+  color: #cc0000 !important;
   font-weight: bold !important;
 }
 
@@ -129,10 +129,12 @@ div.d4p-updated {
     width: 100%;
     float: none;
   }
+
   .d4p-settings-second, .d4p-information-second {
     width: 100%;
     float: none;
   }
+
   .d4p-tabber-ctrl .tab-title {
     display: none;
   }
